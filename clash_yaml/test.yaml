@@ -1,0 +1,1585 @@
+allow-lan: true
+bind-address: "*"
+mode: rule
+log-level: info
+external-controller: "127.0.0.1:9090"
+dns:
+  enable: true
+  ipv6: false
+  default-nameserver: [223.5.5.5, 119.29.29.29, 114.114.114.114]
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  use-hosts: true
+  respect-rules: true
+  proxy-server-nameserver: [223.5.5.5, 119.29.29.29, 114.114.114.114]
+  nameserver: [223.5.5.5, 119.29.29.29, 114.114.114.114]
+  fallback: [1.1.1.1, 8.8.8.8]
+  fallback-filter:
+    {
+      geoip: true,
+      geoip-code: CN,
+      geosite: [gfw],
+      ipcidr: [240.0.0.0/4],
+      domain: [+.google.com, +.facebook.com, +.youtube.com],
+    }
+proxies:
+  - name: 新加坡01aws
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: 1sg001.476579.xyz
+    skip-cert-verify: false
+    sni: 1sg001.476579.xyz
+    type: hysteria2
+    udp: true
+  - name: 新加坡02
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: hkmax02.352343.cc
+    skip-cert-verify: false
+    sni: hkmax02.352343.cc
+    type: hysteria2
+    udp: true
+  - client-fingerprint: chrome
+    flow: xtls-rprx-vision
+    name: vless台湾01
+    port: 8443
+    reality-opts:
+      public-key: 2a0ONLRiBeHJdr9qCruq5tPVf8_3c4fmZsg7YQorFSE
+      short-id: 04d59340
+    server: tw1.344233.cc
+    servername: www.python.org
+    skip-cert-verify: false
+    tls: true
+    type: vless
+    udp: true
+    uuid: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+  - client-fingerprint: chrome
+    flow: xtls-rprx-vision
+    name: vless台湾02
+    port: 8443
+    reality-opts:
+      public-key: 2a0ONLRiBeHJdr9qCruq5tPVf8_3c4fmZsg7YQorFSE
+      short-id: 04d59340
+    server: tw06.352343.cc
+    servername: www.python.org
+    skip-cert-verify: false
+    tls: true
+    type: vless
+    udp: true
+    uuid: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+  - client-fingerprint: chrome
+    flow: xtls-rprx-vision
+    name: vless台湾03
+    port: 8443
+    reality-opts:
+      public-key: 2a0ONLRiBeHJdr9qCruq5tPVf8_3c4fmZsg7YQorFSE
+      short-id: 04d59340
+    server: 2gzdx21.453521.xyz
+    servername: www.python.org
+    skip-cert-verify: false
+    tls: true
+    type: vless
+    udp: true
+    uuid: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+  - client-fingerprint: chrome
+    flow: xtls-rprx-vision
+    name: vless台湾04
+    port: 8443
+    reality-opts:
+      public-key: 2a0ONLRiBeHJdr9qCruq5tPVf8_3c4fmZsg7YQorFSE
+      short-id: 04d59340
+    server: tw11.352343.cc
+    servername: www.python.org
+    skip-cert-verify: false
+    tls: true
+    type: vless
+    udp: true
+    uuid: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+  - client-fingerprint: chrome
+    flow: xtls-rprx-vision
+    name: vless台湾05
+    port: 8443
+    reality-opts:
+      public-key: 2a0ONLRiBeHJdr9qCruq5tPVf8_3c4fmZsg7YQorFSE
+      short-id: 04d59340
+    server: tw7.344233.cc
+    servername: www.python.org
+    skip-cert-verify: false
+    tls: true
+    type: vless
+    udp: true
+    uuid: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+  - client-fingerprint: chrome
+    flow: xtls-rprx-vision
+    name: vless台湾06
+    port: 8443
+    reality-opts:
+      public-key: 2a0ONLRiBeHJdr9qCruq5tPVf8_3c4fmZsg7YQorFSE
+      short-id: 04d59340
+    server: tw07.352343.cc
+    servername: www.python.org
+    skip-cert-verify: false
+    tls: true
+    type: vless
+    udp: true
+    uuid: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+  - name: hy2台湾01
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: 5gzdx.233235.xyz
+    skip-cert-verify: false
+    sni: 5gzdx.233235.xyz
+    type: hysteria2
+    udp: true
+  - name: hy2台湾02
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: tw60.233235.xyz
+    skip-cert-verify: false
+    sni: tw60.233235.xyz
+    type: hysteria2
+    udp: true
+  - name: hy2台湾03
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: tw3.757866.xyz
+    skip-cert-verify: false
+    sni: tw3.757866.xyz
+    type: hysteria2
+    udp: true
+  - name: trojan台湾02
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 3663
+    server: tw5.453521.xyz
+    sni: tw5.453521.xyz
+    type: trojan
+    udp: true
+  - name: hy2台湾07
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: tw40.453521.xyz
+    skip-cert-verify: false
+    sni: tw40.453521.xyz
+    type: hysteria2
+    udp: true
+  - name: 新加坡03aws
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: sg03.344233.cc
+    skip-cert-verify: false
+    sni: sg03.344233.cc
+    type: hysteria2
+    udp: true
+  - name: 新加坡04aws
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: sg04.352343.cc
+    skip-cert-verify: false
+    sni: sg04.352343.cc
+    type: hysteria2
+    udp: true
+  - name: 新加坡06aws
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: sg06.453521.xyz
+    skip-cert-verify: false
+    sni: sg06.453521.xyz
+    type: hysteria2
+    udp: true
+  - name: 新加坡07aws
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: sg07.344233.cc
+    skip-cert-verify: false
+    sni: sg07.344233.cc
+    type: hysteria2
+    udp: true
+  - name: 新加坡09aws
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: sg09.453521.xyz
+    skip-cert-verify: false
+    sni: sg09.453521.xyz
+    type: hysteria2
+    udp: true
+  - name: 新加坡10aws
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: sg10.352343.cc
+    skip-cert-verify: false
+    sni: sg10.352343.cc
+    type: hysteria2
+    udp: true
+  - name: 新加坡11aws
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: sg11.352343.cc
+    skip-cert-verify: false
+    sni: sg11.352343.cc
+    type: hysteria2
+    udp: true
+  - name: 新加坡18aws
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: sg18.352343.cc
+    skip-cert-verify: false
+    sni: sg18.352343.cc
+    type: hysteria2
+    udp: true
+  - name: 香港01
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: hkmax01.376897.xyz
+    skip-cert-verify: false
+    sni: hkmax01.376897.xyz
+    type: hysteria2
+    udp: true
+  - name: 日本01
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8081
+    server: 1jp003.156786.xyz
+    skip-cert-verify: false
+    sni: 1jp003.156786.xyz
+    type: hysteria2
+    udp: true
+  - name: 日本02
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8081
+    server: hyfnjp01.156786.xyz
+    skip-cert-verify: false
+    sni: hyfnjp01.156786.xyz
+    type: hysteria2
+    udp: true
+  - name: 日本03L
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: jp03.344233.cc
+    skip-cert-verify: false
+    sni: jp03.344233.cc
+    type: hysteria2
+    udp: true
+  - name: 日本04L
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: hyfnjp03.352343.cc
+    skip-cert-verify: false
+    sni: hyfnjp03.352343.cc
+    type: hysteria2
+    udp: true
+  - name: 日本01L
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: hyfnjp04.344233.cc
+    skip-cert-verify: false
+    sni: hyfnjp04.344233.cc
+    type: hysteria2
+    udp: true
+  - name: 日本02L
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: hyfnjp07.156786.xyz
+    skip-cert-verify: false
+    sni: hyfnjp07.156786.xyz
+    type: hysteria2
+    udp: true
+  - name: 日本03aws
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: 1jp001.476579.xyz
+    skip-cert-verify: false
+    sni: 1jp001.476579.xyz
+    type: hysteria2
+    udp: true
+  - name: 日本05L
+    password: e4a359d8-2c60-4e1c-95c5-ac3a4c5bccc0
+    port: 8080
+    server: hyfnjp06.376897.xyz
+    skip-cert-verify: false
+    sni: hyfnjp06.376897.xyz
+    type: hysteria2
+    udp: true
+  - name: 🇭🇰 HK香港1（2倍率）
+    port: 10508
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇭🇰 HK香港2（1.5倍率）
+    port: 10508
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇭🇰 HK香港3
+    port: 43014
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇭🇰 HK香港4
+    port: 43014
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇭🇰 HK香港5（1.5倍率）
+    port: 18268
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇭🇰 HK香港6（2倍率）
+    port: 18268
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇭🇰 HK香港7（3倍率）
+    port: 29899
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇭🇰 HK香港8
+    port: 41166
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇭🇰 HK香港9
+    port: 41166
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - client-fingerprint: chrome
+    flow: ""
+    name: 🇭🇰 HK香港国际优化1
+    network: ws
+    port: 443
+    server: cfname.fkknet.cn
+    servername: worldhk1.fuckvps.top
+    skip-cert-verify: true
+    tls: true
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+    ws-opts:
+      headers:
+        Host: worldhk1.fuckvps.top
+      path: /indexx
+  - client-fingerprint: chrome
+    flow: ""
+    name: 🇭🇰 HK香港国际优化2
+    network: ws
+    port: 443
+    server: cfname.fkknet.cn
+    servername: worldhk2.fuckvps.top
+    skip-cert-verify: true
+    tls: true
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+    ws-opts:
+      headers:
+        Host: worldhk2.fuckvps.top
+      path: /indexx
+  - name: 🇯🇵 JP日本1（0.8倍率）
+    port: 35389
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇯🇵 JP日本2（0.8倍率）
+    port: 35389
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇯🇵 JP日本3
+    port: 32687
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇯🇵 JP日本4
+    port: 32687
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - client-fingerprint: chrome
+    flow: ""
+    name: 🇯🇵 JP日本国际优化1
+    network: ws
+    port: 443
+    server: cfname.fkknet.cn
+    servername: worldjp1.fuckvps.top
+    skip-cert-verify: true
+    tls: true
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+    ws-opts:
+      headers:
+        Host: worldjp1.fuckvps.top
+      path: /indexx
+  - client-fingerprint: chrome
+    flow: ""
+    name: 🇯🇵 JP日本国际优化2
+    network: ws
+    port: 443
+    server: cfname.fkknet.cn
+    servername: worldjp2.fuckvps.top
+    skip-cert-verify: true
+    tls: true
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+    ws-opts:
+      headers:
+        Host: worldjp2.fuckvps.top
+      path: /indexx
+  - name: 🇸🇬 SG新加坡1
+    port: 22259
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇸🇬 SG新加坡2
+    port: 22259
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇸🇬 SG新加坡3（0.8倍率）
+    port: 56492
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇸🇬 SG新加坡4（0.8倍率）
+    port: 56492
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇹🇼 TW台湾1（3倍率）
+    port: 14626
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇹🇼 TW台湾2（3倍率）
+    port: 14626
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇰🇷 KR韩国1
+    port: 38120
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇰🇷 KR韩国2
+    port: 38120
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇰🇷 KR韩国3
+    port: 14987
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇰🇷 KR韩国4
+    port: 14987
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇰🇷 KR韩国5
+    port: 15457
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇰🇷 KR韩国6
+    port: 15457
+    server: ccone.fkknet.cn
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - client-fingerprint: chrome
+    flow: xtls-rprx-vision
+    name: 🇰🇷 KR韩国首尔x1直连
+    port: 23258
+    reality-opts:
+      public-key: p-g7A0RMBXZOUey2V-HjWsI-5j-EpNITj_JVqx_9OnI
+      short-id: 545abc6e
+    server: seoul-1.faforex.eu.org
+    servername: akcdnoversea.inter.71edge.com
+    skip-cert-verify: false
+    tls: true
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - client-fingerprint: chrome
+    flow: xtls-rprx-vision
+    name: 🇰🇷 KR韩国首尔x2直连
+    port: 23258
+    reality-opts:
+      public-key: p-g7A0RMBXZOUey2V-HjWsI-5j-EpNITj_JVqx_9OnI
+      short-id: 545abc6e
+    server: chun-001.oci.ee
+    servername: akcdnoversea.inter.71edge.com
+    skip-cert-verify: false
+    tls: true
+    type: vless
+    udp: true
+    uuid: 71b5366c-e6cb-47e2-a965-6c5ba51bb7c3
+  - name: 🇭🇰 香港中转
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 12221
+    server: hxkad246454.nkrpjj.cn
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇭🇰 香港中转 - 东莞
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 12221
+    server: js-12f83a8c.kaiqsz.com
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇭🇰 香港中转 - 广州
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 12221
+    server: gz-43e866.kaiqsz.com
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇨🇳 台湾中转
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 42765
+    server: hxkad246454.nkrpjj.cn
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇨🇳 台湾中转 - 东莞
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 42765
+    server: js-12f83a8c.kaiqsz.com
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇨🇳 台湾中转 - 广州
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 42765
+    server: gz-43e866.kaiqsz.com
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇸🇬 新加坡中转
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 48291
+    server: hxkad246454.nkrpjj.cn
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇸🇬 新加坡中转 - 东莞
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 18489
+    server: js-12f83a8c.kaiqsz.com
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇸🇬 新加坡中转 - 广州
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 18489
+    server: gz-43e866.kaiqsz.com
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇯🇵 日本中转
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 28713
+    server: hxkad246454.nkrpjj.cn
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇯🇵 日本中转 - 广州
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 28713
+    server: gz-43e866.kaiqsz.com
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇯🇵 日本中转 - 东莞
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 28713
+    server: js-12f83a8c.kaiqsz.com
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - down: 10000
+    name: 🇭🇰 香港直连1 - 0.5倍率
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 20461
+    server: hxzlaws.80-25-lyy.com
+    skip-cert-verify: true
+    sni: www.bing.com
+    type: hysteria2
+    up: 10000
+  - down: 10000
+    name: 🇭🇰 香港直连2 - 0.5倍率
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 20461
+    server: hxzlaws.80-25-lyy.com
+    skip-cert-verify: true
+    sni: www.bing.com
+    type: hysteria2
+    up: 10000
+  - down: 10000
+    name: 🇨🇳 台湾直连1 - 0.5倍率
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 48597
+    server: hxzlaws.80-25-lyy.com
+    skip-cert-verify: true
+    sni: www.bing.com
+    type: hysteria2
+    up: 10000
+  - down: 10000
+    name: 🇨🇳 台湾直连2 - 0.5倍率
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 48597
+    server: hxzlaws.80-25-lyy.com
+    skip-cert-verify: true
+    sni: www.bing.com
+    type: hysteria2
+    up: 10000
+  - down: 10000
+    name: 🇸🇬 新加坡直连1 - 0.5倍率
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 31183
+    server: hxzlaws.80-25-lyy.com
+    skip-cert-verify: true
+    sni: www.bing.com
+    type: hysteria2
+    up: 10000
+  - down: 10000
+    name: 🇸🇬 新加坡直连2 - 0.5倍率
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 31183
+    server: hxzlaws.80-25-lyy.com
+    skip-cert-verify: true
+    sni: www.bing.com
+    type: hysteria2
+    up: 10000
+  - down: 10000
+    name: 🇯🇵 日本直连1 - 0.5倍率
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 17371
+    server: hxzlaws.80-25-lyy.com
+    skip-cert-verify: true
+    sni: www.bing.com
+    type: hysteria2
+    up: 10000
+  - down: 10000
+    name: 🇯🇵 日本直连2 - 0.5倍率
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 17371
+    server: hxzlaws.80-25-lyy.com
+    skip-cert-verify: true
+    sni: www.bing.com
+    type: hysteria2
+    up: 10000
+  - name: 🇭🇰香港 IPV6
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 12221
+    server: hxipv6.hongxingdl.vip
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇨🇳 台湾 IPV6
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 42765
+    server: hxipv6.hongxingdl.vip
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇸🇬 新加坡 IPV6
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 48291
+    server: hxipv6.hongxingdl.vip
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇯🇵 日本 IPV6
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 28713
+    server: hxipv6.hongxingdl.vip
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇰🇷 韩国
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 43457
+    server: lm.kaiqsz.com
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+  - name: 🇰🇷 韩国-首尔
+    network: tcp
+    password: 789e350d-be3d-46b7-973d-e0b0241ef64f
+    port: 51075
+    server: lm.kaiqsz.com
+    skip-cert-verify: true
+    sni: v1-dy.ixigua.com
+    type: trojan
+    udp: true
+proxy-groups:
+  - interval: 300
+    name: ⚡ 负载均衡
+    proxies:
+      - hy2台湾01
+      - hy2台湾02
+      - hy2台湾03
+      - hy2台湾07
+      - trojan台湾02
+      - vless台湾01
+      - vless台湾02
+      - vless台湾03
+      - vless台湾04
+      - vless台湾05
+      - vless台湾06
+      - 新加坡01aws
+      - 新加坡02
+      - 新加坡03aws
+      - 新加坡04aws
+      - 新加坡06aws
+      - 新加坡07aws
+      - 新加坡09aws
+      - 新加坡10aws
+      - 新加坡11aws
+      - 新加坡18aws
+      - 日本01
+      - 日本01L
+      - 日本02
+      - 日本02L
+      - 日本03L
+      - 日本03aws
+      - 日本04L
+      - 日本05L
+      - 香港01
+      - 🇨🇳 台湾 IPV6
+      - 🇨🇳 台湾中转
+      - 🇨🇳 台湾中转 - 东莞
+      - 🇨🇳 台湾中转 - 广州
+      - 🇨🇳 台湾直连1 - 0.5倍率
+      - 🇨🇳 台湾直连2 - 0.5倍率
+      - 🇭🇰 HK香港1（2倍率）
+      - 🇭🇰 HK香港2（1.5倍率）
+      - 🇭🇰 HK香港3
+      - 🇭🇰 HK香港4
+      - 🇭🇰 HK香港5（1.5倍率）
+      - 🇭🇰 HK香港6（2倍率）
+      - 🇭🇰 HK香港7（3倍率）
+      - 🇭🇰 HK香港8
+      - 🇭🇰 HK香港9
+      - 🇭🇰 HK香港国际优化1
+      - 🇭🇰 HK香港国际优化2
+      - 🇭🇰 香港中转
+      - 🇭🇰 香港中转 - 东莞
+      - 🇭🇰 香港中转 - 广州
+      - 🇭🇰 香港直连1 - 0.5倍率
+      - 🇭🇰 香港直连2 - 0.5倍率
+      - 🇭🇰香港 IPV6
+      - 🇯🇵 JP日本1（0.8倍率）
+      - 🇯🇵 JP日本2（0.8倍率）
+      - 🇯🇵 JP日本3
+      - 🇯🇵 JP日本4
+      - 🇯🇵 JP日本国际优化1
+      - 🇯🇵 JP日本国际优化2
+      - 🇯🇵 日本 IPV6
+      - 🇯🇵 日本中转
+      - 🇯🇵 日本中转 - 东莞
+      - 🇯🇵 日本中转 - 广州
+      - 🇯🇵 日本直连1 - 0.5倍率
+      - 🇯🇵 日本直连2 - 0.5倍率
+      - 🇰🇷 KR韩国1
+      - 🇰🇷 KR韩国2
+      - 🇰🇷 KR韩国3
+      - 🇰🇷 KR韩国4
+      - 🇰🇷 KR韩国5
+      - 🇰🇷 KR韩国6
+      - 🇰🇷 KR韩国首尔x1直连
+      - 🇰🇷 KR韩国首尔x2直连
+      - 🇰🇷 韩国
+      - 🇰🇷 韩国-首尔
+      - 🇸🇬 SG新加坡1
+      - 🇸🇬 SG新加坡2
+      - 🇸🇬 SG新加坡3（0.8倍率）
+      - 🇸🇬 SG新加坡4（0.8倍率）
+      - 🇸🇬 新加坡 IPV6
+      - 🇸🇬 新加坡中转
+      - 🇸🇬 新加坡中转 - 东莞
+      - 🇸🇬 新加坡中转 - 广州
+      - 🇸🇬 新加坡直连1 - 0.5倍率
+      - 🇸🇬 新加坡直连2 - 0.5倍率
+      - 🇹🇼 TW台湾1（3倍率）
+      - 🇹🇼 TW台湾2（3倍率）
+    strategy: round-robin
+    type: load-balance
+    url: http://www.gstatic.com/generate_204
+  - interval: 300
+    name: ⚡ 负载均衡H
+    proxies:
+      - 🇭🇰 HK香港1（2倍率）
+      - 🇭🇰 HK香港2（1.5倍率）
+      - 🇭🇰 HK香港3
+      - 🇭🇰 HK香港4
+      - 🇭🇰 HK香港5（1.5倍率）
+      - 🇭🇰 HK香港6（2倍率）
+      - 🇭🇰 HK香港7（3倍率）
+      - 🇭🇰 HK香港8
+      - 🇭🇰 HK香港9
+      - 🇭🇰 HK香港国际1
+      - 🇯🇵 JP流媒体专用1x0.8
+      - 🇯🇵 JP流媒体专用2x0.8
+      - 🇯🇵 JP流媒体专用3x0.8
+      - 🇯🇵 JP流媒体专用4x1
+      - 🇯🇵 JP流媒体专用5x1
+      - 🇯🇵 JP流媒体专用6x1
+      - 🇸🇬 SG流媒体专用4x1
+      - 🇸🇬 SG流媒体专用5x1
+      - 🇸🇬 SG流媒体专用6x1
+      - 🇸🇬 SG流媒体专用7x0.8
+      - 🇸🇬 SG流媒体专用8x0.8
+      - 🇸🇬 SG流媒体专用9x0.8
+      - 🇹🇼 TW流媒体专用1x3
+      - 🇹🇼 TW流媒体专用2x3
+      - 🇹🇼 TW流媒体专用3x3
+      - 🇰🇷 KR流媒体专用1x1
+      - 🇰🇷 KR流媒体专用2x1
+      - 🇰🇷 KR流媒体专用3x1
+      - 🇰🇷 KR流媒体专用4x1
+      - 🇰🇷 KR流媒体专用5x1
+      - 🇰🇷 KR流媒体专用6x1
+      - 🇰🇷 KR流媒体专用7x1
+      - 🇰🇷 KR流媒体专用8x1
+      - 🇰🇷 KR流媒体专用9x1
+      - 🇦🇺 AU流媒体专用1x1
+      - 🇦🇺 AU流媒体专用2x1
+      - 🇦🇺 AU流媒体专用3x1
+      - 🇧🇷 BR流媒体专用1x1
+      - 🇧🇷 BR流媒体专用2x1
+      - 🇧🇷 BR流媒体专用3x1
+      - 🇬🇧 UK流媒体专用1x1
+      - 🇬🇧 UK流媒体专用2x1
+      - 🇬🇧 UK流媒体专用3x1
+      - 🇺🇸 US流媒体专用1x1.5
+      - 🇺🇸 US流媒体专用2x1.5
+      - 🇺🇸 US流媒体专用3x1.5
+      - 🇺🇸 US流媒体专用4x1
+      - 🇺🇸 US流媒体专用5x1
+      - 🇺🇸 US流媒体专用6x1
+      - 🇷🇺 RU流媒体专用1x1
+      - 🇷🇺 RU流媒体专用2x1
+      - 🇷🇺 RU流媒体专用3x1
+      - 🇰🇷 KR韩国首尔x1直连
+      - 🇰🇷 KR韩国首尔x2直连
+      - 🇺🇸 US美国凤凰城x1直连
+      - 🇬🇧 UK英国伦敦x1直连
+      - 🇦🇺 AU澳大利亚悉尼x1直连
+      - 🇮🇳 IN印度孟买x1直连
+    strategy: consistent-hashing
+    type: load-balance
+    url: http://www.gstatic.com/generate_204
+  - name: 超实惠机场
+    proxies:
+      - ⚡ 负载均衡
+      - ⚡ 负载均衡
+      - 自动选择
+      - 自动解锁
+      - 故障转移
+      - 剩余流量：575.85 GB
+      - 套餐到期：长期有效
+      - 🇨🇳 使用前请点击更新订阅
+      - 🇨🇳 倍率是流量消耗快慢不是速度！！！
+      - 🇨🇳 流媒体专用节点解锁全球流媒体
+      - 🇨🇳 若全部节点不通请尝试ipv6入站
+      - 🇭🇰 HK香港1（2倍率）
+      - 🇭🇰 HK香港2（1.5倍率）
+      - 🇭🇰 HK香港3
+      - 🇭🇰 HK香港4
+      - 🇭🇰 HK香港5（1.5倍率）
+      - 🇭🇰 HK香港6（2倍率）
+      - 🇭🇰 HK香港7（3倍率）
+      - 🇭🇰 HK香港8
+    type: select
+  - interval: 86400
+    name: 自动选择
+    proxies:
+      - 🇭🇰 香港中转
+      - 🇭🇰 HK香港1（2倍率）
+      - 🇭🇰 HK香港2（1.5倍率）
+      - 🇭🇰 HK香港3
+      - 🇭🇰 HK香港4
+      - 🇭🇰 HK香港5（1.5倍率）
+      - 🇭🇰 HK香港6（2倍率）
+      - 🇭🇰 HK香港7（3倍率）
+      - 🇭🇰 HK香港8
+      - 🇭🇰 HK香港9
+      - 🇭🇰 HK香港国际1
+      - 🇯🇵 JP流媒体专用1x0.8
+      - 🇯🇵 JP流媒体专用2x0.8
+      - 🇯🇵 JP流媒体专用3x0.8
+      - 🇯🇵 JP流媒体专用4x1
+      - 🇯🇵 JP流媒体专用5x1
+      - 🇯🇵 JP流媒体专用6x1
+      - 🇸🇬 SG流媒体专用4x1
+      - 🇸🇬 SG流媒体专用5x1
+      - 🇸🇬 SG流媒体专用6x1
+      - 🇸🇬 SG流媒体专用7x0.8
+      - 🇸🇬 SG流媒体专用8x0.8
+      - 🇸🇬 SG流媒体专用9x0.8
+      - 🇹🇼 TW流媒体专用1x3
+      - 🇹🇼 TW流媒体专用2x3
+      - 🇹🇼 TW流媒体专用3x3
+      - 🇰🇷 KR流媒体专用1x1
+      - 🇰🇷 KR流媒体专用2x1
+      - 🇰🇷 KR流媒体专用3x1
+      - 🇰🇷 KR流媒体专用4x1
+      - 🇰🇷 KR流媒体专用5x1
+      - 🇰🇷 KR流媒体专用6x1
+      - 🇰🇷 KR流媒体专用7x1
+      - 🇰🇷 KR流媒体专用8x1
+      - 🇰🇷 KR流媒体专用9x1
+      - 🇦🇺 AU流媒体专用1x1
+      - 🇦🇺 AU流媒体专用2x1
+      - 🇦🇺 AU流媒体专用3x1
+      - 🇧🇷 BR流媒体专用1x1
+      - 🇧🇷 BR流媒体专用2x1
+      - 🇧🇷 BR流媒体专用3x1
+      - 🇬🇧 UK流媒体专用1x1
+      - 🇬🇧 UK流媒体专用2x1
+      - 🇬🇧 UK流媒体专用3x1
+      - 🇺🇸 US流媒体专用1x1.5
+      - 🇺🇸 US流媒体专用2x1.5
+      - 🇺🇸 US流媒体专用3x1.5
+      - 🇺🇸 US流媒体专用4x1
+      - 🇺🇸 US流媒体专用5x1
+      - 🇺🇸 US流媒体专用6x1
+      - 🇷🇺 RU流媒体专用1x1
+      - 🇷🇺 RU流媒体专用2x1
+      - 🇷🇺 RU流媒体专用3x1
+      - 🇰🇷 KR韩国首尔x1直连
+      - 🇰🇷 KR韩国首尔x2直连
+      - 🇺🇸 US美国凤凰城x1直连
+      - 🇬🇧 UK英国伦敦x1直连
+      - 🇦🇺 AU澳大利亚悉尼x1直连
+      - 🇮🇳 IN印度孟买x1直连
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+  - interval: 86400
+    name: 自动解锁
+    proxies:
+      - 🇨🇳 流媒体专用节点解锁全球流媒体
+      - 🇯🇵 JP流媒体专用1x0.8
+      - 🇯🇵 JP流媒体专用2x0.8
+      - 🇯🇵 JP流媒体专用3x0.8
+      - 🇯🇵 JP流媒体专用4x1
+      - 🇯🇵 JP流媒体专用5x1
+      - 🇯🇵 JP流媒体专用6x1
+      - 🇸🇬 SG流媒体专用4x1
+      - 🇸🇬 SG流媒体专用5x1
+      - 🇸🇬 SG流媒体专用6x1
+      - 🇸🇬 SG流媒体专用7x0.8
+      - 🇸🇬 SG流媒体专用8x0.8
+      - 🇸🇬 SG流媒体专用9x0.8
+      - 🇹🇼 TW流媒体专用1x3
+      - 🇹🇼 TW流媒体专用2x3
+      - 🇹🇼 TW流媒体专用3x3
+      - 🇰🇷 KR流媒体专用1x1
+      - 🇰🇷 KR流媒体专用2x1
+      - 🇰🇷 KR流媒体专用3x1
+      - 🇰🇷 KR流媒体专用4x1
+      - 🇰🇷 KR流媒体专用5x1
+      - 🇰🇷 KR流媒体专用6x1
+      - 🇰🇷 KR流媒体专用7x1
+      - 🇰🇷 KR流媒体专用8x1
+      - 🇰🇷 KR流媒体专用9x1
+      - 🇦🇺 AU流媒体专用1x1
+      - 🇦🇺 AU流媒体专用3x1
+      - 🇧🇷 BR流媒体专用1x1
+      - 🇧🇷 BR流媒体专用2x1
+      - 🇧🇷 BR流媒体专用3x1
+      - 🇬🇧 UK流媒体专用1x1
+      - 🇬🇧 UK流媒体专用2x1
+      - 🇬🇧 UK流媒体专用3x1
+      - 🇺🇸 US流媒体专用1x1.5
+      - 🇺🇸 US流媒体专用2x1.5
+      - 🇺🇸 US流媒体专用3x1.5
+      - 🇺🇸 US流媒体专用4x1
+      - 🇺🇸 US流媒体专用5x1
+      - 🇺🇸 US流媒体专用6x1
+      - 🇷🇺 RU流媒体专用1x1
+      - 🇷🇺 RU流媒体专用2x1
+      - 🇷🇺 RU流媒体专用3x1
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+
+rules:
+  - IP-CIDR,1.1.1.1/32,超实惠机场,no-resolve
+  - IP-CIDR,8.8.8.8/32,超实惠机场,no-resolve
+  - DOMAIN-SUFFIX,services.googleapis.cn,超实惠机场
+  - DOMAIN-SUFFIX,xn--ngstr-lra8j.com,超实惠机场
+  - DOMAIN,safebrowsing.urlsec.qq.com,DIRECT
+  - DOMAIN,safebrowsing.googleapis.com,DIRECT
+  - DOMAIN,developer.apple.com,超实惠机场
+  - DOMAIN-SUFFIX,digicert.com,超实惠机场
+  - DOMAIN,ocsp.apple.com,超实惠机场
+  - DOMAIN,ocsp.comodoca.com,超实惠机场
+  - DOMAIN,ocsp.usertrust.com,超实惠机场
+  - DOMAIN,ocsp.sectigo.com,超实惠机场
+  - DOMAIN,ocsp.verisign.net,超实惠机场
+  - DOMAIN-SUFFIX,apple-dns.net,超实惠机场
+  - DOMAIN,testflight.apple.com,超实惠机场
+  - DOMAIN,sandbox.itunes.apple.com,超实惠机场
+  - DOMAIN,itunes.apple.com,超实惠机场
+  - DOMAIN-SUFFIX,apps.apple.com,超实惠机场
+  - DOMAIN-SUFFIX,blobstore.apple.com,超实惠机场
+  - DOMAIN,cvws.icloud-content.com,超实惠机场
+  - DOMAIN-SUFFIX,mzstatic.com,DIRECT
+  - DOMAIN-SUFFIX,itunes.apple.com,DIRECT
+  - DOMAIN-SUFFIX,icloud.com,DIRECT
+  - DOMAIN-SUFFIX,icloud-content.com,DIRECT
+  - DOMAIN-SUFFIX,me.com,DIRECT
+  - DOMAIN-SUFFIX,aaplimg.com,DIRECT
+  - DOMAIN-SUFFIX,cdn20.com,DIRECT
+  - DOMAIN-SUFFIX,cdn-apple.com,DIRECT
+  - DOMAIN-SUFFIX,akadns.net,DIRECT
+  - DOMAIN-SUFFIX,akamaiedge.net,DIRECT
+  - DOMAIN-SUFFIX,edgekey.net,DIRECT
+  - DOMAIN-SUFFIX,mwcloudcdn.com,DIRECT
+  - DOMAIN-SUFFIX,mwcname.com,DIRECT
+  - DOMAIN-SUFFIX,apple.com,DIRECT
+  - DOMAIN-SUFFIX,apple-cloudkit.com,DIRECT
+  - DOMAIN-SUFFIX,apple-mapkit.com,DIRECT
+  - DOMAIN,cn.bing.com,DIRECT
+  - DOMAIN-SUFFIX,126.com,DIRECT
+  - DOMAIN-SUFFIX,126.net,DIRECT
+  - DOMAIN-SUFFIX,127.net,DIRECT
+  - DOMAIN-SUFFIX,163.com,DIRECT
+  - DOMAIN-SUFFIX,360buyimg.com,DIRECT
+  - DOMAIN-SUFFIX,36kr.com,DIRECT
+  - DOMAIN-SUFFIX,acfun.tv,DIRECT
+  - DOMAIN-SUFFIX,air-matters.com,DIRECT
+  - DOMAIN-SUFFIX,aixifan.com,DIRECT
+  - DOMAIN-KEYWORD,alicdn,DIRECT
+  - DOMAIN-KEYWORD,alipay,DIRECT
+  - DOMAIN-KEYWORD,taobao,DIRECT
+  - DOMAIN-SUFFIX,amap.com,DIRECT
+  - DOMAIN-SUFFIX,autonavi.com,DIRECT
+  - DOMAIN-KEYWORD,baidu,DIRECT
+  - DOMAIN-SUFFIX,bdimg.com,DIRECT
+  - DOMAIN-SUFFIX,bdstatic.com,DIRECT
+  - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.com,DIRECT
+  - DOMAIN-SUFFIX,caiyunapp.com,DIRECT
+  - DOMAIN-SUFFIX,clouddn.com,DIRECT
+  - DOMAIN-SUFFIX,cnbeta.com,DIRECT
+  - DOMAIN-SUFFIX,cnbetacdn.com,DIRECT
+  - DOMAIN-SUFFIX,cootekservice.com,DIRECT
+  - DOMAIN-SUFFIX,csdn.net,DIRECT
+  - DOMAIN-SUFFIX,ctrip.com,DIRECT
+  - DOMAIN-SUFFIX,dgtle.com,DIRECT
+  - DOMAIN-SUFFIX,dianping.com,DIRECT
+  - DOMAIN-SUFFIX,douban.com,DIRECT
+  - DOMAIN-SUFFIX,doubanio.com,DIRECT
+  - DOMAIN-SUFFIX,duokan.com,DIRECT
+  - DOMAIN-SUFFIX,easou.com,DIRECT
+  - DOMAIN-SUFFIX,ele.me,DIRECT
+  - DOMAIN-SUFFIX,feng.com,DIRECT
+  - DOMAIN-SUFFIX,fir.im,DIRECT
+  - DOMAIN-SUFFIX,frdic.com,DIRECT
+  - DOMAIN-SUFFIX,g-cores.com,DIRECT
+  - DOMAIN-SUFFIX,godic.net,DIRECT
+  - DOMAIN-SUFFIX,gtimg.com,DIRECT
+  - DOMAIN,cdn.hockeyapp.net,DIRECT
+  - DOMAIN-SUFFIX,hongxiu.com,DIRECT
+  - DOMAIN-SUFFIX,hxcdn.net,DIRECT
+  - DOMAIN-SUFFIX,iciba.com,DIRECT
+  - DOMAIN-SUFFIX,ifeng.com,DIRECT
+  - DOMAIN-SUFFIX,ifengimg.com,DIRECT
+  - DOMAIN-SUFFIX,ipip.net,DIRECT
+  - DOMAIN-SUFFIX,iqiyi.com,DIRECT
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,jianshu.com,DIRECT
+  - DOMAIN-SUFFIX,knewone.com,DIRECT
+  - DOMAIN-SUFFIX,le.com,DIRECT
+  - DOMAIN-SUFFIX,lecloud.com,DIRECT
+  - DOMAIN-SUFFIX,lemicp.com,DIRECT
+  - DOMAIN-SUFFIX,licdn.com,DIRECT
+  - DOMAIN-SUFFIX,luoo.net,DIRECT
+  - DOMAIN-SUFFIX,meituan.com,DIRECT
+  - DOMAIN-SUFFIX,meituan.net,DIRECT
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,miaopai.com,DIRECT
+  - DOMAIN-SUFFIX,microsoft.com,DIRECT
+  - DOMAIN-SUFFIX,microsoftonline.com,DIRECT
+  - DOMAIN-SUFFIX,miui.com,DIRECT
+  - DOMAIN-SUFFIX,miwifi.com,DIRECT
+  - DOMAIN-SUFFIX,mob.com,DIRECT
+  - DOMAIN-SUFFIX,netease.com,DIRECT
+  - DOMAIN-SUFFIX,office.com,DIRECT
+  - DOMAIN-SUFFIX,office365.com,DIRECT
+  - DOMAIN-KEYWORD,officecdn,DIRECT
+  - DOMAIN-SUFFIX,oschina.net,DIRECT
+  - DOMAIN-SUFFIX,ppsimg.com,DIRECT
+  - DOMAIN-SUFFIX,pstatp.com,DIRECT
+  - DOMAIN-SUFFIX,qcloud.com,DIRECT
+  - DOMAIN-SUFFIX,qdaily.com,DIRECT
+  - DOMAIN-SUFFIX,qdmm.com,DIRECT
+  - DOMAIN-SUFFIX,qhimg.com,DIRECT
+  - DOMAIN-SUFFIX,qhres.com,DIRECT
+  - DOMAIN-SUFFIX,qidian.com,DIRECT
+  - DOMAIN-SUFFIX,qihucdn.com,DIRECT
+  - DOMAIN-SUFFIX,qiniu.com,DIRECT
+  - DOMAIN-SUFFIX,qiniucdn.com,DIRECT
+  - DOMAIN-SUFFIX,qiyipic.com,DIRECT
+  - DOMAIN-SUFFIX,qq.com,DIRECT
+  - DOMAIN-SUFFIX,qqurl.com,DIRECT
+  - DOMAIN-SUFFIX,rarbg.to,DIRECT
+  - DOMAIN-SUFFIX,ruguoapp.com,DIRECT
+  - DOMAIN-SUFFIX,segmentfault.com,DIRECT
+  - DOMAIN-SUFFIX,sinaapp.com,DIRECT
+  - DOMAIN-SUFFIX,smzdm.com,DIRECT
+  - DOMAIN-SUFFIX,snapdrop.net,DIRECT
+  - DOMAIN-SUFFIX,sogou.com,DIRECT
+  - DOMAIN-SUFFIX,sogoucdn.com,DIRECT
+  - DOMAIN-SUFFIX,sohu.com,DIRECT
+  - DOMAIN-SUFFIX,soku.com,DIRECT
+  - DOMAIN-SUFFIX,speedtest.net,DIRECT
+  - DOMAIN-SUFFIX,sspai.com,DIRECT
+  - DOMAIN-SUFFIX,suning.com,DIRECT
+  - DOMAIN-SUFFIX,taobao.com,DIRECT
+  - DOMAIN-SUFFIX,tencent.com,DIRECT
+  - DOMAIN-SUFFIX,tenpay.com,DIRECT
+  - DOMAIN-SUFFIX,tianyancha.com,DIRECT
+  - DOMAIN-SUFFIX,tmall.com,DIRECT
+  - DOMAIN-SUFFIX,tudou.com,DIRECT
+  - DOMAIN-SUFFIX,umetrip.com,DIRECT
+  - DOMAIN-SUFFIX,upaiyun.com,DIRECT
+  - DOMAIN-SUFFIX,upyun.com,DIRECT
+  - DOMAIN-SUFFIX,veryzhun.com,DIRECT
+  - DOMAIN-SUFFIX,weather.com,DIRECT
+  - DOMAIN-SUFFIX,weibo.com,DIRECT
+  - DOMAIN-SUFFIX,xiami.com,DIRECT
+  - DOMAIN-SUFFIX,xiami.net,DIRECT
+  - DOMAIN-SUFFIX,xiaomicp.com,DIRECT
+  - DOMAIN-SUFFIX,ximalaya.com,DIRECT
+  - DOMAIN-SUFFIX,xmcdn.com,DIRECT
+  - DOMAIN-SUFFIX,xunlei.com,DIRECT
+  - DOMAIN-SUFFIX,yhd.com,DIRECT
+  - DOMAIN-SUFFIX,yihaodianimg.com,DIRECT
+  - DOMAIN-SUFFIX,yinxiang.com,DIRECT
+  - DOMAIN-SUFFIX,ykimg.com,DIRECT
+  - DOMAIN-SUFFIX,youdao.com,DIRECT
+  - DOMAIN-SUFFIX,youku.com,DIRECT
+  - DOMAIN-SUFFIX,zealer.com,DIRECT
+  - DOMAIN-SUFFIX,zhihu.com,DIRECT
+  - DOMAIN-SUFFIX,zhimg.com,DIRECT
+  - DOMAIN-SUFFIX,zimuzu.tv,DIRECT
+  - DOMAIN-SUFFIX,zoho.com,DIRECT
+  - DOMAIN-KEYWORD,amazon,超实惠机场
+  - DOMAIN-KEYWORD,google,超实惠机场
+  - DOMAIN-KEYWORD,gmail,超实惠机场
+  - DOMAIN-KEYWORD,youtube,超实惠机场
+  - DOMAIN-KEYWORD,facebook,超实惠机场
+  - DOMAIN-SUFFIX,fb.me,超实惠机场
+  - DOMAIN-SUFFIX,fbcdn.net,超实惠机场
+  - DOMAIN-KEYWORD,twitter,超实惠机场
+  - DOMAIN-KEYWORD,instagram,超实惠机场
+  - DOMAIN-KEYWORD,dropbox,超实惠机场
+  - DOMAIN-SUFFIX,twimg.com,超实惠机场
+  - DOMAIN-KEYWORD,blogspot,超实惠机场
+  - DOMAIN-SUFFIX,youtu.be,超实惠机场
+  - DOMAIN-KEYWORD,whatsapp,超实惠机场
+  - DOMAIN-KEYWORD,admarvel,REJECT
+  - DOMAIN-KEYWORD,admaster,REJECT
+  - DOMAIN-KEYWORD,adsage,REJECT
+  - DOMAIN-KEYWORD,adsmogo,REJECT
+  - DOMAIN-KEYWORD,adsrvmedia,REJECT
+  - DOMAIN-KEYWORD,adwords,REJECT
+  - DOMAIN-KEYWORD,adservice,REJECT
+  - DOMAIN-SUFFIX,appsflyer.com,REJECT
+  - DOMAIN-KEYWORD,domob,REJECT
+  - DOMAIN-SUFFIX,doubleclick.net,REJECT
+  - DOMAIN-KEYWORD,duomeng,REJECT
+  - DOMAIN-KEYWORD,dwtrack,REJECT
+  - DOMAIN-KEYWORD,guanggao,REJECT
+  - DOMAIN-KEYWORD,lianmeng,REJECT
+  - DOMAIN-SUFFIX,mmstat.com,REJECT
+  - DOMAIN-KEYWORD,mopub,REJECT
+  - DOMAIN-KEYWORD,omgmta,REJECT
+  - DOMAIN-KEYWORD,openx,REJECT
+  - DOMAIN-KEYWORD,partnerad,REJECT
+  - DOMAIN-KEYWORD,pingfore,REJECT
+  - DOMAIN-KEYWORD,supersonicads,REJECT
+  - DOMAIN-KEYWORD,uedas,REJECT
+  - DOMAIN-KEYWORD,umeng,REJECT
+  - DOMAIN-KEYWORD,usage,REJECT
+  - DOMAIN-SUFFIX,vungle.com,REJECT
+  - DOMAIN-KEYWORD,wlmonitor,REJECT
+  - DOMAIN-KEYWORD,zjtoolbar,REJECT
+  - DOMAIN-SUFFIX,9to5mac.com,超实惠机场
+  - DOMAIN-SUFFIX,abpchina.org,超实惠机场
+  - DOMAIN-SUFFIX,adblockplus.org,超实惠机场
+  - DOMAIN-SUFFIX,adobe.com,超实惠机场
+  - DOMAIN-SUFFIX,akamaized.net,超实惠机场
+  - DOMAIN-SUFFIX,alfredapp.com,超实惠机场
+  - DOMAIN-SUFFIX,amplitude.com,超实惠机场
+  - DOMAIN-SUFFIX,ampproject.org,超实惠机场
+  - DOMAIN-SUFFIX,android.com,超实惠机场
+  - DOMAIN-SUFFIX,angularjs.org,超实惠机场
+  - DOMAIN-SUFFIX,aolcdn.com,超实惠机场
+  - DOMAIN-SUFFIX,apkpure.com,超实惠机场
+  - DOMAIN-SUFFIX,appledaily.com,超实惠机场
+  - DOMAIN-SUFFIX,appshopper.com,超实惠机场
+  - DOMAIN-SUFFIX,appspot.com,超实惠机场
+  - DOMAIN-SUFFIX,arcgis.com,超实惠机场
+  - DOMAIN-SUFFIX,archive.org,超实惠机场
+  - DOMAIN-SUFFIX,armorgames.com,超实惠机场
+  - DOMAIN-SUFFIX,aspnetcdn.com,超实惠机场
+  - DOMAIN-SUFFIX,att.com,超实惠机场
+  - DOMAIN-SUFFIX,awsstatic.com,超实惠机场
+  - DOMAIN-SUFFIX,azureedge.net,超实惠机场
+  - DOMAIN-SUFFIX,azurewebsites.net,超实惠机场
+  - DOMAIN-SUFFIX,bing.com,超实惠机场
+  - DOMAIN-SUFFIX,bintray.com,超实惠机场
+  - DOMAIN-SUFFIX,bit.com,超实惠机场
+  - DOMAIN-SUFFIX,bit.ly,超实惠机场
+  - DOMAIN-SUFFIX,bitbucket.org,超实惠机场
+  - DOMAIN-SUFFIX,bjango.com,超实惠机场
+  - DOMAIN-SUFFIX,bkrtx.com,超实惠机场
+  - DOMAIN-SUFFIX,blog.com,超实惠机场
+  - DOMAIN-SUFFIX,blogcdn.com,超实惠机场
+  - DOMAIN-SUFFIX,blogger.com,超实惠机场
+  - DOMAIN-SUFFIX,blogsmithmedia.com,超实惠机场
+  - DOMAIN-SUFFIX,blogspot.com,超实惠机场
+  - DOMAIN-SUFFIX,blogspot.hk,超实惠机场
+  - DOMAIN-SUFFIX,bloomberg.com,超实惠机场
+  - DOMAIN-SUFFIX,box.com,超实惠机场
+  - DOMAIN-SUFFIX,box.net,超实惠机场
+  - DOMAIN-SUFFIX,cachefly.net,超实惠机场
+  - DOMAIN-SUFFIX,chromium.org,超实惠机场
+  - DOMAIN-SUFFIX,cl.ly,超实惠机场
+  - DOMAIN-SUFFIX,cloudflare.com,超实惠机场
+  - DOMAIN-SUFFIX,cloudfront.net,超实惠机场
+  - DOMAIN-SUFFIX,cloudmagic.com,超实惠机场
+  - DOMAIN-SUFFIX,cmail19.com,超实惠机场
+  - DOMAIN-SUFFIX,cnet.com,超实惠机场
+  - DOMAIN-SUFFIX,cocoapods.org,超实惠机场
+  - DOMAIN-SUFFIX,comodoca.com,超实惠机场
+  - DOMAIN-SUFFIX,crashlytics.com,超实惠机场
+  - DOMAIN-SUFFIX,culturedcode.com,超实惠机场
+  - DOMAIN-SUFFIX,d.pr,超实惠机场
+  - DOMAIN-SUFFIX,danilo.to,超实惠机场
+  - DOMAIN-SUFFIX,dayone.me,超实惠机场
+  - DOMAIN-SUFFIX,db.tt,超实惠机场
+  - DOMAIN-SUFFIX,deskconnect.com,超实惠机场
+  - DOMAIN-SUFFIX,disq.us,超实惠机场
+  - DOMAIN-SUFFIX,disqus.com,超实惠机场
+  - DOMAIN-SUFFIX,disquscdn.com,超实惠机场
+  - DOMAIN-SUFFIX,dnsimple.com,超实惠机场
+  - DOMAIN-SUFFIX,docker.com,超实惠机场
+  - DOMAIN-SUFFIX,dribbble.com,超实惠机场
+  - DOMAIN-SUFFIX,droplr.com,超实惠机场
+  - DOMAIN-SUFFIX,duckduckgo.com,超实惠机场
+  - DOMAIN-SUFFIX,dueapp.com,超实惠机场
+  - DOMAIN-SUFFIX,dytt8.net,超实惠机场
+  - DOMAIN-SUFFIX,edgecastcdn.net,超实惠机场
+  - DOMAIN-SUFFIX,edgekey.net,超实惠机场
+  - DOMAIN-SUFFIX,edgesuite.net,超实惠机场
+  - DOMAIN-SUFFIX,engadget.com,超实惠机场
+  - DOMAIN-SUFFIX,entrust.net,超实惠机场
+  - DOMAIN-SUFFIX,eurekavpt.com,超实惠机场
+  - DOMAIN-SUFFIX,evernote.com,超实惠机场
+  - DOMAIN-SUFFIX,fabric.io,超实惠机场
+  - DOMAIN-SUFFIX,fast.com,超实惠机场
+  - DOMAIN-SUFFIX,fastly.net,超实惠机场
+  - DOMAIN-SUFFIX,fc2.com,超实惠机场
+  - DOMAIN-SUFFIX,feedburner.com,超实惠机场
+  - DOMAIN-SUFFIX,feedly.com,超实惠机场
+  - DOMAIN-SUFFIX,feedsportal.com,超实惠机场
+  - DOMAIN-SUFFIX,fiftythree.com,超实惠机场
+  - DOMAIN-SUFFIX,firebaseio.com,超实惠机场
+  - DOMAIN-SUFFIX,flexibits.com,超实惠机场
+  - DOMAIN-SUFFIX,flickr.com,超实惠机场
+  - DOMAIN-SUFFIX,flipboard.com,超实惠机场
+  - DOMAIN-SUFFIX,g.co,超实惠机场
+  - DOMAIN-SUFFIX,gabia.net,超实惠机场
+  - DOMAIN-SUFFIX,geni.us,超实惠机场
+  - DOMAIN-SUFFIX,gfx.ms,超实惠机场
+  - DOMAIN-SUFFIX,ggpht.com,超实惠机场
+  - DOMAIN-SUFFIX,ghostnoteapp.com,超实惠机场
+  - DOMAIN-SUFFIX,git.io,超实惠机场
+  - DOMAIN-KEYWORD,github,超实惠机场
+  - DOMAIN-SUFFIX,globalsign.com,超实惠机场
+  - DOMAIN-SUFFIX,gmodules.com,超实惠机场
+  - DOMAIN-SUFFIX,godaddy.com,超实惠机场
+  - DOMAIN-SUFFIX,golang.org,超实惠机场
+  - DOMAIN-SUFFIX,gongm.in,超实惠机场
+  - DOMAIN-SUFFIX,goo.gl,超实惠机场
+  - DOMAIN-SUFFIX,goodreaders.com,超实惠机场
+  - DOMAIN-SUFFIX,goodreads.com,超实惠机场
+  - DOMAIN-SUFFIX,gravatar.com,超实惠机场
+  - DOMAIN-SUFFIX,gstatic.com,超实惠机场
+  - DOMAIN-SUFFIX,gvt0.com,超实惠机场
+  - DOMAIN-SUFFIX,hockeyapp.net,超实惠机场
+  - DOMAIN-SUFFIX,hotmail.com,超实惠机场
+  - DOMAIN-SUFFIX,icons8.com,超实惠机场
+  - DOMAIN-SUFFIX,ifixit.com,超实惠机场
+  - DOMAIN-SUFFIX,ift.tt,超实惠机场
+  - DOMAIN-SUFFIX,ifttt.com,超实惠机场
+  - DOMAIN-SUFFIX,iherb.com,超实惠机场
+  - DOMAIN-SUFFIX,imageshack.us,超实惠机场
+  - DOMAIN-SUFFIX,img.ly,超实惠机场
+  - DOMAIN-SUFFIX,imgur.com,超实惠机场
+  - DOMAIN-SUFFIX,imore.com,超实惠机场
+  - DOMAIN-SUFFIX,instapaper.com,超实惠机场
+  - DOMAIN-SUFFIX,ipn.li,超实惠机场
+  - DOMAIN-SUFFIX,is.gd,超实惠机场
+  - DOMAIN-SUFFIX,issuu.com,超实惠机场
+  - DOMAIN-SUFFIX,itgonglun.com,超实惠机场
+  - DOMAIN-SUFFIX,itun.es,超实惠机场
+  - DOMAIN-SUFFIX,ixquick.com,超实惠机场
+  - DOMAIN-SUFFIX,j.mp,超实惠机场
+  - DOMAIN-SUFFIX,js.revsci.net,超实惠机场
+  - DOMAIN-SUFFIX,jshint.com,超实惠机场
+  - DOMAIN-SUFFIX,jtvnw.net,超实惠机场
+  - DOMAIN-SUFFIX,justgetflux.com,超实惠机场
+  - DOMAIN-SUFFIX,kat.cr,超实惠机场
+  - DOMAIN-SUFFIX,klip.me,超实惠机场
+  - DOMAIN-SUFFIX,libsyn.com,超实惠机场
+  - DOMAIN-SUFFIX,linkedin.com,超实惠机场
+  - DOMAIN-SUFFIX,line-apps.com,超实惠机场
+  - DOMAIN-SUFFIX,linode.com,超实惠机场
+  - DOMAIN-SUFFIX,lithium.com,超实惠机场
+  - DOMAIN-SUFFIX,littlehj.com,超实惠机场
+  - DOMAIN-SUFFIX,live.com,超实惠机场
+  - DOMAIN-SUFFIX,live.net,超实惠机场
+  - DOMAIN-SUFFIX,livefilestore.com,超实惠机场
+  - DOMAIN-SUFFIX,llnwd.net,超实惠机场
+  - DOMAIN-SUFFIX,macid.co,超实惠机场
+  - DOMAIN-SUFFIX,macromedia.com,超实惠机场
+  - DOMAIN-SUFFIX,macrumors.com,超实惠机场
+  - DOMAIN-SUFFIX,mashable.com,超实惠机场
+  - DOMAIN-SUFFIX,mathjax.org,超实惠机场
+  - DOMAIN-SUFFIX,medium.com,超实惠机场
+  - DOMAIN-SUFFIX,mega.co.nz,超实惠机场
+  - DOMAIN-SUFFIX,mega.nz,超实惠机场
+  - DOMAIN-SUFFIX,megaupload.com,超实惠机场
+  - DOMAIN-SUFFIX,microsofttranslator.com,超实惠机场
+  - DOMAIN-SUFFIX,mindnode.com,超实惠机场
+  - DOMAIN-SUFFIX,mobile01.com,超实惠机场
+  - DOMAIN-SUFFIX,modmyi.com,超实惠机场
+  - DOMAIN-SUFFIX,msedge.net,超实惠机场
+  - DOMAIN-SUFFIX,myfontastic.com,超实惠机场
+  - DOMAIN-SUFFIX,name.com,超实惠机场
+  - DOMAIN-SUFFIX,nextmedia.com,超实惠机场
+  - DOMAIN-SUFFIX,nsstatic.net,超实惠机场
+  - DOMAIN-SUFFIX,nssurge.com,超实惠机场
+  - DOMAIN-SUFFIX,nyt.com,超实惠机场
+  - DOMAIN-SUFFIX,nytimes.com,超实惠机场
+  - DOMAIN-SUFFIX,omnigroup.com,超实惠机场
+  - DOMAIN-SUFFIX,onedrive.com,超实惠机场
+  - DOMAIN-SUFFIX,onenote.com,超实惠机场
+  - DOMAIN-SUFFIX,ooyala.com,超实惠机场
+  - DOMAIN-SUFFIX,openvpn.net,超实惠机场
+  - DOMAIN-SUFFIX,openwrt.org,超实惠机场
+  - DOMAIN-SUFFIX,orkut.com,超实惠机场
+  - DOMAIN-SUFFIX,osxdaily.com,超实惠机场
+  - DOMAIN-SUFFIX,outlook.com,超实惠机场
+  - DOMAIN-SUFFIX,ow.ly,超实惠机场
+  - DOMAIN-SUFFIX,paddleapi.com,超实惠机场
+  - DOMAIN-SUFFIX,parallels.com,超实惠机场
+  - DOMAIN-SUFFIX,parse.com,超实惠机场
+  - DOMAIN-SUFFIX,pdfexpert.com,超实惠机场
+  - DOMAIN-SUFFIX,periscope.tv,超实惠机场
+  - DOMAIN-SUFFIX,pinboard.in,超实惠机场
+  - DOMAIN-SUFFIX,pinterest.com,超实惠机场
+  - DOMAIN-SUFFIX,pixelmator.com,超实惠机场
+  - DOMAIN-SUFFIX,pixiv.net,超实惠机场
+  - DOMAIN-SUFFIX,playpcesor.com,超实惠机场
+  - DOMAIN-SUFFIX,playstation.com,超实惠机场
+  - DOMAIN-SUFFIX,playstation.com.hk,超实惠机场
+  - DOMAIN-SUFFIX,playstation.net,超实惠机场
+  - DOMAIN-SUFFIX,playstationnetwork.com,超实惠机场
+  - DOMAIN-SUFFIX,pushwoosh.com,超实惠机场
+  - DOMAIN-SUFFIX,rime.im,超实惠机场
+  - DOMAIN-SUFFIX,servebom.com,超实惠机场
+  - DOMAIN-SUFFIX,sfx.ms,超实惠机场
+  - DOMAIN-SUFFIX,shadowsocks.org,超实惠机场
+  - DOMAIN-SUFFIX,sharethis.com,超实惠机场
+  - DOMAIN-SUFFIX,shazam.com,超实惠机场
+  - DOMAIN-SUFFIX,skype.com,超实惠机场
+  - DOMAIN-SUFFIX,smartdns超实惠机场.com,超实惠机场
+  - DOMAIN-SUFFIX,smartmailcloud.com,超实惠机场
+  - DOMAIN-SUFFIX,sndcdn.com,超实惠机场
+  - DOMAIN-SUFFIX,sony.com,超实惠机场
+  - DOMAIN-SUFFIX,soundcloud.com,超实惠机场
+  - DOMAIN-SUFFIX,sourceforge.net,超实惠机场
+  - DOMAIN-SUFFIX,spotify.com,超实惠机场
+  - DOMAIN-SUFFIX,squarespace.com,超实惠机场
+  - DOMAIN-SUFFIX,sstatic.net,超实惠机场
+  - DOMAIN-SUFFIX,st.luluku.pw,超实惠机场
+  - DOMAIN-SUFFIX,stackoverflow.com,超实惠机场
+  - DOMAIN-SUFFIX,startpage.com,超实惠机场
+  - DOMAIN-SUFFIX,staticflickr.com,超实惠机场
+  - DOMAIN-SUFFIX,steamcommunity.com,超实惠机场
+  - DOMAIN-SUFFIX,symauth.com,超实惠机场
+  - DOMAIN-SUFFIX,symcb.com,超实惠机场
+  - DOMAIN-SUFFIX,symcd.com,超实惠机场
+  - DOMAIN-SUFFIX,tapbots.com,超实惠机场
+  - DOMAIN-SUFFIX,tapbots.net,超实惠机场
+  - DOMAIN-SUFFIX,tdesktop.com,超实惠机场
+  - DOMAIN-SUFFIX,techcrunch.com,超实惠机场
+  - DOMAIN-SUFFIX,techsmith.com,超实惠机场
+  - DOMAIN-SUFFIX,thepiratebay.org,超实惠机场
+  - DOMAIN-SUFFIX,theverge.com,超实惠机场
+  - DOMAIN-SUFFIX,time.com,超实惠机场
+  - DOMAIN-SUFFIX,timeinc.net,超实惠机场
+  - DOMAIN-SUFFIX,tiny.cc,超实惠机场
+  - DOMAIN-SUFFIX,tinypic.com,超实惠机场
+  - DOMAIN-SUFFIX,tmblr.co,超实惠机场
+  - DOMAIN-SUFFIX,todoist.com,超实惠机场
+  - DOMAIN-SUFFIX,trello.com,超实惠机场
+  - DOMAIN-SUFFIX,trustasiassl.com,超实惠机场
+  - DOMAIN-SUFFIX,tumblr.co,超实惠机场
+  - DOMAIN-SUFFIX,tumblr.com,超实惠机场
+  - DOMAIN-SUFFIX,tweetdeck.com,超实惠机场
+  - DOMAIN-SUFFIX,tweetmarker.net,超实惠机场
+  - DOMAIN-SUFFIX,twitch.tv,超实惠机场
+  - DOMAIN-SUFFIX,txmblr.com,超实惠机场
+  - DOMAIN-SUFFIX,typekit.net,超实惠机场
+  - DOMAIN-SUFFIX,ubertags.com,超实惠机场
+  - DOMAIN-SUFFIX,ublock.org,超实惠机场
+  - DOMAIN-SUFFIX,ubnt.com,超实惠机场
+  - DOMAIN-SUFFIX,ulyssesapp.com,超实惠机场
+  - DOMAIN-SUFFIX,urchin.com,超实惠机场
+  - DOMAIN-SUFFIX,usertrust.com,超实惠机场
+  - DOMAIN-SUFFIX,v.gd,超实惠机场
+  - DOMAIN-SUFFIX,v2ex.com,超实惠机场
+  - DOMAIN-SUFFIX,vimeo.com,超实惠机场
+  - DOMAIN-SUFFIX,vimeocdn.com,超实惠机场
+  - DOMAIN-SUFFIX,vine.co,超实惠机场
+  - DOMAIN-SUFFIX,vivaldi.com,超实惠机场
+  - DOMAIN-SUFFIX,vox-cdn.com,超实惠机场
+  - DOMAIN-SUFFIX,vsco.co,超实惠机场
+  - DOMAIN-SUFFIX,vultr.com,超实惠机场
+  - DOMAIN-SUFFIX,w.org,超实惠机场
+  - DOMAIN-SUFFIX,w3schools.com,超实惠机场
+  - DOMAIN-SUFFIX,webtype.com,超实惠机场
+  - DOMAIN-SUFFIX,wikiwand.com,超实惠机场
+  - DOMAIN-SUFFIX,wikileaks.org,超实惠机场
+  - DOMAIN-SUFFIX,wikimedia.org,超实惠机场
+  - DOMAIN-SUFFIX,wikipedia.com,超实惠机场
+  - DOMAIN-SUFFIX,wikipedia.org,超实惠机场
+  - DOMAIN-SUFFIX,windows.com,超实惠机场
+  - DOMAIN-SUFFIX,windows.net,超实惠机场
+  - DOMAIN-SUFFIX,wire.com,超实惠机场
+  - DOMAIN-SUFFIX,wordpress.com,超实惠机场
+  - DOMAIN-SUFFIX,workflowy.com,超实惠机场
+  - DOMAIN-SUFFIX,wp.com,超实惠机场
+  - DOMAIN-SUFFIX,wsj.com,超实惠机场
+  - DOMAIN-SUFFIX,wsj.net,超实惠机场
+  - DOMAIN-SUFFIX,xda-developers.com,超实惠机场
+  - DOMAIN-SUFFIX,xeeno.com,超实惠机场
+  - DOMAIN-SUFFIX,xiti.com,超实惠机场
+  - DOMAIN-SUFFIX,yahoo.com,超实惠机场
+  - DOMAIN-SUFFIX,yimg.com,超实惠机场
+  - DOMAIN-SUFFIX,ying.com,超实惠机场
+  - DOMAIN-SUFFIX,yoyo.org,超实惠机场
+  - DOMAIN-SUFFIX,ytimg.com,超实惠机场
+  - DOMAIN-SUFFIX,telegra.ph,超实惠机场
+  - DOMAIN-SUFFIX,telegram.org,超实惠机场
+  - IP-CIDR,91.108.4.0/22,超实惠机场,no-resolve
+  - IP-CIDR,91.108.8.0/21,超实惠机场,no-resolve
+  - IP-CIDR,91.108.16.0/22,超实惠机场,no-resolve
+  - IP-CIDR,91.108.56.0/22,超实惠机场,no-resolve
+  - IP-CIDR,149.154.160.0/20,超实惠机场,no-resolve
+  - IP-CIDR6,2001:67c:4e8::/48,超实惠机场,no-resolve
+  - IP-CIDR6,2001:b28:f23d::/48,超实惠机场,no-resolve
+  - IP-CIDR6,2001:b28:f23f::/48,超实惠机场,no-resolve
+  - IP-CIDR,120.232.181.162/32,超实惠机场,no-resolve
+  - IP-CIDR,120.241.147.226/32,超实惠机场,no-resolve
+  - IP-CIDR,120.253.253.226/32,超实惠机场,no-resolve
+  - IP-CIDR,120.253.255.162/32,超实惠机场,no-resolve
+  - IP-CIDR,120.253.255.34/32,超实惠机场,no-resolve
+  - IP-CIDR,120.253.255.98/32,超实惠机场,no-resolve
+  - IP-CIDR,180.163.150.162/32,超实惠机场,no-resolve
+  - IP-CIDR,180.163.150.34/32,超实惠机场,no-resolve
+  - IP-CIDR,180.163.151.162/32,超实惠机场,no-resolve
+  - IP-CIDR,180.163.151.34/32,超实惠机场,no-resolve
+  - IP-CIDR,203.208.39.0/24,超实惠机场,no-resolve
+  - IP-CIDR,203.208.40.0/24,超实惠机场,no-resolve
+  - IP-CIDR,203.208.41.0/24,超实惠机场,no-resolve
+  - IP-CIDR,203.208.43.0/24,超实惠机场,no-resolve
+  - IP-CIDR,203.208.50.0/24,超实惠机场,no-resolve
+  - IP-CIDR,220.181.174.162/32,超实惠机场,no-resolve
+  - IP-CIDR,220.181.174.226/32,超实惠机场,no-resolve
+  - IP-CIDR,220.181.174.34/32,超实惠机场,no-resolve
+  - DOMAIN,injections.adguard.org,DIRECT
+  - DOMAIN,local.adguard.org,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - IP-CIDR,127.0.0.0/8,DIRECT
+  - IP-CIDR,172.16.0.0/12,DIRECT
+  - IP-CIDR,192.168.0.0/16,DIRECT
+  - IP-CIDR,10.0.0.0/8,DIRECT
+  - IP-CIDR,17.0.0.0/8,DIRECT
+  - IP-CIDR,100.64.0.0/10,DIRECT
+  - IP-CIDR,224.0.0.0/4,DIRECT
+  - IP-CIDR6,fe80::/10,DIRECT
+  - DOMAIN-SUFFIX,cn,DIRECT
+  - DOMAIN-KEYWORD,-cn,DIRECT
+  - GEOIP,CN,DIRECT
+  - MATCH,超实惠机场

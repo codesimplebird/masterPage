@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>我的数字指挥舱 — 酷炫版</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap"
+          rel="stylesheet">
+    <style>
+        :root {
+            --bg: #06060a;
+            --panel: rgba(18, 18, 22, 0.48);
+            --panel-strong: rgba(25, 25, 30, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --neon-1: #00f0ff;
+            /* cyan */
+            --neon-2: #9b5cff;
+            /* violet */
+            --accent: #ff4d7e;
+            /* accent pink */
+            --muted: #b9b9c4;
+            --text: #eaf0ff;
+        }
+
+        /* reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html,
+        body,
+        #app {
+            height: 100%
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Noto Sans SC', sans-serif;
+            background: radial-gradient(1200px 600px at 10% 10%, rgba(155, 92, 255, 0.08), transparent 6%),
+                radial-gradient(1000px 500px at 90% 90%, rgba(0, 240, 255, 0.06), transparent 8%),
+                var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+
+        /* reduced motion respect */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important
+            }
+        }
+
+        /* container */
+        .canvas {
+            width: 100%;
+            max-width: 1500px;
+            height: 82vh;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 36px;
+            position: relative;
+        }
+
+        /* subtle 3D grid */
+        .grid3d {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.35;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 64px 64px;
+            transform: translateZ(0) rotateX(60deg);
+            mask-image: linear-gradient(180deg, transparent, black 10%, black 90%, transparent);
+            animation: gridFloat 36s linear infinite;
+        }
+
+        @keyframes gridFloat {
+            from {
+                transform: translateY(0) rotateX(60deg)
+            }
+
+            to {
+                transform: translateY(30px) rotateX(60deg)
+            }
+        }
+
+        /* orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.28;
+            mix-blend-mode: screen
+        }
+
+        .orb.a {
+            width: 420px;
+            height: 420px;
+            background: linear-gradient(120deg, var(--neon-1), #00a3ff);
+            left: -8%;
+            top: -12%;
+        }
+
+        .orb.b {
+            width: 360px;
+            height: 360px;
+            background: linear-gradient(120deg, var(--neon-2), #6a2eff);
+            right: -6%;
+            bottom: -10%;
+            animation-delay: -8s
+        }
+
+        /* SIDEBAR */
+        .panel {
+            background: var(--panel);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5)
+        }
+
+        .left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px
+        }
+
+        .greet {
+            font-size: 0.85rem;
+            color: var(--muted);
+            letter-spacing: 0.6px
+        }
+
+        .clock {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .time-main {
+            font-size: 3.6rem;
+            font-weight: 700;
+            line-height: 1;
+            display: inline-block;
+            background: linear-gradient(180deg, #fff, #e0e7ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 6px 28px rgba(0, 240, 255, 0.06);
+        }
+
+        .time-main::after {
+            content: '';
+            display: block;
+            height: 6px;
+            width: 80px;
+            margin-top: 6px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--neon-1), var(--neon-2));
+            opacity: 0.14
+        }
+
+        .colon {
+            font-size: 3.2rem;
+            color: var(--muted);
+            animation: blink 1s steps(1) infinite;
+            transform: translateY(-4px)
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0
+            }
+        }
+
+        .sec {
+            font-size: 1.6rem;
+            color: var(--accent);
+            font-weight: 600;
+            opacity: 0.95;
+            padding-left: 6px;
+            border-left: 1px solid rgba(255, 255, 255, 0.04);
+            margin-left: 6px
+        }
+
+        .date {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            padding-top: 12px
+        }
+
+        .status {
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--muted)
+        }
+
+        .track {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 999px;
+            overflow: hidden
+        }
+
+        .bar {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 900ms cubic-bezier(.22, .9, .21, 1)
+        }
+
+        /* right content */
+        .right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden
+        }
+
+        .search-wrap {
+            position: sticky;
+            top: 18px;
+            z-index: 10
+        }
+
+        .search {
+            width: 100%;
+            padding: 16px 18px;
+            font-size: 1rem;
+            border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            background: var(--panel-strong);
+            color: var(--text);
+            outline: none;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45)
+        }
+
+        .search:focus {
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.06), 0 10px 30px rgba(0, 0, 0, 0.45);
+            border-color: rgba(0, 240, 255, 0.12)
+        }
+
+        .links {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 22px;
+            padding-bottom: 40px;
+            padding-top: 8px
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: transform 280ms cubic-bezier(.2, .9, .2, 1), box-shadow 280ms, background 280ms;
+            border: 1px solid transparent
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+            border-color: rgba(255, 255, 255, 0.06)
+        }
+
+        .icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: block;
+            object-fit: cover
+        }
+
+        .title {
+            font-size: 0.95rem;
+            color: var(--muted);
+            font-weight: 600
+        }
+
+        /* neon outline on focus (keyboard accessible) */
+        .card:focus {
+            outline: none;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.08), 0 18px 40px rgba(0, 0, 0, 0.5);
+            transform: translateY(-6px)
+        }
+
+        /* footer hint */
+        .hint {
+            font-size: 0.85rem;
+            color: var(--muted);
+            opacity: 0.9
+        }
+
+        /* responsive */
+        @media (max-width:1000px) {
+            .canvas {
+                grid-template-columns: 1fr;
+                height: auto;
+                padding: 18px
+            }
+
+            .left {
+                flex-direction: row;
+                gap: 12px;
+                flex-wrap: wrap
+            }
+
+            .panel {
+                padding: 16px
+            }
+
+            .time-main {
+                font-size: 2.6rem
+            }
+
+            .search {
+                padding: 12px
+            }
+        }
+
+        @media (max-width:480px) {
+            .links {
+                gap: 14px;
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .icon {
+                width: 46px;
+                height: 46px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="app">
+        <div class="grid3d"></div>
+        <div class="orb a" aria-hidden="true"></div>
+        <div class="orb b" aria-hidden="true"></div>
+
+        <section class="canvas" role="application" aria-label="数字指挥舱">
+
+            <!-- LEFT -->
+            <aside class="left">
+                <div class="panel">
+                    <div class="greet" id="greet">System Online</div>
+
+                    <div class="clock" aria-hidden="false">
+                        <div class="time-main" id="hm">00:00</div>
+                        <div class="sec" id="ss">00</div>
+                    </div>
+
+                    <div class="date" id="date">加载中…</div>
+                </div>
+
+                <div class="panel status">
+                    <div style="font-family:'JetBrains Mono';color:var(--neon-1);font-size:0.85rem;margin-bottom:6px">//
+                        STATUS</div>
+
+                    <div class="status-row"><span>CPU</span><span id="cpu-val">14%</span></div>
+                    <div class="track">
+                        <div id="cpu" class="bar"
+                             style="width:14%;background:linear-gradient(90deg,var(--neon-1),var(--neon-2))"></div>
+                    </div>
+
+                    <div class="status-row"><span>MEM</span><span id="mem-val">42%</span></div>
+                    <div class="track">
+                        <div id="mem" class="bar"
+                             style="width:42%;background:linear-gradient(90deg,var(--neon-2),var(--neon-1))"></div>
+                    </div>
+
+                    <div class="hint">提示：按 Enter 搜索，或在卡片上按 Tab 激活并打开。</div>
+                </div>
+            </aside>
+
+            <!-- RIGHT -->
+            <main class="right">
+                <div class="search-wrap panel" style="position:sticky;top:16px">
+                    <input id="search" class="search" type="search" placeholder="搜索网站或过滤应用（按 Enter 打开）"
+                           aria-label="搜索" />
+                </div>
+
+                <div class="links" id="links">
+                    <!-- cards injected -->
+                </div>
+
+            </main>
+
+        </section>
+    </div>
+
+    <script>
+        // === 配置 ===
+        const config = {
+            links: [
+                { name: 'Bilibili', url: 'https://www.bilibili.com', icon: 'https://static.hdslb.com/images/favicon.ico' },
+                { name: 'Google', url: 'https://www.google.com', icon: 'https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png' },
+                { name: 'YouTube', url: 'https://www.youtube.com', icon: 'https://www.youtube.com/s/desktop/1a96390c/img/favicon_144x144.png' },
+                { name: 'GitHub', url: 'https://github.com', icon: 'https://github.githubassets.com/favicons/favicon.png' },
+                { name: 'ChatGPT', url: 'https://chat.openai.com', icon: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg' },
+                { name: '知乎', url: 'https://www.zhihu.com', icon: 'https://static.zhihu.com/heifetz/favicon.ico' },
+                { name: 'OpenWrt', url: 'http://192.168.30.100', icon: 'https://openwrt.org/_media/favicon.ico' },
+                { name: 'Gmail', url: 'https://mail.google.com', icon: 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico' },
+                { name: 'Notion', url: 'https://www.notion.so', icon: 'https://www.notion.so/images/favicon.ico' },
+                { name: 'Vercel', url: 'https://vercel.com', icon: 'https://assets.vercel.com/image/upload/front/favicon/vercel/favicon.ico' }
+            ]
+        };
+
+        // === 时钟 ===
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('hm').textContent = `${h}:${m}`;
+            document.getElementById('ss').textContent = s;
+
+            document.getElementById('date').textContent = now.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short' });
+
+            const hour = now.getHours();
+            let greet = 'Good Evening';
+            if (hour >= 5 && hour < 12) greet = 'Good Morning';
+            else if (hour >= 12 && hour < 18) greet = 'Good Afternoon';
+            document.getElementById('greet').textContent = `${greet}, Captain.`;
+        }
+        updateClock(); setInterval(updateClock, 1000);
+
+        // === 渲染 link cards ===
+        const linksEl = document.getElementById('links');
+        function render(keyword = '') {
+            linksEl.innerHTML = '';
+            const list = config.links.filter(i => i.name.toLowerCase().includes(keyword.toLowerCase()));
+            list.forEach((l, idx) => {
+                const a = document.createElement('a');
+                a.className = 'card'; a.href = l.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.tabIndex = 0;
+                a.style.animation = `fadeIn .45s cubic-bezier(.2,.9,.2,1) ${idx * 0.03}s forwards`;
+                a.innerHTML = `<img class="icon" alt="${l.name}" src="${l.icon}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name='+encodeURIComponent('${l.name}')">` +
+                    `<div class="title">${l.name}</div>`;
+                linksEl.appendChild(a);
+            });
+        }
+        render();
+
+        // === 搜索与回车跳转 ===
+        const search = document.getElementById('search');
+        search.addEventListener('input', (e) => render(e.target.value));
+        search.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                const val = e.target.value.trim();
+                if (!val) return;
+                const match = config.links.find(l => l.name.toLowerCase().includes(val.toLowerCase()));
+                const url = match ? match.url : `https://www.google.com/search?q=${encodeURIComponent(val)}`;
+                window.open(url, '_self');
+            }
+        });
+
+        // === 模拟动态 CPU/MEM（前端演示） ===
+        function animateStatus() {
+            // 随机波动 + 缓动展示
+            const cpu = Math.max(6, Math.round(12 + Math.abs(Math.sin(Date.now() / 4000)) * 60));
+            const mem = Math.max(20, Math.round(30 + Math.abs(Math.cos(Date.now() / 5000)) * 50));
+            document.getElementById('cpu-val').textContent = cpu + '%';
+            document.getElementById('mem-val').textContent = mem + '%';
+            document.getElementById('cpu').style.width = cpu + '%';
+            document.getElementById('mem').style.width = mem + '%';
+            requestAnimationFrame(animateStatus);
+        }
+        animateStatus();
+
+        // Accessibility: allow keyboard Enter to open focused card
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.activeElement && document.activeElement.classList.contains('card')) {
+                document.activeElement.click();
+            }
+        });
+
+        // small animation keyframe injected for entry (kept local to script)
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}`;
+        document.head.appendChild(styleSheet);
+    </script>
+</body>
+
+</html>

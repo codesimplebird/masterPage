@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+            /* 更丰富的渐变背景 */
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50, #4a235a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #fff;
+        }
+
+        /* 背景动画 */
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 50px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            font-weight: 300;
+            opacity: 0.85;
+        }
+
+        .links-grid {
+            /* 增大间距，使分布更均匀 */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 40px;
+            /* 增大 gap */
+            padding: 20px;
+        }
+
+        .link-item {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1 / 1;
+            /* 保持正方形比例 */
+        }
+
+        .link-item:hover {
+            transform: translateY(-8px) scale(1.03);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .link-icon {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 20px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .link-item:hover .link-icon {
+            transform: scale(1.1);
+        }
+
+        .link-name {
+            font-size: 1.2em;
+            font-weight: 400;
+            text-align: center;
+        }
+
+        @media (max-width: 1024px) {
+            .links-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 30px;
+            }
+
+            .link-icon {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 30px 15px;
+            }
+
+            .header h1 {
+                font-size: 2.5em;
+            }
+
+            .links-grid {
+                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+                gap: 25px;
+            }
+
+            .link-item {
+                padding: 25px 15px;
+            }
+
+            .link-icon {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 15px;
+            }
+
+            .link-name {
+                font-size: 1.1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1.1em;
+            }
+
+            .links-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>我的主页</h1>
+            <p>快速访问常用网站</p>
+        </div>
+
+        <div class="links-grid" id="links-container">
+            <!-- 链接将通过JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <script>
+        // 配置数据 - 使用图片URL作为图标
+        const config = {
+            "title": "我的主页",
+            "links": [
+                {
+                    "name": "Bilibili",
+                    "url": "https://t.bilibili.com/?spm_id_from=333.788.0.0",
+                    "icon": "    https://static.hdslb.com/images/favicon.ico    ",
+                    "color": "#00a1d6"
+                },
+                {
+                    "name": "Google",
+                    "url": "https://www.google.com    ",
+                    "icon": "https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png    ",
+                    "color": "#4285f4"
+                },
+                {
+                    "name": "Google_aistudio",
+                    "url": "https://aistudio.google.com/prompts/new_chat    ",
+                    "icon": "https://www.gstatic.com/aistudio/zero-state/promo_chat_url_context.png    ",
+                    "color": "#4285f4"
+                },
+
+                {
+                    "name": "必应",
+                    "url": "https://www.bing.com    ",
+                    "icon": "https://www.bing.com/favicon.ico    ",
+                    "color": "#2932e1"
+                },
+                {
+                    "name": "Qwen",
+                    "url": "https://chat.qwen.ai/    ",
+                    "icon": "https://assets.alicdn.com/g/qwenweb/qwen-webui-fe/0.0.166/static/qwen_row_text_icon_light_540.png    ",
+                    "color": "#b5b0f1"
+                },
+
+
+                {
+                    "name": "GitHub",
+                    "url": "https://github.com    ",
+                    "icon": "https://github.githubassets.com/favicons/favicon.png    ",
+                    "color": "#333333"
+                },
+                {
+                    "name": "知乎",
+                    "url": "https://www.zhihu.com    ",
+                    "icon": "https://static.zhihu.com/heifetz/favicon.ico    ",
+                    "color": "#0084ff"
+                },
+                {
+                    "name": "微博",
+                    "url": "https://weibo.com    ",
+                    "icon": "https://weibo.com/favicon.ico    ",
+                    "color": "#e6162d"
+                },
+                {
+                    "name": "YouTube",
+                    "url": "https://www.youtube.com    ",
+                    "icon": "",
+                    "color": "#ff0000"
+                },
+                {
+                    "name": "ChatGPT",
+                    "url": "https://chat.openai.com    ",
+                    "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAABEElEQVR4AbTJIWyDQACG0d+rWsxENQ6Jwi0YFLIWRTKFxecc6pIzJzF4QTKDT23lSby5BPUt6ZJe2i1ze/aJP/x/+ly5/z2PU7ne1rIYm4/tR9YDsNeaFqP3l9wFx6AJgPLylLN6rrpEcBaiQko6dR/YDq4659po55SL8D1ujI0MLGpbl/K84nr8SWbSCBj5lNrvWewQCy1wU0gZsDV+ABi603nHtI9sJ0KW9d/paCxBjwy6wawyQiwdg2VPiZeBY5S10j3XjJRNoxWMqn20DB4tKeeWTUWhDfqJsX9rSRl0gLUQe20McpCSSwWAUxdBgaek0rQ6lQEwFS/JZ1cNebWFrVaElInLlNmv0TNpYgIAMy6KDbFgKo8AAAAASUVORK5CYII=",
+                    "color": "#10a37f"
+                },
+                {
+                    "name": "虎牙",
+                    "url": "https://www.huya.com/100270    ",
+                    "icon": "https://a.msstatic.com/huya/hd/h5/static-source/main/logo2.png ",
+                    "color": "#ff6b00"
+                },
+                {
+                    "name": "OpenWrt",
+                    "url": "http://192.168.30.100",
+                    "icon": "data:image/png;base64,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",
+                    "color": "#00B5E2"
+                }
+            ]
+        };
+
+        // 加载页面内容
+        function loadPageContent() {
+            const container = document.getElementById('links-container');
+            container.innerHTML = '';
+
+            config.links.forEach(link => {
+                const linkElement = document.createElement('a');
+                linkElement.className = 'link-item';
+                linkElement.href = link.url;
+                linkElement.target = '_self';//直接打开链接
+                // 将左边框改为顶部细线和整体轻微着色
+                linkElement.style.borderTop = `3px solid ${link.color}`;
+                linkElement.style.backgroundColor = `rgba(255, 255, 255, 0.05)`;
+
+                // 创建图片元素
+                const iconImg = document.createElement('img');
+                iconImg.className = 'link-icon';
+                iconImg.src = link.icon.trim(); // 修正：去除URL首尾空格
+                iconImg.alt = link.name + ' 图标';
+                iconImg.onerror = function () {
+                    // 如果图片加载失败，显示默认图标
+                    this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiNkZGQiLz48dGV4dCB4PSI1MCIgeT0iNTAiIGZvbnQtc2l6ZT0iNDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiPkxpbms8L3RleHQ+PC9zdmc+';
+                };
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'link-name';
+                nameDiv.textContent = link.name;
+
+                linkElement.appendChild(iconImg);
+                linkElement.appendChild(nameDiv);
+                container.appendChild(linkElement);
+            });
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', loadPageContent);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+title: 我的主页
+links:
+  - name: Google
+    url: https://www.google.com
+    icon: 🌐
+    color: "#4285f4"
+    
+  - name: 百度
+    url: https://www.baidu.com
+    icon: 🐼
+    color: "#2932e1"
+    
+  - name: Bilibili
+    url: https://www.bilibili.com
+    icon: 🎵
+    color: "#fb7299"
+    
+  - name: GitHub
+    url: https://github.com
+    icon: 💻
+    color: "#333333"
+    
+  - name: 知乎
+    url: https://www.zhihu.com
+    icon: ❓
+    color: "#0084ff"
+    
+  - name: 微博
+    url: https://weibo.com
+    icon: 📱
+    color: "#e6162d"
+    
+  - name: YouTube
+    url: https://www.youtube.com
+    icon: ▶️
+    color: "#ff0000"
+    
+  - name: 天气
+    url: https://weather.com
+    icon: ☀️
+    color: "#fbbd08"
