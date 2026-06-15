@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CYBER-DECK V14.2</title>
-    <meta name="description" content="A simple HTML navigation page - your personal cyber deck for quick access to favorite websites.">
+    <meta name="description"
+          content="A simple HTML navigation page - your personal cyber deck for quick access to favorite websites.">
 
     <!-- 防闪屏：在首次绘制前就应用已保存的主题，避免 dark→light 闪烁 (FOUC) -->
     <script>
@@ -27,10 +28,10 @@
 
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
-    
+
     <!-- YAML 解析库 -->
     <script src="js-yaml.min.js"></script>
-    
+
     <style>
         /* --- 全局变量适配 --- */
         :root {
@@ -575,7 +576,8 @@
 
         <div class="side-panel" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
             <div class="stat-label" style="color: var(--neon-alt);">[ MEMO_PAD ]</div>
-            <label for="todo-in" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">新增备忘</label>
+            <label for="todo-in" class="sr-only"
+                   style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">新增备忘</label>
             <input type="text" id="todo-in" placeholder="+ Add new note...">
             <div id="todo-list" role="list"></div>
         </div>
@@ -583,7 +585,9 @@
 
     <main class="main-content">
         <div class="search-container">
-            <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">// A simple HTML navigation page · 按 <kbd>/</kbd> 搜索 · <kbd>Esc</kbd> 清空</p>
+            <p
+               style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">
+                // A simple HTML navigation page · 按 <kbd>/</kbd> 搜索 · <kbd>Esc</kbd> 清空</p>
             <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
                    autocomplete="off" aria-label="搜索链接">
         </div>
@@ -592,7 +596,8 @@
     </main>
 
     <noscript>
-        <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text-main);font-family:sans-serif;text-align:center;padding:20px;">
+        <div
+             style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text-main);font-family:sans-serif;text-align:center;padding:20px;">
             本导航页依赖 JavaScript 渲染。请在浏览器设置中启用 JavaScript 后刷新。
         </div>
     </noscript>
@@ -951,7 +956,7 @@
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const yamlText = await response.text();
                 const data = jsyaml.load(yamlText);
-                
+
                 if (data.categories && data.links) {
                     config.categories = data.categories;
                     config.links = data.links;
@@ -962,7 +967,7 @@
                 }
             } catch (err) {
                 console.error('❌ 加载 YAML 失败:', err);
-                document.getElementById('render-area').innerHTML = 
+                document.getElementById('render-area').innerHTML =
                     `<div class="empty-hint">// 配置文件加载失败<br/>${err.message}</div>`;
                 return false;
             }
@@ -973,7 +978,7 @@
             // 先加载 YAML 配置
             const loaded = await loadConfigFromYAML();
             if (!loaded) return;  // 加载失败则停止
-            
+
             // 非网络依赖任务优先瞬间执行，画出 UI 骨架
             updateClock();
             setInterval(updateClock, 1000);
