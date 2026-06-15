@@ -4,10 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V14</title>
+    <title>CYBER-DECK V14.2</title>
     <meta name="description" content="A simple HTML navigation page - your personal cyber deck for quick access to favorite websites.">
 
-    <!-- 优化 1：异步非阻塞字体加载，告别白屏死等 -->
+    <!-- 防闪屏：在首次绘制前就应用已保存的主题，避免 dark→light 闪烁 (FOUC) -->
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('cyber-v14-theme');
+                if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+            } catch (e) { /* localStorage 不可用时静默降级 */ }
+        })();
+    </script>
+
+    <!-- 异步非阻塞字体加载 -->
     <link rel="preconnect" href="https://fonts.geekzu.org" crossorigin>
     <link rel="preload" as="style"
           href="https://fonts.geekzu.org/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap">
@@ -17,6 +27,10 @@
 
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
+    
+    <!-- YAML 解析库 -->
+    <script src="js-yaml.min.js"></script>
+    
     <style>
         /* --- 全局变量适配 --- */
         :root {
@@ -28,16 +42,18 @@
             --text-main: #ffffff;
             --text-sub: #a1a1aa;
             --grid-color: rgba(0, 242, 255, 0.05);
+            --sidebar-w: 320px;
         }
 
+        /* light 主题抬高对比度，满足 WCAG AA */
         [data-theme="light"] {
             --neon: #0055ff;
             --neon-alt: #6200ea;
-            --bg: #f0f3f7;
-            --panel: rgba(255, 255, 255, 0.9);
-            --border: rgba(0, 85, 255, 0.2);
-            --text-main: #1a1a2e;
-            --text-sub: #555555;
+            --bg: #eef1f6;
+            --panel: rgba(255, 255, 255, 0.92);
+            --border: rgba(0, 85, 255, 0.25);
+            --text-main: #14161f;
+            --text-sub: #454a5a;
             --grid-color: rgba(0, 0, 0, 0.05);
         }
 
@@ -45,7 +61,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            cursor: none !important;
         }
 
         body {
@@ -58,17 +73,20 @@
             transition: background 0.5s ease, color 0.5s ease;
         }
 
-        /* --- 零延迟霓虹光标 --- */
+        /* --- 零延迟霓虹光标（默认隐藏，触屏走系统光标） --- */
         #neon-cursor {
             position: fixed;
             top: 0;
             left: 0;
             width: 22px;
             height: 22px;
+            margin-left: -4px;
+            margin-top: -2px;
             z-index: 10000;
             pointer-events: none;
             transform: translate3d(0, 0, 0);
             filter: drop-shadow(0 0 8px var(--neon));
+            display: none;
         }
 
         #neon-cursor svg {
@@ -76,6 +94,20 @@
             width: 100%;
             height: 100%;
             transition: fill 0.3s;
+        }
+
+        /* 仅在「精确指针 + 支持悬停」的设备上启用霓虹光标并隐藏系统光标。
+           关键：此规则必须放在 #neon-cursor 基础规则之后——
+           specificity 相同时后出现的覆盖先出现的，
+           否则上面的 display:none 会压过这里的 display:block，电脑也看不到光标。 */
+        @media (hover: hover) and (pointer: fine) {
+            * {
+                cursor: none !important;
+            }
+
+            #neon-cursor {
+                display: block;
+            }
         }
 
         .click-ripple {
@@ -110,12 +142,14 @@
             background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 50px 50px;
+            -webkit-mask-image: radial-gradient(circle, black, transparent 90%);
             mask-image: radial-gradient(circle, black, transparent 90%);
         }
 
         /* --- 侧边栏 --- */
         .sidebar {
-            width: 320px;
+            width: var(--sidebar-w);
+            flex-shrink: 0;
             background: var(--panel);
             backdrop-filter: blur(40px);
             border-right: 1px solid var(--border);
@@ -124,6 +158,7 @@
             flex-direction: column;
             gap: 20px;
             z-index: 100;
+            overflow-y: auto;
         }
 
         .side-panel {
@@ -182,6 +217,54 @@
             transition: width 0.6s;
         }
 
+        /* 备忘录 */
+        .memo {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .memo .txt {
+            word-break: break-all;
+        }
+
+        .memo .del {
+            opacity: 0.3;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: 0.85rem;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+
+        .memo .del:hover {
+            opacity: 1;
+            color: var(--neon);
+        }
+
+        #todo-in {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            font-size: 0.8rem;
+            padding: 10px 0;
+            outline: none;
+        }
+
+        #todo-list {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
         /* --- 右侧看板 (列式清单) --- */
         .main-content {
             flex: 1;
@@ -189,6 +272,7 @@
             flex-direction: column;
             padding: 30px 40px;
             overflow-x: auto;
+            min-width: 0;
         }
 
         .search-container {
@@ -208,11 +292,20 @@
             backdrop-filter: blur(10px);
             outline: none;
             transition: 0.3s;
+            font-family: inherit;
         }
 
         .search-bar:focus {
             border-color: var(--neon);
             box-shadow: 0 0 20px var(--neon);
+        }
+
+        /* 键盘可见焦点环（鼠标点击不显示，键盘 Tab 显示） */
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible {
+            outline: 2px solid var(--neon);
+            outline-offset: 2px;
         }
 
         #render-area {
@@ -251,6 +344,11 @@
             letter-spacing: 2px;
         }
 
+        .cat-count {
+            opacity: 0.5;
+            margin-left: 6px;
+        }
+
         .links-list {
             display: flex;
             flex-direction: column;
@@ -266,6 +364,7 @@
             align-items: center;
             gap: 20px;
             text-decoration: none;
+            color: inherit;
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
@@ -310,6 +409,7 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
+            min-width: 0;
         }
 
         .link-name {
@@ -322,6 +422,15 @@
             color: var(--text-sub);
             font-size: 0.7rem;
             font-family: 'JetBrains Mono';
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .empty-hint {
+            color: var(--text-sub);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 20px;
         }
 
         /* 主题切换 */
@@ -347,26 +456,104 @@
             box-shadow: 0 0 15px var(--neon);
             transform: scale(1.1);
         }
+
+        /* 移动端汉堡按钮 */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1002;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            color: var(--neon);
+            font-size: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+
+        /* --- 响应式：窄屏抽屉式侧栏 --- */
+        @media (max-width: 860px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100%;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar.open~.sidebar-backdrop {
+                display: block;
+            }
+
+            .main-content {
+                padding: 80px 20px 30px;
+            }
+
+            #render-area {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .cat-column {
+                min-width: 0;
+                width: 100%;
+            }
+        }
+
+        /* 尊重「减少动态效果」系统设置 */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
     </style>
 </head>
 
-<body data-theme="dark">
+<body>
 
-    <div id="neon-cursor">
+    <div id="neon-cursor" aria-hidden="true">
         <svg viewBox="0 0 32 32">
             <path d="M8 2 L24 16 L16 16 L22 28 L18 30 L12 18 L8 22 Z" />
         </svg>
     </div>
 
-    <div class="bg-grid"></div>
-    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    <div class="bg-grid" aria-hidden="true"></div>
 
-    <aside class="sidebar">
+    <button class="theme-toggle" id="theme-btn" type="button" aria-label="切换深色/浅色主题" title="切换主题">🌓</button>
+    <button class="menu-toggle" id="menu-btn" type="button" aria-label="打开侧边面板" aria-expanded="false">☰</button>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+
+    <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <div class="side-panel clock-wrap">
             <div style="font-size: 0.7rem; color: var(--neon); letter-spacing: 2px;">SECURE_TIME</div>
             <div>
-                <span class="clock-time" id="time-hm">00:00</span>
-                <span class="clock-sec" id="time-s">00</span>
+                <span class="clock-time" id="time-hm">00:00</span><span class="clock-sec" id="time-s">00</span>
             </div>
             <div class="clock-date" id="date-str">BOOTING...</div>
         </div>
@@ -375,7 +562,7 @@
             <div class="stat-label"><span>WEATHER</span><span id="weather-desc">LOADING</span></div>
             <div style="font-size: 2rem; font-weight: bold; color: var(--neon); margin: 5px 0;" id="temp-val">--°C</div>
 
-            <div class="stat-label"><span>POWER</span><span id="batt-val">100%</span></div>
+            <div class="stat-label"><span id="batt-label">POWER</span><span id="batt-val">--</span></div>
             <div class="bar-outer">
                 <div class="bar-inner" id="batt-bar" style="width: 100%;"></div>
             </div>
@@ -386,185 +573,423 @@
             </div>
         </div>
 
-        <div class="side-panel" style="flex: 1; display: flex; flex-direction: column;">
+        <div class="side-panel" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
             <div class="stat-label" style="color: var(--neon-alt);">[ MEMO_PAD ]</div>
-            <input type="text" id="todo-in"
-                   style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); color:var(--text-main); font-size:0.8rem; padding:10px 0; outline:none;"
-                   placeholder="+ Add new note...">
-            <div id="todo-list" style="margin-top: 10px; font-size: 0.75rem; overflow-y:auto; flex:1;"></div>
+            <label for="todo-in" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">新增备忘</label>
+            <input type="text" id="todo-in" placeholder="+ Add new note...">
+            <div id="todo-list" role="list"></div>
         </div>
     </aside>
 
     <main class="main-content">
         <div class="search-container">
-            <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">// A simple HTML navigation page</p>
+            <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">// A simple HTML navigation page · 按 <kbd>/</kbd> 搜索 · <kbd>Esc</kbd> 清空</p>
             <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
-                   autocomplete="off">
+                   autocomplete="off" aria-label="搜索链接">
         </div>
 
-        <div id="render-area"></div>
+        <div id="render-area" aria-live="polite"></div>
     </main>
 
+    <noscript>
+        <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--text-main);font-family:sans-serif;text-align:center;padding:20px;">
+            本导航页依赖 JavaScript 渲染。请在浏览器设置中启用 JavaScript 后刷新。
+        </div>
+    </noscript>
+
     <script>
-        const config = {
-            categories: [
-                { id: 'media', name: 'MEDIA_STATIONS' },
-                { id: 'ai', name: 'NEURAL_INTELLIGENCE' },
-                { id: 'dev', name: 'FORGE_WORKSHOP' },
-                { id: 'social', name: 'SOCIAL_NEXUS' },
-                { id: 'search', name: 'SEARCH_ENGINES' }
-            ],
-            links: [
-                // --- MEDIA_STATIONS (影音娱乐) ---
+        'use strict';
 
-                { name: "Bilibili", url: "https://t.bilibili.com/", cat: "media", icon: "https://static.hdslb.com/images/favicon.ico" },
-                { name: "YouTube", url: "https://www.youtube.com", cat: "media", icon: "https://www.youtube.com/favicon.ico" },
-                { name: "Netflix", url: "https://www.netflix.com", cat: "media", icon: "https://www.netflix.com/favicon.ico" },
-                { name: "Twitch", url: "https://www.twitch.tv", cat: "media", icon: "https://th.bing.com/th/id/ODF.NGz4Api7uY8oq1SpbgkfcA?w=32&h=32&qlt=90&pcl=fffffc&o=6&pid=1.2" },
-                { name: "Spotify", url: "https://open.spotify.com", cat: "media", icon: "https://open.spotify.com/favicon.ico" },
-                { name: "Steam", url: "https://store.steampowered.com/", cat: "media", icon: "https://store.steampowered.com/favicon.ico" },
-                { name: "虎牙直播", url: "https://www.huya.com", cat: "media", icon: "https://a.msstatic.com/huya/hd/h5/static-source/main/logo2.png" },
-
-                // --- NEURAL_INTELLIGENCE (AI 助手) ---
-                { name: "AI Studio", url: "https://aistudio.google.com", cat: "ai", icon: "https://www.gstatic.com/aistudio/zero-state/promo_chat_url_context.png" },
-                { name: "xiaomimimo", url: "https://aistudio.xiaomimimo.com/#/", cat: "ai", icon: "https://cdn.cnbj1.fds.api.mi-img.com/aife/mimo-blog-fe/doc_build/static/image/logo.99baaffe.png" },
-                { name: "通义千问", url: "https://chat.qwen.ai/", cat: "ai", icon: "https://th.bing.com/th?id=OCBZA.B73F50E19DFEAB57CA111B36001945C0C87797D5E5AC215BCAEA773DF9D57E6FA&pid=BZA&rs=0" },
-                { name: "ChatGPT", url: "https://chatgpt.com", cat: "ai", icon: "https://chatgpt.com/favicon.ico" },
-                { name: "DeepSeek", url: "https://chat.deepseek.com", cat: "ai", icon: "https://www.deepseek.com/favicon.ico" },
-                { name: "Claude", url: "https://claude.ai", cat: "ai", icon: "https://claude.ai/favicon.ico" },
-                { name: "Gemini", url: "https://gemini.google.com", cat: "ai", icon: "https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg" },
-                { name: "Kimi", url: "https://kimi.moonshot.cn", cat: "ai", icon: "https://kimi.moonshot.cn/favicon.ico" },
-                { name: "Midjourney", url: "https://www.midjourney.com", cat: "ai", icon: "https://www.midjourney.com/favicon.ico" },
-
-                // --- FORGE_WORKSHOP (开发/工具) ---
-                { name: "GitHub", url: "https://github.com", cat: "dev", icon: "https://github.githubassets.com/favicons/favicon.png" },
-                { name: "Vercel", url: "https://vercel.com", cat: "dev", icon: "https://assets.vercel.com/image/upload/front/favicon/vercel/favicon.ico" },
-                { name: "Notion", url: "https://www.notion.so", cat: "dev", icon: "https://www.notion.so/images/favicon.ico" },
-                { name: "Figma", url: "https://www.figma.com", cat: "dev", icon: "https://www.figma.com/favicon.ico" },
-                { name: "Canva", url: "https://www.canva.com", cat: "dev", icon: "https://www.canva.com/favicon.ico" },
-                { name: "Stack Overflow", url: "https://stackoverflow.com", cat: "dev", icon: "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico" },
-                { name: "OpenWrt", url: "http://192.168.30.100", cat: "dev", icon: "https://openwrt.org/_media/favicon.ico" },
-
-                // --- SOCIAL_NEXUS (社交网络) ---
-                { name: "Gmail", url: "https://mail.google.com", cat: "social", icon: "https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" },
-                { name: "X / Twitter", url: "https://x.com", cat: "social", icon: "https://abs.twimg.com/favicons/twitter.2.ico" },
-                { name: "Discord", url: "https://discord.com", cat: "social", icon: "https://discord.com/favicon.icohttps://th.bing.com/th/id/ODF.xXp47-dBXlzjKRnoX3v0kQ?w=32&h=32&qlt=90&pcl=fffffa&o=6&pid=1.2" },
-                { name: "Reddit", url: "https://www.reddit.com", cat: "social", icon: "https://www.redditstatic.com/desktop2x/img/favicon/favicon-32x32.png" },
-                { name: "知乎", url: "https://www.zhihu.com", cat: "social", icon: "https://static.zhihu.com/heifetz/favicon.ico" },
-                { name: "微博", url: "https://weibo.com", cat: "social", icon: "https://weibo.com/favicon.ico" },
-                { name: "Telegram", url: "https://web.telegram.org", cat: "social", icon: "https://web.telegram.org/favicon.ico" },
-
-                // --- SEARCH_ENGINES (搜索引擎) ---
-                { name: "Google", url: "https://www.google.com", cat: "search", icon: "https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png" },
-                { name: "Bing", url: "https://www.bing.com", cat: "search", icon: "https://www.bing.com/favicon.ico" },
-                { name: "DuckDuckGo", url: "https://duckduckgo.com", cat: "search", icon: "https://duckduckgo.com/favicon.ico" },
-                { name: "百度", url: "https://www.baidu.com", cat: "search", icon: "https://www.baidu.com/favicon.ico" },
-                { name: "WolframAlpha", url: "https://www.wolframalpha.com", cat: "search", icon: "https://www.wolframalpha.com/_cdn/favicon.ico" }
-            ]
+        // 从 YAML 加载的配置，初始为空
+        let config = {
+            categories: [],
+            links: []
         };
-        // --- 深度主题切换 ---
-        function toggleTheme() {
-            const current = document.body.getAttribute('data-theme');
-            const target = current === 'dark' ? 'light' : 'dark';
-            document.body.setAttribute('data-theme', target);
-            localStorage.setItem('cyber-v14-theme', target);
+
+        // --- 工具函数 ---
+        // 安全地把 url 解析成 hostname，失败时回退到原始字符串，避免一条坏链接拖垮整页渲染
+        function safeHostname(url) {
+            try {
+                return new URL(url).hostname || url;
+            } catch (e) {
+                return url;
+            }
         }
 
-        // --- 渲染 (64px 看板单列) ---
-        function render(kw = '') {
-            const area = document.getElementById('render-area');
-            area.innerHTML = '';
-            config.categories.forEach(cat => {
-                const list = config.links.filter(l => l.cat === cat.id && l.name.toLowerCase().includes(kw.toLowerCase()));
-                if (list.length > 0) {
-                    const col = document.createElement('div');
-                    col.className = 'cat-column';
-                    col.innerHTML = `
-                        <div class="cat-header">// ${cat.name}</div>
-                        <div class="links-list">
-                            ${list.map(l => `
-                                <a href="${l.url}" class="link-card" target="_self">
-                                    <div class="icon-wrap">${getIcon(l)}</div>
-                                    <div class="link-info">
-                                        <span class="link-name">${l.name}</span>
-                                        <span class="link-url">${new URL(l.url).hostname}</span>
-                                    </div>
-                                </a>
-                            `).join('')}
-                        </div>
-                    `;
-                    area.appendChild(col);
+        // 文本转义，防止链接名含特殊字符破坏 DOM / 注入
+        function escapeText(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        // 根据字符串生成稳定的霓虹色
+        function hashColor(s) {
+            const sum = String(s || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+            return `hsl(${Math.abs(sum) % 360}, 60%, 50%)`;
+        }
+
+        // 简单防抖
+        function debounce(fn, ms) {
+            let t;
+            return function (...args) {
+                clearTimeout(t);
+                t = setTimeout(() => fn.apply(this, args), ms);
+            };
+        }
+
+        // --- 主题切换 ---
+        const themeBtn = document.getElementById('theme-btn');
+        function currentTheme() {
+            return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+        }
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            try { localStorage.setItem('cyber-v14-theme', theme); } catch (e) { /* ignore */ }
+        }
+        themeBtn.addEventListener('click', () => applyTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
+
+        // --- 渲染 (用 DOM API 构建节点，避免 innerHTML 转义/引号脆弱性) ---
+        const renderArea = document.getElementById('render-area');
+
+        function buildIcon(link) {
+            const wrap = document.createElement('div');
+            wrap.className = 'icon-wrap';
+
+            const name = link.name || '?';
+            const img = document.createElement('img');
+            img.className = 'link-icon';
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.alt = name;                       // a11y：图标带 alt
+            img.onerror = () => {                 // 失败回退到首字母方块
+                if (wrap.contains(img)) {
+                    const fb = document.createElement('div');
+                    fb.className = 'icon-fallback';
+                    fb.style.background = hashColor(name);
+                    fb.textContent = name[0].toUpperCase();
+                    wrap.replaceChild(fb, img);
                 }
-            });
+            };
+            img.src = link.icon;
+            wrap.appendChild(img);
+            return wrap;
         }
 
-        function getIcon(link) {
-            const hashColor = (s) => `hsl(${Math.abs(s.split('').reduce((a, b) => a + b.charCodeAt(0), 0) % 360)}, 60%, 50%)`;
-            // 优化 2：依然保持 lazy 懒加载，防阻塞
-            return `<img src="${link.icon}" class="link-icon" loading="lazy" decoding="async" onerror="this.outerHTML='<div class=\'icon-fallback\' style=\'background:${hashColor(link.name)}\'>${link.name[0].toUpperCase()}</div>'">`;
+        function buildCard(link) {
+            const a = document.createElement('a');
+            a.href = link.url;
+            a.className = 'link-card';
+            a.target = '_self';
+            a.rel = 'noopener noreferrer';
+
+            a.appendChild(buildIcon(link));
+
+            const info = document.createElement('div');
+            info.className = 'link-info';
+            const nameEl = document.createElement('span');
+            nameEl.className = 'link-name';
+            nameEl.textContent = link.name;
+            const urlEl = document.createElement('span');
+            urlEl.className = 'link-url';
+            urlEl.textContent = safeHostname(link.url);
+            info.appendChild(nameEl);
+            info.appendChild(urlEl);
+            a.appendChild(info);
+            return a;
+        }
+
+        function render(kw) {
+            renderArea.innerHTML = '';
+            const q = (kw || '').toLowerCase().trim();
+            let total = 0;
+
+            config.categories.forEach(cat => {
+                const list = config.links.filter(l => {
+                    if (l.cat !== cat.id) return false;
+                    if (!q) return true;
+                    // 同时匹配名称、URL、分类名
+                    return (l.name || '').toLowerCase().includes(q)
+                        || (l.url || '').toLowerCase().includes(q)
+                        || cat.name.toLowerCase().includes(q);
+                });
+                if (list.length === 0) return;
+                total += list.length;
+
+                const col = document.createElement('div');
+                col.className = 'cat-column';
+
+                const header = document.createElement('div');
+                header.className = 'cat-header';
+                header.textContent = '// ' + cat.name;
+                const cnt = document.createElement('span');
+                cnt.className = 'cat-count';
+                cnt.textContent = `(${list.length})`;
+                header.appendChild(cnt);
+                col.appendChild(header);
+
+                const ul = document.createElement('div');
+                ul.className = 'links-list';
+                list.forEach(l => ul.appendChild(buildCard(l)));
+                col.appendChild(ul);
+
+                renderArea.appendChild(col);
+            });
+
+            if (total === 0) {
+                const hint = document.createElement('div');
+                hint.className = 'empty-hint';
+                hint.textContent = q ? `// 未匹配到 "${kw}" 的结果` : '// 暂无链接';
+                renderArea.appendChild(hint);
+            }
         }
 
         // --- 系统同步 ---
         function updateClock() {
             const now = new Date();
-            document.getElementById('time-hm').innerText = now.toTimeString().split(' ')[0].substring(0, 5);
-            document.getElementById('time-s').innerText = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('date-str').innerText = now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' }).toUpperCase();
+            document.getElementById('time-hm').textContent = now.toTimeString().split(' ')[0].substring(0, 5);
+            document.getElementById('time-s').textContent = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('date-str').textContent =
+                now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
             const day = now.getDay() === 0 ? 7 : now.getDay();
             const per = Math.round((day / 7) * 100);
-            document.getElementById('week-val').innerText = per + '%';
+            document.getElementById('week-val').textContent = per + '%';
             document.getElementById('week-bar').style.width = per + '%';
         }
 
+        // --- 天气：带本地缓存 + 后台不重复请求 ---
+        const WEATHER_KEY = 'cyber-v14-weather';
+        function applyWeather(tempC, desc) {
+            document.getElementById('temp-val').textContent = `${tempC}°C`;
+            document.getElementById('weather-desc').textContent = String(desc || '').toUpperCase();
+        }
+        function loadCachedWeather() {
+            try {
+                const raw = localStorage.getItem(WEATHER_KEY);
+                if (!raw) return;
+                const obj = JSON.parse(raw);
+                // 1 小时内的缓存直接用
+                if (obj && obj.ts && Date.now() - obj.ts < 3600000) {
+                    applyWeather(obj.tempC, obj.desc);
+                }
+            } catch (e) { /* ignore */ }
+        }
         async function updateWeather() {
+            // 后台标签页跳过请求，节省流量
+            if (document.hidden) return;
             try {
                 const res = await fetch('https://wttr.in/?format=j1');
                 const data = await res.json();
                 const cur = data.current_condition[0];
-                document.getElementById('temp-val').innerText = `${cur.temp_C}°C`;
-                document.getElementById('weather-desc').innerText = cur.weatherDesc[0].value.toUpperCase();
-            } catch (e) { document.getElementById('weather-desc').innerText = "OFFLINE"; }
+                const tempC = cur.temp_C;
+                const desc = cur.weatherDesc[0].value;
+                applyWeather(tempC, desc);
+                try {
+                    localStorage.setItem(WEATHER_KEY, JSON.stringify({ tempC, desc, ts: Date.now() }));
+                } catch (e) { /* ignore */ }
+            } catch (e) {
+                document.getElementById('weather-desc').textContent = 'OFFLINE';
+            }
         }
 
-        // --- 光标锁定 ---
-        const cursor = document.getElementById('neon-cursor');
-        document.addEventListener('mousemove', e => cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`);
-        document.addEventListener('mousedown', e => {
-            const r = document.createElement('div');
-            r.className = 'click-ripple';
-            r.style.left = e.clientX + 'px'; r.style.top = e.clientY + 'px';
-            document.body.appendChild(r);
-            setTimeout(() => r.remove(), 500);
-        });
+        // --- 电量：带降级（API 不存在时不报错） ---
+        function setupBattery() {
+            const valEl = document.getElementById('batt-val');
+            const barEl = document.getElementById('batt-bar');
+            const labelEl = document.getElementById('batt-label');
+            if (navigator.getBattery) {
+                navigator.getBattery().then(b => {
+                    const fn = () => {
+                        const pct = Math.round(b.level * 100);
+                        valEl.textContent = pct + '%';
+                        barEl.style.width = b.level * 100 + '%';
+                    };
+                    fn();
+                    b.addEventListener('levelchange', fn);
+                }).catch(() => { /* 拒绝时走降级 */ });
+            } else {
+                // 桌面端/不支持时给出合理提示，而非假装 100%
+                labelEl.textContent = 'POWER';
+                valEl.textContent = 'N/A';
+                barEl.style.width = '0%';
+                barEl.style.background = 'var(--text-sub)';
+                barEl.style.boxShadow = 'none';
+            }
+        }
 
-        // --- 初始化 ---
-        function init() {
-            // 优化 3：非网络依赖的任务优先瞬间执行，画出 UI 骨架
-            updateClock(); setInterval(updateClock, 1000);
+        // --- 备忘录：事件委托 + 安全持久化（不再依赖全局 save） ---
+        function setupMemo() {
+            const tIn = document.getElementById('todo-in');
+            const tList = document.getElementById('todo-list');
+            const KEY = 'v14-memos';
 
-            if (navigator.getBattery) navigator.getBattery().then(b => {
-                const fn = () => { document.getElementById('batt-val').innerText = Math.round(b.level * 100) + '%'; document.getElementById('batt-bar').style.width = b.level * 100 + '%'; };
-                fn(); b.addEventListener('levelchange', fn);
-            });
+            const save = () => {
+                try {
+                    const items = Array.from(tList.querySelectorAll('.memo .txt')).map(s => s.textContent);
+                    localStorage.setItem(KEY, JSON.stringify(items));
+                } catch (e) { /* ignore */ }
+            };
 
-            const tIn = document.getElementById('todo-in'), tList = document.getElementById('todo-list');
-            const save = () => localStorage.setItem('v14-memos', JSON.stringify(Array.from(tList.querySelectorAll('.txt')).map(s => s.innerText)));
-            const add = (t) => {
-                const d = document.createElement('div'); d.style.padding = '8px 0'; d.style.borderBottom = '1px solid rgba(255,255,255,0.05)'; d.style.display = 'flex'; d.style.justifyContent = 'space-between';
-                d.innerHTML = `<span class="txt">${t}</span><span style="opacity:0.3" onclick="this.parentElement.remove();save();">✕</span>`;
+            const add = (text) => {
+                if (!text) return;
+                const d = document.createElement('div');
+                d.className = 'memo';
+                d.setAttribute('role', 'listitem');
+
+                const span = document.createElement('span');
+                span.className = 'txt';
+                span.textContent = text;
+
+                const del = document.createElement('button');
+                del.className = 'del';
+                del.type = 'button';
+                del.setAttribute('aria-label', '删除该备忘');
+                del.textContent = '✕';
+
+                d.appendChild(span);
+                d.appendChild(del);
                 tList.appendChild(d);
             };
-            tIn.addEventListener('keypress', e => { if (e.key === 'Enter' && tIn.value.trim()) { add(tIn.value.trim()); tIn.value = ''; save(); } });
-            JSON.parse(localStorage.getItem('v14-memos') || '[]').forEach(add);
-            document.getElementById('search-in').addEventListener('input', e => render(e.target.value));
 
-            const savedTheme = localStorage.getItem('cyber-v14-theme');
-            if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
+            // 事件委托：所有删除按钮统一处理，闭包内可访问 save
+            tList.addEventListener('click', e => {
+                const btn = e.target.closest('.del');
+                if (!btn) return;
+                btn.closest('.memo')?.remove();
+                save();
+            });
 
-            // 优化 4：核心 DOM 注入与外部 API 请求延迟 200ms，为骨架渲染让路
+            tIn.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && tIn.value.trim()) {
+                    add(tIn.value.trim());
+                    tIn.value = '';
+                    save();
+                }
+            });
+
+            try {
+                JSON.parse(localStorage.getItem(KEY) || '[]').forEach(add);
+            } catch (e) { /* 损坏数据忽略 */ }
+        }
+
+        // --- 搜索：防抖 + 键盘交互 ---
+        function setupSearch() {
+            const input = document.getElementById('search-in');
+            const debouncedRender = debounce(v => render(v), 120);
+            input.addEventListener('input', e => debouncedRender(e.target.value));
+            // 回车直达第一个匹配结果
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    const first = renderArea.querySelector('.link-card');
+                    if (first) window.location.href = first.href;
+                }
+                if (e.key === 'Escape') {
+                    input.value = '';
+                    render('');
+                }
+            });
+        }
+
+        // --- 全局快捷键：/ 聚焦搜索，Esc 清空 ---
+        document.addEventListener('keydown', e => {
+            const tag = (document.activeElement && document.activeElement.tagName) || '';
+            const typing = tag === 'INPUT' || tag === 'TEXTAREA';
+            if (e.key === '/' && !typing) {
+                e.preventDefault();
+                document.getElementById('search-in').focus();
+            }
+        });
+
+        // --- 光标：rAF 节流，移动端自动禁用 ---
+        function setupCursor() {
+            const cursor = document.getElementById('neon-cursor');
+            // 仅在精细指针设备绑定（与 CSS 媒体查询一致）
+            if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+            let mx = 0, my = 0, rafId = null;
+            document.addEventListener('mousemove', e => {
+                mx = e.clientX; my = e.clientY;
+                if (rafId) return;
+                rafId = requestAnimationFrame(() => {
+                    cursor.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
+                    rafId = null;
+                });
+            });
+            document.addEventListener('mousedown', e => {
+                const r = document.createElement('div');
+                r.className = 'click-ripple';
+                r.style.left = e.clientX + 'px';
+                r.style.top = e.clientY + 'px';
+                document.body.appendChild(r);
+                setTimeout(() => r.remove(), 500);
+            });
+        }
+
+        // --- 移动端抽屉 ---
+        function setupSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const btn = document.getElementById('menu-btn');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const toggle = (open) => {
+                const o = open == null ? !sidebar.classList.contains('open') : open;
+                sidebar.classList.toggle('open', o);
+                btn.setAttribute('aria-expanded', o ? 'true' : 'false');
+            };
+            btn.addEventListener('click', () => toggle());
+            backdrop.addEventListener('click', () => toggle(false));
+        }
+
+        // --- 可见性变化时刷新一次天气（从后台切回前台） ---
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) updateWeather();
+        });
+
+        // --- 从 YAML 加载配置 ---
+        async function loadConfigFromYAML() {
+            try {
+                const response = await fetch('./links-v2.yaml');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const yamlText = await response.text();
+                const data = jsyaml.load(yamlText);
+                
+                if (data.categories && data.links) {
+                    config.categories = data.categories;
+                    config.links = data.links;
+                    return true;
+                } else {
+                    console.warn('⚠ YAML 缺少必需字段');
+                    return false;
+                }
+            } catch (err) {
+                console.error('❌ 加载 YAML 失败:', err);
+                document.getElementById('render-area').innerHTML = 
+                    `<div class="empty-hint">// 配置文件加载失败<br/>${err.message}</div>`;
+                return false;
+            }
+        }
+
+        // --- 初始化 ---
+        async function init() {
+            // 先加载 YAML 配置
+            const loaded = await loadConfigFromYAML();
+            if (!loaded) return;  // 加载失败则停止
+            
+            // 非网络依赖任务优先瞬间执行，画出 UI 骨架
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            setupBattery();
+            setupMemo();
+            setupSearch();
+            setupCursor();
+            setupSidebar();
+            loadCachedWeather();
+
+            // 核心 DOM 注入与外部 API 请求延迟一帧，为骨架渲染让路
             setTimeout(() => {
                 render();
-                updateWeather(); setInterval(updateWeather, 600000);
+                updateWeather();
+                setInterval(updateWeather, 600000);
             }, 200);
         }
 
