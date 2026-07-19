@@ -646,11 +646,11 @@
 
         const config = {
             categories: [
-                { id: 'media', name: 'MEDIA_STATIONS' },
-                { id: 'ai', name: 'NEURAL_INTELLIGENCE' },
-                { id: 'dev', name: 'FORGE_WORKSHOP' },
-                { id: 'social', name: 'SOCIAL_NEXUS' },
-                { id: 'search', name: 'SEARCH_ENGINES' }
+                { id: 'media', name: 'Media Stations' },
+                { id: 'ai', name: 'Neural Intelligence' },
+                { id: 'dev', name: 'Forge Workshop' },
+                { id: 'social', name: 'Social Nexus' },
+                { id: 'search', name: 'Search Engines' }
             ],
             links: [
                 { name: "Bilibili", url: "https://t.bilibili.com/", cat: "media", icon: "https://static.hdslb.com/images/favicon.ico" },
@@ -877,7 +877,7 @@
                 emoji.textContent = categoryEmojis[cat.id] || '✦';
                 emoji.setAttribute('aria-hidden', 'true');
                 header.appendChild(emoji);
-                header.appendChild(document.createTextNode('// ' + cat.name));
+                header.appendChild(document.createTextNode(cat.name));
                 const cnt = document.createElement('span');
                 cnt.className = 'cat-count';
                 cnt.textContent = `(${list.length})`;
