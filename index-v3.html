@@ -4,21 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V14.2</title>
-    <meta name="description"
-          content="A simple HTML navigation page - your personal cyber deck for quick access to favorite websites.">
+    <title>CYBER-DECK V16</title>
+    <meta name="description" content="A cyberpunk-style HTML navigation page for quick access to favorite websites.">
+    <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#eef1f6" media="(prefers-color-scheme: light)">
 
-    <!-- 防闪屏：在首次绘制前就应用已保存的主题，避免 dark→light 闪烁 (FOUC) -->
     <script>
         (function () {
             try {
-                var t = localStorage.getItem('cyber-v14-theme');
+                var t = localStorage.getItem('cyber-v16-theme');
                 if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-            } catch (e) { /* localStorage 不可用时静默降级 */ }
+            } catch (e) { }
         })();
     </script>
 
-    <!-- 异步非阻塞字体加载 -->
     <link rel="preconnect" href="https://fonts.geekzu.org" crossorigin>
     <link rel="preload" as="style"
           href="https://fonts.geekzu.org/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap">
@@ -29,11 +28,13 @@
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
 
-    <!-- YAML 解析库 -->
-    <script src="js-yaml.min.js"></script>
+    <link rel="dns-prefetch" href="//www.google.com">
+    <link rel="dns-prefetch" href="//github.githubassets.com">
+    <link rel="dns-prefetch" href="//static.hdslb.com">
+    <link rel="dns-prefetch" href="//www.youtube.com">
+    <link rel="dns-prefetch" href="//chatgpt.com">
 
     <style>
-        /* --- 全局变量适配 --- */
         :root {
             --neon: #00f2ff;
             --neon-alt: #9d50ff;
@@ -46,7 +47,6 @@
             --sidebar-w: 320px;
         }
 
-        /* light 主题抬高对比度，满足 WCAG AA */
         [data-theme="light"] {
             --neon: #0055ff;
             --neon-alt: #6200ea;
@@ -74,7 +74,6 @@
             transition: background 0.5s ease, color 0.5s ease;
         }
 
-        /* --- 零延迟霓虹光标（默认隐藏，触屏走系统光标） --- */
         #neon-cursor {
             position: fixed;
             top: 0;
@@ -96,10 +95,6 @@
         #neon-cursor.is-pressed .cursor-ring { transform: scale(0.58); }
         }
 
-        /* 仅在「精确指针 + 支持悬停」的设备上启用霓虹光标并隐藏系统光标。
-           关键：此规则必须放在 #neon-cursor 基础规则之后——
-           specificity 相同时后出现的覆盖先出现的，
-           否则上面的 display:none 会压过这里的 display:block，电脑也看不到光标。 */
         @media (hover: hover) and (pointer: fine) {
             * {
                 cursor: none !important;
@@ -134,7 +129,6 @@
             }
         }
 
-        /* --- 背景装饰 --- */
         .bg-grid {
             position: fixed;
             inset: 0;
@@ -146,7 +140,6 @@
             mask-image: radial-gradient(circle, black, transparent 90%);
         }
 
-        /* --- 侧边栏 --- */
         .sidebar {
             width: var(--sidebar-w);
             flex-shrink: 0;
@@ -217,7 +210,6 @@
             transition: width 0.6s;
         }
 
-        /* 备忘录 */
         .memo {
             padding: 8px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -265,7 +257,6 @@
             flex: 1;
         }
 
-        /* --- 右侧看板 (列式清单) --- */
         .main-content {
             flex: 1;
             display: flex;
@@ -300,7 +291,6 @@
             box-shadow: 0 0 20px var(--neon);
         }
 
-        /* 键盘可见焦点环（鼠标点击不显示，键盘 Tab 显示） */
         a:focus-visible,
         button:focus-visible,
         input:focus-visible {
@@ -406,19 +396,35 @@
             transition: width 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
         }
 
-        .link-card:hover {
+        .link-card:hover,
+        .link-card.focused {
             background: color-mix(in srgb, var(--card-accent) 7%, var(--panel));
             border-color: color-mix(in srgb, var(--card-accent) 72%, transparent);
             transform: translateX(12px);
             box-shadow: -10px 10px 25px rgba(0, 0, 0, 0.2), 0 0 20px color-mix(in srgb, var(--card-accent) 22%, transparent);
         }
 
-        .link-card:hover::before {
+        .link-card:hover::before,
+        .link-card.focused::before {
             width: 112%;
             opacity: 0.48;
         }
 
-        /* 巨型图标 */
+        .search-highlight {
+            background: rgba(0, 242, 255, 0.2);
+            color: var(--neon);
+            border-radius: 2px;
+            padding: 0 1px;
+        }
+
+        .search-bar:not(:placeholder-shown)+.search-hint {
+            opacity: 0;
+        }
+
+        .search-hint {
+            transition: opacity 0.2s;
+        }
+
         .icon-wrap {
             width: 64px;
             height: 64px;
@@ -476,7 +482,6 @@
             padding: 20px;
         }
 
-        /* 主题切换 */
         .theme-toggle {
             position: fixed;
             top: 20px;
@@ -500,7 +505,6 @@
             transform: scale(1.1);
         }
 
-        /* 移动端汉堡按钮 */
         .menu-toggle {
             display: none;
             position: fixed;
@@ -526,7 +530,6 @@
             z-index: 99;
         }
 
-        /* --- 响应式：窄屏抽屉式侧栏 --- */
         @media (max-width: 860px) {
             .menu-toggle {
                 display: flex;
@@ -564,7 +567,6 @@
             }
         }
 
-        /* 尊重「减少动态效果」系统设置 */
         @media (prefers-reduced-motion: reduce) {
 
             *,
@@ -579,7 +581,6 @@
 </head>
 
 <body>
-
     <div id="neon-cursor" aria-hidden="true"><span class="cursor-ring"></span><span class="cursor-core"></span></div>
 
     <div class="bg-grid" aria-hidden="true"></div>
@@ -623,9 +624,9 @@
 
     <main class="main-content">
         <div class="search-container">
-            <p
+            <p class="search-hint"
                style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">
-                // A simple HTML navigation page · 按 <kbd>/</kbd> 搜索 · <kbd>Esc</kbd> 清空</p>
+                // A simple HTML navigation page · 按 <kbd>/</kbd> 搜索 · <kbd>Esc</kbd> 清空 · <kbd>↑↓</kbd> 导航 · <kbd>Enter</kbd> 打开</p>
             <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
                    autocomplete="off" aria-label="搜索链接">
         </div>
@@ -652,7 +653,6 @@
                 { id: 'search', name: 'SEARCH_ENGINES' }
             ],
             links: [
-                // --- MEDIA_STATIONS (影音娱乐) ---
                 { name: "Bilibili", url: "https://t.bilibili.com/", cat: "media", icon: "https://static.hdslb.com/images/favicon.ico" },
                 { name: "YouTube", url: "https://www.youtube.com", cat: "media", icon: "https://www.youtube.com/favicon.ico" },
                 { name: "Netflix", url: "https://www.netflix.com", cat: "media", icon: "https://www.netflix.com/favicon.ico" },
@@ -661,7 +661,6 @@
                 { name: "Steam", url: "https://store.steampowered.com/", cat: "media", icon: "https://store.steampowered.com/favicon.ico" },
                 { name: "虎牙直播", url: "https://www.huya.com", cat: "media", icon: "https://a.msstatic.com/huya/hd/h5/static-source/main/logo2.png" },
 
-                // --- NEURAL_INTELLIGENCE (AI 助手) ---
                 { name: "AI Studio", url: "https://aistudio.google.com", cat: "ai", icon: "https://www.gstatic.com/aistudio/zero-state/promo_chat_url_context.png" },
                 { name: "xiaomimimo", url: "https://aistudio.xiaomimimo.com/#/", cat: "ai", icon: "https://cdn.cnbj1.fds.api.mi-img.com/aife/mimo-blog-fe/doc_build/static/image/logo.99baaffe.png" },
                 { name: "通义千问", url: "https://chat.qwen.ai/", cat: "ai", icon: "https://th.bing.com/th?id=OCBZA.B73F50E19DFEAB57CA111B36001945C0C87797D5E5AC215BCAEA773DF9D57E6FA&pid=BZA&rs=0" },
@@ -672,7 +671,6 @@
                 { name: "Kimi", url: "https://kimi.moonshot.cn", cat: "ai", icon: "https://kimi.moonshot.cn/favicon.ico" },
                 { name: "Midjourney", url: "https://www.midjourney.com", cat: "ai", icon: "https://www.midjourney.com/favicon.ico" },
 
-                // --- FORGE_WORKSHOP (开发/工具) ---
                 { name: "GitHub", url: "https://github.com", cat: "dev", icon: "https://github.githubassets.com/favicons/favicon.png" },
                 { name: "Vercel", url: "https://vercel.com", cat: "dev", icon: "https://assets.vercel.com/image/upload/front/favicon/vercel/favicon.ico" },
                 { name: "Notion", url: "https://www.notion.so", cat: "dev", icon: "https://www.notion.so/images/favicon.ico" },
@@ -681,7 +679,6 @@
                 { name: "Stack Overflow", url: "https://stackoverflow.com", cat: "dev", icon: "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico" },
                 { name: "OpenWrt", url: "http://192.168.30.100", cat: "dev", icon: "https://openwrt.org/_media/favicon.ico" },
 
-                // --- SOCIAL_NEXUS (社交网络) ---
                 { name: "Gmail", url: "https://mail.google.com", cat: "social", icon: "https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" },
                 { name: "X / Twitter", url: "https://x.com", cat: "social", icon: "https://abs.twimg.com/favicons/twitter.2.ico" },
                 { name: "Discord", url: "https://discord.com", cat: "social", icon: "https://discord.com/favicon.ico" },
@@ -690,7 +687,6 @@
                 { name: "微博", url: "https://weibo.com", cat: "social", icon: "https://weibo.com/favicon.ico" },
                 { name: "Telegram", url: "https://web.telegram.org", cat: "social", icon: "https://web.telegram.org/favicon.ico" },
 
-                // --- SEARCH_ENGINES (搜索引擎) ---
                 { name: "Google", url: "https://www.google.com", cat: "search", icon: "https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png" },
                 { name: "Bing", url: "https://www.bing.com", cat: "search", icon: "https://www.bing.com/favicon.ico" },
                 { name: "DuckDuckGo", url: "https://duckduckgo.com", cat: "search", icon: "https://duckduckgo.com/favicon.ico" },
@@ -699,24 +695,34 @@
             ]
         };
 
-        // --- 工具函数 ---
-        // 安全地把 url 解析成 hostname，失败时回退到原始字符串，避免一条坏链接拖垮整页渲染
+        const $ = id => document.getElementById(id);
+
+        const els = {
+            themeBtn: $('theme-btn'),
+            menuBtn: $('menu-btn'),
+            sidebar: $('sidebar'),
+            backdrop: $('sidebar-backdrop'),
+            searchIn: $('search-in'),
+            renderArea: $('render-area'),
+            timeHm: $('time-hm'),
+            timeS: $('time-s'),
+            dateStr: $('date-str'),
+            weekVal: $('week-val'),
+            weekBar: $('week-bar'),
+            tempVal: $('temp-val'),
+            weatherDesc: $('weather-desc'),
+            battVal: $('batt-val'),
+            battBar: $('batt-bar'),
+            battLabel: $('batt-label'),
+            todoIn: $('todo-in'),
+            todoList: $('todo-list'),
+            neonCursor: $('neon-cursor')
+        };
+
         function safeHostname(url) {
-            try {
-                return new URL(url).hostname || url;
-            } catch (e) {
-                return url;
-            }
+            try { return new URL(url).hostname || url; } catch (e) { return url; }
         }
 
-        // 文本转义，防止链接名含特殊字符破坏 DOM / 注入
-        function escapeText(s) {
-            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-            }[c]));
-        }
-
-        // 根据字符串生成稳定的霓虹色
         function hashColor(s) {
             const sum = String(s || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0);
             return `hsl(${Math.abs(sum) % 360}, 60%, 50%)`;
@@ -744,7 +750,6 @@
             return match ? brandColors[match] : hashColor(link.name || host);
         }
 
-        // 简单防抖
         function debounce(fn, ms) {
             let t;
             return function (...args) {
@@ -753,45 +758,72 @@
             };
         }
 
-        // --- 主题切换 ---
-        const themeBtn = document.getElementById('theme-btn');
+        function highlightMatch(text, query) {
+            if (!query) return document.createTextNode(text);
+            const idx = text.toLowerCase().indexOf(query.toLowerCase());
+            if (idx === -1) return document.createTextNode(text);
+            const frag = document.createDocumentFragment();
+            frag.appendChild(document.createTextNode(text.slice(0, idx)));
+            const mark = document.createElement('span');
+            mark.className = 'search-highlight';
+            mark.textContent = text.slice(idx, idx + query.length);
+            frag.appendChild(mark);
+            frag.appendChild(document.createTextNode(text.slice(idx + query.length)));
+            return frag;
+        }
+
+        function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+        }
+
+        const LS = {
+            get(key, fallback) {
+                try {
+                    const v = localStorage.getItem(key);
+                    return v != null ? JSON.parse(v) : fallback;
+                } catch (e) { return fallback; }
+            },
+            set(key, value) {
+                try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { }
+            }
+        };
+
         function currentTheme() {
             return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
         }
+
         function applyTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
-            try { localStorage.setItem('cyber-v14-theme', theme); } catch (e) { /* ignore */ }
+            LS.set('cyber-v16-theme', theme);
         }
-        themeBtn.addEventListener('click', () => applyTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
 
-        // --- 渲染 (用 DOM API 构建节点，避免 innerHTML 转义/引号脆弱性) ---
-        const renderArea = document.getElementById('render-area');
+        els.themeBtn.addEventListener('click', () => applyTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
 
         function buildIcon(link) {
             const wrap = document.createElement('div');
             wrap.className = 'icon-wrap';
-
             const name = link.name || '?';
             const img = document.createElement('img');
             img.className = 'link-icon';
             img.loading = 'lazy';
             img.decoding = 'async';
-            img.alt = name;                       // a11y：图标带 alt
-            img.onerror = () => {                 // 失败回退到首字母方块
-                if (wrap.contains(img)) {
-                    const fb = document.createElement('div');
-                    fb.className = 'icon-fallback';
-                    fb.style.background = hashColor(name);
-                    fb.textContent = name[0].toUpperCase();
-                    wrap.replaceChild(fb, img);
-                }
+            img.alt = name;
+            img.onerror = () => {
+                if (!wrap.contains(img)) return;
+                const fb = document.createElement('div');
+                fb.className = 'icon-fallback';
+                fb.style.background = hashColor(name);
+                fb.textContent = name[0].toUpperCase();
+                wrap.replaceChild(fb, img);
             };
             img.src = link.icon;
             wrap.appendChild(img);
             return wrap;
         }
 
-        function buildCard(link) {
+        function buildCard(link, query) {
             const a = document.createElement('a');
             a.href = link.url;
             a.className = 'link-card';
@@ -805,7 +837,7 @@
             info.className = 'link-info';
             const nameEl = document.createElement('span');
             nameEl.className = 'link-name';
-            nameEl.textContent = link.name;
+            nameEl.appendChild(highlightMatch(link.name, query));
             const urlEl = document.createElement('span');
             urlEl.className = 'link-url';
             urlEl.textContent = safeHostname(link.url);
@@ -815,16 +847,18 @@
             return a;
         }
 
+        let currentQuery = '';
+
         function render(kw) {
-            renderArea.innerHTML = '';
+            els.renderArea.innerHTML = '';
             const q = (kw || '').toLowerCase().trim();
+            currentQuery = q;
             let total = 0;
 
-            config.categories.forEach(cat => {
+            config.categories.forEach((cat, catIdx) => {
                 const list = config.links.filter(l => {
                     if (l.cat !== cat.id) return false;
                     if (!q) return true;
-                    // 同时匹配名称、URL、分类名
                     return (l.name || '').toLowerCase().includes(q)
                         || (l.url || '').toLowerCase().includes(q)
                         || cat.name.toLowerCase().includes(q);
@@ -834,6 +868,7 @@
 
                 const col = document.createElement('div');
                 col.className = 'cat-column';
+                col.style.animationDelay = `${catIdx * 0.1}s`;
 
                 const header = document.createElement('div');
                 header.className = 'cat-header';
@@ -851,104 +886,89 @@
 
                 const ul = document.createElement('div');
                 ul.className = 'links-list';
-                list.forEach(l => ul.appendChild(buildCard(l)));
+                list.forEach((l, i) => {
+                    const card = buildCard(l, q);
+                    card.style.animationDelay = `${catIdx * 0.1 + i * 0.05}s`;
+                    ul.appendChild(card);
+                });
                 col.appendChild(ul);
 
-                renderArea.appendChild(col);
+                els.renderArea.appendChild(col);
             });
 
             if (total === 0) {
                 const hint = document.createElement('div');
                 hint.className = 'empty-hint';
                 hint.textContent = q ? `// 未匹配到 "${kw}" 的结果` : '// 暂无链接';
-                renderArea.appendChild(hint);
+                els.renderArea.appendChild(hint);
             }
         }
 
-        // --- 系统同步 ---
         function updateClock() {
             const now = new Date();
-            document.getElementById('time-hm').textContent = now.toTimeString().split(' ')[0].substring(0, 5);
-            document.getElementById('time-s').textContent = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('date-str').textContent =
+            const time = now.toTimeString().split(' ')[0];
+            els.timeHm.textContent = time.substring(0, 5);
+            els.timeS.textContent = time.substring(6, 8);
+            els.dateStr.textContent =
                 now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
             const day = now.getDay() === 0 ? 7 : now.getDay();
             const per = Math.round((day / 7) * 100);
-            document.getElementById('week-val').textContent = per + '%';
-            document.getElementById('week-bar').style.width = per + '%';
+            els.weekVal.textContent = per + '%';
+            els.weekBar.style.width = per + '%';
         }
 
-        // --- 天气：带本地缓存 + 后台不重复请求 ---
-        const WEATHER_KEY = 'cyber-v14-weather';
+        const WEATHER_KEY = 'cyber-v16-weather';
         function applyWeather(tempC, desc) {
-            document.getElementById('temp-val').textContent = `${tempC}°C`;
-            document.getElementById('weather-desc').textContent = String(desc || '').toUpperCase();
+            els.tempVal.textContent = `${tempC}°C`;
+            els.weatherDesc.textContent = String(desc || '').toUpperCase();
         }
         function loadCachedWeather() {
-            try {
-                const raw = localStorage.getItem(WEATHER_KEY);
-                if (!raw) return;
-                const obj = JSON.parse(raw);
-                // 1 小时内的缓存直接用
-                if (obj && obj.ts && Date.now() - obj.ts < 3600000) {
-                    applyWeather(obj.tempC, obj.desc);
-                }
-            } catch (e) { /* ignore */ }
+            const obj = LS.get(WEATHER_KEY, null);
+            if (obj && obj.ts && Date.now() - obj.ts < 3600000) {
+                applyWeather(obj.tempC, obj.desc);
+            }
         }
         async function updateWeather() {
-            // 后台标签页跳过请求，节省流量
             if (document.hidden) return;
             try {
-                const res = await fetch('https://wttr.in/?format=j1');
+                const res = await fetchWithTimeout('https://wttr.in/?format=j1', {}, 8000);
                 const data = await res.json();
                 const cur = data.current_condition[0];
                 const tempC = cur.temp_C;
                 const desc = cur.weatherDesc[0].value;
                 applyWeather(tempC, desc);
-                try {
-                    localStorage.setItem(WEATHER_KEY, JSON.stringify({ tempC, desc, ts: Date.now() }));
-                } catch (e) { /* ignore */ }
+                LS.set(WEATHER_KEY, { tempC, desc, ts: Date.now() });
             } catch (e) {
-                document.getElementById('weather-desc').textContent = 'OFFLINE';
+                els.weatherDesc.textContent = 'OFFLINE';
             }
         }
 
-        // --- 电量：带降级（API 不存在时不报错） ---
         function setupBattery() {
-            const valEl = document.getElementById('batt-val');
-            const barEl = document.getElementById('batt-bar');
-            const labelEl = document.getElementById('batt-label');
-            if (navigator.getBattery) {
-                navigator.getBattery().then(b => {
-                    const fn = () => {
-                        const pct = Math.round(b.level * 100);
-                        valEl.textContent = pct + '%';
-                        barEl.style.width = b.level * 100 + '%';
-                    };
-                    fn();
-                    b.addEventListener('levelchange', fn);
-                }).catch(() => { /* 拒绝时走降级 */ });
-            } else {
-                // 桌面端/不支持时给出合理提示，而非假装 100%
-                labelEl.textContent = 'POWER';
-                valEl.textContent = 'N/A';
-                barEl.style.width = '0%';
-                barEl.style.background = 'var(--text-sub)';
-                barEl.style.boxShadow = 'none';
+            if (!navigator.getBattery) {
+                els.battLabel.textContent = 'POWER';
+                els.battVal.textContent = 'N/A';
+                els.battBar.style.width = '0%';
+                els.battBar.style.background = 'var(--text-sub)';
+                els.battBar.style.boxShadow = 'none';
+                return;
             }
+            navigator.getBattery().then(b => {
+                const fn = () => {
+                    const pct = Math.round(b.level * 100);
+                    els.battVal.textContent = pct + '%';
+                    els.battBar.style.width = pct + '%';
+                };
+                fn();
+                b.addEventListener('levelchange', fn);
+            }).catch(() => { });
         }
 
-        // --- 备忘录：事件委托 + 安全持久化（不再依赖全局 save） ---
         function setupMemo() {
-            const tIn = document.getElementById('todo-in');
-            const tList = document.getElementById('todo-list');
-            const KEY = 'v14-memos';
+            const KEY = 'v16-memos';
 
             const save = () => {
-                try {
-                    const items = Array.from(tList.querySelectorAll('.memo .txt')).map(s => s.textContent);
-                    localStorage.setItem(KEY, JSON.stringify(items));
-                } catch (e) { /* ignore */ }
+                const items = Array.from(els.todoList.querySelectorAll('.memo .txt')).map(s => s.textContent);
+                LS.set(KEY, items);
             };
 
             const add = (text) => {
@@ -969,62 +989,78 @@
 
                 d.appendChild(span);
                 d.appendChild(del);
-                tList.appendChild(d);
+                els.todoList.appendChild(d);
             };
 
-            // 事件委托：所有删除按钮统一处理，闭包内可访问 save
-            tList.addEventListener('click', e => {
+            els.todoList.addEventListener('click', e => {
                 const btn = e.target.closest('.del');
                 if (!btn) return;
                 btn.closest('.memo')?.remove();
                 save();
             });
 
-            tIn.addEventListener('keydown', e => {
-                if (e.key === 'Enter' && tIn.value.trim()) {
-                    add(tIn.value.trim());
-                    tIn.value = '';
+            els.todoIn.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && els.todoIn.value.trim()) {
+                    add(els.todoIn.value.trim());
+                    els.todoIn.value = '';
                     save();
                 }
             });
 
-            try {
-                JSON.parse(localStorage.getItem(KEY) || '[]').forEach(add);
-            } catch (e) { /* 损坏数据忽略 */ }
+            (LS.get(KEY, []) || []).forEach(add);
         }
 
-        // --- 搜索：防抖 + 键盘交互 ---
+        let focusIdx = -1;
+
+        function getVisibleCards() {
+            return Array.from(els.renderArea.querySelectorAll('.link-card'));
+        }
+
+        function setFocus(idx) {
+            const cards = getVisibleCards();
+            cards.forEach(c => c.classList.remove('focused'));
+            if (idx >= 0 && idx < cards.length) {
+                cards[idx].classList.add('focused');
+                cards[idx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+            focusIdx = idx;
+        }
+
         function setupSearch() {
-            const input = document.getElementById('search-in');
-            const debouncedRender = debounce(v => render(v), 120);
-            input.addEventListener('input', e => debouncedRender(e.target.value));
-            // 回车直达第一个匹配结果
-            input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') {
-                    const first = renderArea.querySelector('.link-card');
-                    if (first) window.location.href = first.href;
-                }
-                if (e.key === 'Escape') {
-                    input.value = '';
+            const debouncedRender = debounce(v => {
+                render(v);
+                focusIdx = -1;
+            }, 120);
+            els.searchIn.addEventListener('input', e => debouncedRender(e.target.value));
+            els.searchIn.addEventListener('keydown', e => {
+                const cards = getVisibleCards();
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setFocus(Math.min(focusIdx + 1, cards.length - 1));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setFocus(Math.max(focusIdx - 1, 0));
+                } else if (e.key === 'Enter') {
+                    const target = focusIdx >= 0 ? cards[focusIdx] : cards[0];
+                    if (target) window.location.href = target.href;
+                } else if (e.key === 'Escape') {
+                    els.searchIn.value = '';
                     render('');
+                    focusIdx = -1;
                 }
             });
         }
 
-        // --- 全局快捷键：/ 聚焦搜索，Esc 清空 ---
         document.addEventListener('keydown', e => {
             const tag = (document.activeElement && document.activeElement.tagName) || '';
             const typing = tag === 'INPUT' || tag === 'TEXTAREA';
             if (e.key === '/' && !typing) {
                 e.preventDefault();
-                document.getElementById('search-in').focus();
+                els.searchIn.focus();
             }
         });
 
-        // --- 光标：rAF 节流，移动端自动禁用 ---
         function setupCursor() {
-            const cursor = document.getElementById('neon-cursor');
-            // 仅在精细指针设备绑定（与 CSS 媒体查询一致）
             if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
             let mx = 0, my = 0, rafId = null;
@@ -1032,51 +1068,55 @@
                 mx = e.clientX; my = e.clientY;
                 if (rafId) return;
                 rafId = requestAnimationFrame(() => {
-                    cursor.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
+                    els.neonCursor.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
                     rafId = null;
                 });
             });
             document.addEventListener('mouseover', e => {
                 const target = e.target.closest('a, button, input, .memo');
                 const card = e.target.closest('.link-card');
-                cursor.classList.toggle('is-action', Boolean(target));
-                cursor.style.color = card ? getComputedStyle(card).getPropertyValue('--card-accent').trim() : 'var(--neon)';
+                els.neonCursor.classList.toggle('is-action', Boolean(target));
+                els.neonCursor.style.color = card ? getComputedStyle(card).getPropertyValue('--card-accent').trim() : 'var(--neon)';
             });
             document.addEventListener('mousedown', e => {
-                cursor.classList.add('is-pressed');
+                els.neonCursor.classList.add('is-pressed');
                 const r = document.createElement('div');
                 r.className = 'click-ripple';
                 r.style.left = e.clientX + 'px';
                 r.style.top = e.clientY + 'px';
-                r.style.setProperty('--ripple-color', cursor.style.color || 'var(--neon)');
+                r.style.setProperty('--ripple-color', els.neonCursor.style.color || 'var(--neon)');
                 document.body.appendChild(r);
                 setTimeout(() => r.remove(), 500);
             });
-            document.addEventListener('mouseup', () => cursor.classList.remove('is-pressed'));
+            document.addEventListener('mouseup', () => els.neonCursor.classList.remove('is-pressed'));
         }
 
-        // --- 移动端抽屉 ---
+        function toggleSidebar(open) {
+            const o = open == null ? !els.sidebar.classList.contains('open') : open;
+            els.sidebar.classList.toggle('open', o);
+            els.menuBtn.setAttribute('aria-expanded', o ? 'true' : 'false');
+        }
+
         function setupSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const btn = document.getElementById('menu-btn');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            const toggle = (open) => {
-                const o = open == null ? !sidebar.classList.contains('open') : open;
-                sidebar.classList.toggle('open', o);
-                btn.setAttribute('aria-expanded', o ? 'true' : 'false');
-            };
-            btn.addEventListener('click', () => toggle());
-            backdrop.addEventListener('click', () => toggle(false));
+            els.menuBtn.addEventListener('click', () => toggleSidebar());
+            els.backdrop.addEventListener('click', () => toggleSidebar(false));
+
+            els.sidebar.addEventListener('click', e => {
+                if (e.target.closest('a, .link-card')) toggleSidebar(false);
+            });
+
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && els.sidebar.classList.contains('open')) {
+                    toggleSidebar(false);
+                }
+            });
         }
 
-        // --- 可见性变化时刷新一次天气（从后台切回前台） ---
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) updateWeather();
         });
 
-        // --- 初始化 ---
         function init() {
-            // 非网络依赖任务优先瞬间执行，画出 UI 骨架
             updateClock();
             setInterval(updateClock, 1000);
 
@@ -1087,7 +1127,6 @@
             setupSidebar();
             loadCachedWeather();
 
-            // 核心 DOM 注入与外部 API 请求延迟一帧，为骨架渲染让路
             setTimeout(() => {
                 render();
                 updateWeather();
