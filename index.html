@@ -90,11 +90,38 @@
             transition: color 0.18s ease;
         }
 
-        .cursor-core { position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; margin: -2.5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
-        .cursor-ring { position: absolute; inset: 3px; border: 1px solid currentColor; border-radius: 50%; opacity: 0.78; box-shadow: 0 0 12px color-mix(in srgb, currentColor 55%, transparent), inset 0 0 7px color-mix(in srgb, currentColor 20%, transparent); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.25s ease, opacity 0.25s ease; }
-        #neon-cursor.is-action .cursor-ring { transform: scale(1.38); border-radius: 36% 64% 58% 42%; opacity: 1; }
-        #neon-cursor.is-pressed .cursor-ring { transform: scale(0.58); }
+        .cursor-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            margin: -2.5px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
         }
+
+        .cursor-ring {
+            position: absolute;
+            inset: 3px;
+            border: 1px solid currentColor;
+            border-radius: 50%;
+            opacity: 0.78;
+            box-shadow: 0 0 12px color-mix(in srgb, currentColor 55%, transparent), inset 0 0 7px color-mix(in srgb, currentColor 20%, transparent);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.25s ease, opacity 0.25s ease;
+        }
+
+        #neon-cursor.is-action .cursor-ring {
+            transform: scale(1.38);
+            border-radius: 36% 64% 58% 42%;
+            opacity: 1;
+        }
+
+        #neon-cursor.is-pressed .cursor-ring {
+            transform: scale(0.58);
+        }
+
 
         /* 仅在「精确指针 + 支持悬停」的设备上启用霓虹光标并隐藏系统光标。
            关键：此规则必须放在 #neon-cursor 基础规则之后——
@@ -363,8 +390,17 @@
         }
 
         @keyframes categoryPulse {
-            0%, 100% { transform: translateY(0) rotate(0); filter: drop-shadow(0 0 0 transparent); }
-            50% { transform: translateY(-3px) rotate(-5deg); filter: drop-shadow(0 0 8px var(--neon-alt)); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0);
+                filter: drop-shadow(0 0 0 transparent);
+            }
+
+            50% {
+                transform: translateY(-3px) rotate(-5deg);
+                filter: drop-shadow(0 0 8px var(--neon-alt));
+            }
         }
 
         .cat-count {
