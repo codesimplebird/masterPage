@@ -4,21 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V14.2</title>
-    <meta name="description"
-          content="A simple HTML navigation page - your personal cyber deck for quick access to favorite websites.">
+    <title>CYBER-DECK V15</title>
+    <meta name="description" content="A cyberpunk-style HTML navigation page for quick access to favorite websites.">
 
-    <!-- 防闪屏：在首次绘制前就应用已保存的主题，避免 dark→light 闪烁 (FOUC) -->
     <script>
         (function () {
             try {
-                var t = localStorage.getItem('cyber-v14-theme');
+                var t = localStorage.getItem('cyber-v15-theme');
                 if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-            } catch (e) { /* localStorage 不可用时静默降级 */ }
+            } catch (e) { }
         })();
     </script>
 
-    <!-- 异步非阻塞字体加载 -->
     <link rel="preconnect" href="https://fonts.geekzu.org" crossorigin>
     <link rel="preload" as="style"
           href="https://fonts.geekzu.org/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap">
@@ -29,11 +26,9 @@
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
 
-    <!-- YAML 解析库 -->
     <script src="js-yaml.min.js"></script>
 
     <style>
-        /* --- 全局变量适配 --- */
         :root {
             --neon: #00f2ff;
             --neon-alt: #9d50ff;
@@ -46,7 +41,6 @@
             --sidebar-w: 320px;
         }
 
-        /* light 主题抬高对比度，满足 WCAG AA */
         [data-theme="light"] {
             --neon: #0055ff;
             --neon-alt: #6200ea;
@@ -74,7 +68,6 @@
             transition: background 0.5s ease, color 0.5s ease;
         }
 
-        /* --- 零延迟霓虹光标（默认隐藏，触屏走系统光标） --- */
         #neon-cursor {
             position: fixed;
             top: 0;
@@ -97,10 +90,6 @@
             transition: fill 0.3s;
         }
 
-        /* 仅在「精确指针 + 支持悬停」的设备上启用霓虹光标并隐藏系统光标。
-           关键：此规则必须放在 #neon-cursor 基础规则之后——
-           specificity 相同时后出现的覆盖先出现的，
-           否则上面的 display:none 会压过这里的 display:block，电脑也看不到光标。 */
         @media (hover: hover) and (pointer: fine) {
             * {
                 cursor: none !important;
@@ -135,7 +124,6 @@
             }
         }
 
-        /* --- 背景装饰 --- */
         .bg-grid {
             position: fixed;
             inset: 0;
@@ -147,7 +135,6 @@
             mask-image: radial-gradient(circle, black, transparent 90%);
         }
 
-        /* --- 侧边栏 --- */
         .sidebar {
             width: var(--sidebar-w);
             flex-shrink: 0;
@@ -218,7 +205,6 @@
             transition: width 0.6s;
         }
 
-        /* 备忘录 */
         .memo {
             padding: 8px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -266,7 +252,6 @@
             flex: 1;
         }
 
-        /* --- 右侧看板 (列式清单) --- */
         .main-content {
             flex: 1;
             display: flex;
@@ -301,7 +286,6 @@
             box-shadow: 0 0 20px var(--neon);
         }
 
-        /* 键盘可见焦点环（鼠标点击不显示，键盘 Tab 显示） */
         a:focus-visible,
         button:focus-visible,
         input:focus-visible {
@@ -376,7 +360,6 @@
             box-shadow: -10px 10px 25px rgba(0, 0, 0, 0.2);
         }
 
-        /* 巨型图标 */
         .icon-wrap {
             width: 64px;
             height: 64px;
@@ -434,7 +417,6 @@
             padding: 20px;
         }
 
-        /* 主题切换 */
         .theme-toggle {
             position: fixed;
             top: 20px;
@@ -458,7 +440,6 @@
             transform: scale(1.1);
         }
 
-        /* 移动端汉堡按钮 */
         .menu-toggle {
             display: none;
             position: fixed;
@@ -484,7 +465,6 @@
             z-index: 99;
         }
 
-        /* --- 响应式：窄屏抽屉式侧栏 --- */
         @media (max-width: 860px) {
             .menu-toggle {
                 display: flex;
@@ -522,7 +502,6 @@
             }
         }
 
-        /* 尊重「减少动态效果」系统设置 */
         @media (prefers-reduced-motion: reduce) {
 
             *,
@@ -537,7 +516,6 @@
 </head>
 
 <body>
-
     <div id="neon-cursor" aria-hidden="true">
         <svg viewBox="0 0 32 32">
             <path d="M8 2 L24 16 L16 16 L22 28 L18 30 L12 18 L8 22 Z" />
@@ -605,36 +583,72 @@
     <script>
         'use strict';
 
-        // 从 YAML 加载的配置，初始为空
-        let config = {
-            categories: [],
-            links: []
+        const config = {
+            categories: [
+                { id: 'media', name: 'MEDIA_STATIONS' },
+                { id: 'ai', name: 'NEURAL_INTELLIGENCE' },
+                { id: 'dev', name: 'FORGE_WORKSHOP' },
+                { id: 'social', name: 'SOCIAL_NEXUS' },
+                { id: 'search', name: 'SEARCH_ENGINES' }
+            ],
+            links: [
+                { name: "Bilibili", url: "https://t.bilibili.com/", cat: "media", icon: "https://static.hdslb.com/images/favicon.ico" },
+                { name: "YouTube", url: "https://www.youtube.com", cat: "media", icon: "https://www.youtube.com/favicon.ico" },
+                { name: "Netflix", url: "https://www.netflix.com", cat: "media", icon: "https://www.netflix.com/favicon.ico" },
+                { name: "Twitch", url: "https://www.twitch.tv", cat: "media", icon: "https://th.bing.com/th/id/ODF.NGz4Api7uY8oq1SpbgkfcA?w=32&h=32&qlt=90&pcl=fffffc&o=6&pid=1.2" },
+                { name: "Spotify", url: "https://open.spotify.com", cat: "media", icon: "https://open.spotify.com/favicon.ico" },
+                { name: "Steam", url: "https://store.steampowered.com/", cat: "media", icon: "https://store.steampowered.com/favicon.ico" },
+                { name: "虎牙直播", url: "https://www.huya.com", cat: "media", icon: "https://a.msstatic.com/huya/hd/h5/static-source/main/logo2.png" },
+
+                { name: "AI Studio", url: "https://aistudio.google.com", cat: "ai", icon: "https://www.gstatic.com/aistudio/zero-state/promo_chat_url_context.png" },
+                { name: "xiaomimimo", url: "https://aistudio.xiaomimimo.com/#/", cat: "ai", icon: "https://cdn.cnbj1.fds.api.mi-img.com/aife/mimo-blog-fe/doc_build/static/image/logo.99baaffe.png" },
+                { name: "通义千问", url: "https://chat.qwen.ai/", cat: "ai", icon: "https://th.bing.com/th?id=OCBZA.B73F50E19DFEAB57CA111B36001945C0C87797D5E5AC215BCAEA773DF9D57E6FA&pid=BZA&rs=0" },
+                { name: "ChatGPT", url: "https://chatgpt.com", cat: "ai", icon: "https://chatgpt.com/favicon.ico" },
+                { name: "DeepSeek", url: "https://chat.deepseek.com", cat: "ai", icon: "https://www.deepseek.com/favicon.ico" },
+                { name: "Claude", url: "https://claude.ai", cat: "ai", icon: "https://claude.ai/favicon.ico" },
+                { name: "Gemini", url: "https://gemini.google.com", cat: "ai", icon: "https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg" },
+                { name: "Kimi", url: "https://kimi.moonshot.cn", cat: "ai", icon: "https://kimi.moonshot.cn/favicon.ico" },
+                { name: "Midjourney", url: "https://www.midjourney.com", cat: "ai", icon: "https://www.midjourney.com/favicon.ico" },
+
+                { name: "GitHub", url: "https://github.com", cat: "dev", icon: "https://github.githubassets.com/favicons/favicon.png" },
+                { name: "Vercel", url: "https://vercel.com", cat: "dev", icon: "https://assets.vercel.com/image/upload/front/favicon/vercel/favicon.ico" },
+                { name: "Notion", url: "https://www.notion.so", cat: "dev", icon: "https://www.notion.so/images/favicon.ico" },
+                { name: "Figma", url: "https://www.figma.com", cat: "dev", icon: "https://www.figma.com/favicon.ico" },
+                { name: "Canva", url: "https://www.canva.com", cat: "dev", icon: "https://www.canva.com/favicon.ico" },
+                { name: "Stack Overflow", url: "https://stackoverflow.com", cat: "dev", icon: "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico" },
+                { name: "OpenWrt", url: "http://192.168.30.100", cat: "dev", icon: "https://openwrt.org/_media/favicon.ico" },
+
+                { name: "Gmail", url: "https://mail.google.com", cat: "social", icon: "https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" },
+                { name: "X / Twitter", url: "https://x.com", cat: "social", icon: "https://abs.twimg.com/favicons/twitter.2.ico" },
+                { name: "Discord", url: "https://discord.com", cat: "social", icon: "https://discord.com/favicon.ico" },
+                { name: "Reddit", url: "https://www.reddit.com", cat: "social", icon: "https://www.redditstatic.com/desktop2x/img/favicon/favicon-32x32.png" },
+                { name: "知乎", url: "https://www.zhihu.com", cat: "social", icon: "https://static.zhihu.com/heifetz/favicon.ico" },
+                { name: "微博", url: "https://weibo.com", cat: "social", icon: "https://weibo.com/favicon.ico" },
+                { name: "Telegram", url: "https://web.telegram.org", cat: "social", icon: "https://web.telegram.org/favicon.ico" },
+
+                { name: "Google", url: "https://www.google.com", cat: "search", icon: "https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png" },
+                { name: "Bing", url: "https://www.bing.com", cat: "search", icon: "https://www.bing.com/favicon.ico" },
+                { name: "DuckDuckGo", url: "https://duckduckgo.com", cat: "search", icon: "https://duckduckgo.com/favicon.ico" },
+                { name: "百度", url: "https://www.baidu.com", cat: "search", icon: "https://www.baidu.com/favicon.ico" },
+                { name: "WolframAlpha", url: "https://www.wolframalpha.com", cat: "search", icon: "https://www.wolframalpha.com/_cdn/favicon.ico" }
+            ]
         };
 
-        // --- 工具函数 ---
-        // 安全地把 url 解析成 hostname，失败时回退到原始字符串，避免一条坏链接拖垮整页渲染
         function safeHostname(url) {
-            try {
-                return new URL(url).hostname || url;
-            } catch (e) {
-                return url;
-            }
+            try { return new URL(url).hostname || url; } catch (e) { return url; }
         }
 
-        // 文本转义，防止链接名含特殊字符破坏 DOM / 注入
         function escapeText(s) {
             return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                '&': '&', '<': '<', '>': '>', '"': '"', "'": '''
             }[c]));
         }
 
-        // 根据字符串生成稳定的霓虹色
         function hashColor(s) {
             const sum = String(s || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0);
             return `hsl(${Math.abs(sum) % 360}, 60%, 50%)`;
         }
 
-        // 简单防抖
         function debounce(fn, ms) {
             let t;
             return function (...args) {
@@ -643,38 +657,52 @@
             };
         }
 
-        // --- 主题切换 ---
+        function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+        }
+
+        const LS = {
+            get(key, fallback) {
+                try {
+                    const v = localStorage.getItem(key);
+                    return v != null ? JSON.parse(v) : fallback;
+                } catch (e) { return fallback; }
+            },
+            set(key, value) {
+                try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { }
+            }
+        };
+
         const themeBtn = document.getElementById('theme-btn');
         function currentTheme() {
             return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
         }
         function applyTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
-            try { localStorage.setItem('cyber-v14-theme', theme); } catch (e) { /* ignore */ }
+            LS.set('cyber-v15-theme', theme);
         }
         themeBtn.addEventListener('click', () => applyTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
 
-        // --- 渲染 (用 DOM API 构建节点，避免 innerHTML 转义/引号脆弱性) ---
         const renderArea = document.getElementById('render-area');
 
         function buildIcon(link) {
             const wrap = document.createElement('div');
             wrap.className = 'icon-wrap';
-
             const name = link.name || '?';
             const img = document.createElement('img');
             img.className = 'link-icon';
             img.loading = 'lazy';
             img.decoding = 'async';
-            img.alt = name;                       // a11y：图标带 alt
-            img.onerror = () => {                 // 失败回退到首字母方块
-                if (wrap.contains(img)) {
-                    const fb = document.createElement('div');
-                    fb.className = 'icon-fallback';
-                    fb.style.background = hashColor(name);
-                    fb.textContent = name[0].toUpperCase();
-                    wrap.replaceChild(fb, img);
-                }
+            img.alt = name;
+            img.onerror = () => {
+                if (!wrap.contains(img)) return;
+                const fb = document.createElement('div');
+                fb.className = 'icon-fallback';
+                fb.style.background = hashColor(name);
+                fb.textContent = name[0].toUpperCase();
+                wrap.replaceChild(fb, img);
             };
             img.src = link.icon;
             wrap.appendChild(img);
@@ -713,7 +741,6 @@
                 const list = config.links.filter(l => {
                     if (l.cat !== cat.id) return false;
                     if (!q) return true;
-                    // 同时匹配名称、URL、分类名
                     return (l.name || '').toLowerCase().includes(q)
                         || (l.url || '').toLowerCase().includes(q)
                         || cat.name.toLowerCase().includes(q);
@@ -749,7 +776,6 @@
             }
         }
 
-        // --- 系统同步 ---
         function updateClock() {
             const now = new Date();
             document.getElementById('time-hm').textContent = now.toTimeString().split(' ')[0].substring(0, 5);
@@ -762,77 +788,63 @@
             document.getElementById('week-bar').style.width = per + '%';
         }
 
-        // --- 天气：带本地缓存 + 后台不重复请求 ---
-        const WEATHER_KEY = 'cyber-v14-weather';
+        const WEATHER_KEY = 'cyber-v15-weather';
         function applyWeather(tempC, desc) {
             document.getElementById('temp-val').textContent = `${tempC}°C`;
             document.getElementById('weather-desc').textContent = String(desc || '').toUpperCase();
         }
         function loadCachedWeather() {
-            try {
-                const raw = localStorage.getItem(WEATHER_KEY);
-                if (!raw) return;
-                const obj = JSON.parse(raw);
-                // 1 小时内的缓存直接用
-                if (obj && obj.ts && Date.now() - obj.ts < 3600000) {
-                    applyWeather(obj.tempC, obj.desc);
-                }
-            } catch (e) { /* ignore */ }
+            const obj = LS.get(WEATHER_KEY, null);
+            if (obj && obj.ts && Date.now() - obj.ts < 3600000) {
+                applyWeather(obj.tempC, obj.desc);
+            }
         }
         async function updateWeather() {
-            // 后台标签页跳过请求，节省流量
             if (document.hidden) return;
             try {
-                const res = await fetch('https://wttr.in/?format=j1');
+                const res = await fetchWithTimeout('https://wttr.in/?format=j1', {}, 8000);
                 const data = await res.json();
                 const cur = data.current_condition[0];
                 const tempC = cur.temp_C;
                 const desc = cur.weatherDesc[0].value;
                 applyWeather(tempC, desc);
-                try {
-                    localStorage.setItem(WEATHER_KEY, JSON.stringify({ tempC, desc, ts: Date.now() }));
-                } catch (e) { /* ignore */ }
+                LS.set(WEATHER_KEY, { tempC, desc, ts: Date.now() });
             } catch (e) {
                 document.getElementById('weather-desc').textContent = 'OFFLINE';
             }
         }
 
-        // --- 电量：带降级（API 不存在时不报错） ---
         function setupBattery() {
             const valEl = document.getElementById('batt-val');
             const barEl = document.getElementById('batt-bar');
             const labelEl = document.getElementById('batt-label');
-            if (navigator.getBattery) {
-                navigator.getBattery().then(b => {
-                    const fn = () => {
-                        const pct = Math.round(b.level * 100);
-                        valEl.textContent = pct + '%';
-                        barEl.style.width = b.level * 100 + '%';
-                    };
-                    fn();
-                    b.addEventListener('levelchange', fn);
-                }).catch(() => { /* 拒绝时走降级 */ });
-            } else {
-                // 桌面端/不支持时给出合理提示，而非假装 100%
+            if (!navigator.getBattery) {
                 labelEl.textContent = 'POWER';
                 valEl.textContent = 'N/A';
                 barEl.style.width = '0%';
                 barEl.style.background = 'var(--text-sub)';
                 barEl.style.boxShadow = 'none';
+                return;
             }
+            navigator.getBattery().then(b => {
+                const fn = () => {
+                    const pct = Math.round(b.level * 100);
+                    valEl.textContent = pct + '%';
+                    barEl.style.width = pct + '%';
+                };
+                fn();
+                b.addEventListener('levelchange', fn);
+            }).catch(() => { });
         }
 
-        // --- 备忘录：事件委托 + 安全持久化（不再依赖全局 save） ---
         function setupMemo() {
             const tIn = document.getElementById('todo-in');
             const tList = document.getElementById('todo-list');
-            const KEY = 'v14-memos';
+            const KEY = 'v15-memos';
 
             const save = () => {
-                try {
-                    const items = Array.from(tList.querySelectorAll('.memo .txt')).map(s => s.textContent);
-                    localStorage.setItem(KEY, JSON.stringify(items));
-                } catch (e) { /* ignore */ }
+                const items = Array.from(tList.querySelectorAll('.memo .txt')).map(s => s.textContent);
+                LS.set(KEY, items);
             };
 
             const add = (text) => {
@@ -856,7 +868,6 @@
                 tList.appendChild(d);
             };
 
-            // 事件委托：所有删除按钮统一处理，闭包内可访问 save
             tList.addEventListener('click', e => {
                 const btn = e.target.closest('.del');
                 if (!btn) return;
@@ -872,17 +883,13 @@
                 }
             });
 
-            try {
-                JSON.parse(localStorage.getItem(KEY) || '[]').forEach(add);
-            } catch (e) { /* 损坏数据忽略 */ }
+            (LS.get(KEY, []) || []).forEach(add);
         }
 
-        // --- 搜索：防抖 + 键盘交互 ---
         function setupSearch() {
             const input = document.getElementById('search-in');
             const debouncedRender = debounce(v => render(v), 120);
             input.addEventListener('input', e => debouncedRender(e.target.value));
-            // 回车直达第一个匹配结果
             input.addEventListener('keydown', e => {
                 if (e.key === 'Enter') {
                     const first = renderArea.querySelector('.link-card');
@@ -895,7 +902,6 @@
             });
         }
 
-        // --- 全局快捷键：/ 聚焦搜索，Esc 清空 ---
         document.addEventListener('keydown', e => {
             const tag = (document.activeElement && document.activeElement.tagName) || '';
             const typing = tag === 'INPUT' || tag === 'TEXTAREA';
@@ -905,10 +911,8 @@
             }
         });
 
-        // --- 光标：rAF 节流，移动端自动禁用 ---
         function setupCursor() {
             const cursor = document.getElementById('neon-cursor');
-            // 仅在精细指针设备绑定（与 CSS 媒体查询一致）
             if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
             let mx = 0, my = 0, rafId = null;
@@ -930,7 +934,6 @@
             });
         }
 
-        // --- 移动端抽屉 ---
         function setupSidebar() {
             const sidebar = document.getElementById('sidebar');
             const btn = document.getElementById('menu-btn');
@@ -944,42 +947,11 @@
             backdrop.addEventListener('click', () => toggle(false));
         }
 
-        // --- 可见性变化时刷新一次天气（从后台切回前台） ---
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) updateWeather();
         });
 
-        // --- 从 YAML 加载配置 ---
-        async function loadConfigFromYAML() {
-            try {
-                const response = await fetch('./links-v2.yaml');
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const yamlText = await response.text();
-                const data = jsyaml.load(yamlText);
-
-                if (data.categories && data.links) {
-                    config.categories = data.categories;
-                    config.links = data.links;
-                    return true;
-                } else {
-                    console.warn('⚠ YAML 缺少必需字段');
-                    return false;
-                }
-            } catch (err) {
-                console.error('❌ 加载 YAML 失败:', err);
-                document.getElementById('render-area').innerHTML =
-                    `<div class="empty-hint">// 配置文件加载失败<br/>${err.message}</div>`;
-                return false;
-            }
-        }
-
-        // --- 初始化 ---
-        async function init() {
-            // 先加载 YAML 配置
-            const loaded = await loadConfigFromYAML();
-            if (!loaded) return;  // 加载失败则停止
-
-            // 非网络依赖任务优先瞬间执行，画出 UI 骨架
+        function init() {
             updateClock();
             setInterval(updateClock, 1000);
 
@@ -990,7 +962,6 @@
             setupSidebar();
             loadCachedWeather();
 
-            // 核心 DOM 注入与外部 API 请求延迟一帧，为骨架渲染让路
             setTimeout(() => {
                 render();
                 updateWeather();
