@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V14.2</title>
+    <title>CYBER-DECK V14.3</title>
     <meta name="description"
           content="A simple HTML navigation page - your personal cyber deck for quick access to favorite websites.">
+    <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#eef1f6" media="(prefers-color-scheme: light)">
 
     <!-- 防闪屏：在首次绘制前就应用已保存的主题，避免 dark→light 闪烁 (FOUC) -->
     <script>
@@ -29,8 +31,12 @@
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
 
-    <!-- YAML 解析库 -->
-    <script src="js-yaml.min.js"></script>
+    <!-- 常用域名预解析，缩短图标/资源首连接耗时 -->
+    <link rel="dns-prefetch" href="//www.google.com">
+    <link rel="dns-prefetch" href="//github.githubassets.com">
+    <link rel="dns-prefetch" href="//static.hdslb.com">
+    <link rel="dns-prefetch" href="//www.youtube.com">
+    <link rel="dns-prefetch" href="//chatgpt.com">
 
     <style>
         /* --- 全局变量适配 --- */
@@ -329,6 +335,23 @@
             box-shadow: 0 0 20px var(--neon);
         }
 
+        /* 搜索命中高亮 */
+        .search-highlight {
+            background: rgba(0, 242, 255, 0.2);
+            color: var(--neon);
+            border-radius: 2px;
+            padding: 0 1px;
+        }
+
+        /* 输入后淡出快捷键提示 */
+        .search-hint {
+            transition: opacity 0.2s;
+        }
+
+        .search-hint.is-hidden {
+            opacity: 0;
+        }
+
         /* 键盘可见焦点环（鼠标点击不显示，键盘 Tab 显示） */
         a:focus-visible,
         button:focus-visible,
@@ -444,14 +467,16 @@
             transition: width 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
         }
 
-        .link-card:hover {
+        .link-card:hover,
+        .link-card.focused {
             background: color-mix(in srgb, var(--card-accent) 7%, var(--panel));
             border-color: color-mix(in srgb, var(--card-accent) 72%, transparent);
             transform: translateX(12px);
             box-shadow: -10px 10px 25px rgba(0, 0, 0, 0.2), 0 0 20px color-mix(in srgb, var(--card-accent) 22%, transparent);
         }
 
-        .link-card:hover::before {
+        .link-card:hover::before,
+        .link-card.focused::before {
             width: 112%;
             opacity: 0.48;
         }
@@ -661,9 +686,11 @@
 
     <main class="main-content">
         <div class="search-container">
-            <p
+            <p class="search-hint"
                style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">
-                // A simple HTML navigation page · 按 <kbd>/</kbd> 搜索 · <kbd>Esc</kbd> 清空</p>
+                // A simple HTML navigation page · 按 <kbd>/</kbd> 搜索 · <kbd>Esc</kbd> 清空 · <kbd>↑↓</kbd> 导航 ·
+                <kbd>Enter</kbd> 打开
+            </p>
             <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
                    autocomplete="off" aria-label="搜索链接">
         </div>
@@ -700,15 +727,15 @@
                 { name: "虎牙直播", url: "https://www.huya.com", cat: "media", icon: "https://a.msstatic.com/huya/hd/h5/static-source/main/logo2.png" },
 
                 // --- NEURAL_INTELLIGENCE (AI 助手) ---
+                { name: "DeepSeek", url: "https://chat.deepseek.com", cat: "ai", icon: "https://www.deepseek.com/favicon.ico" },
+                { name: "Qwenstudio", url: "https://chat.qwen.ai/", cat: "ai", icon: "https://assets.alicdn.com/g/qwenweb/qwen-chat-fe/0.2.74/static/images/ms-icon-light-150x150.png" },
+                { name: "ChatGPT", url: "https://chatgpt.com", cat: "ai", icon: "https://chatgpt.com/favicon.ico" },
                 { name: "AI Studio", url: "https://aistudio.google.com", cat: "ai", icon: "https://www.gstatic.com/aistudio/zero-state/promo_chat_url_context.png" },
                 { name: "xiaomimimo", url: "https://aistudio.xiaomimimo.com/#/", cat: "ai", icon: "https://cdn.cnbj1.fds.api.mi-img.com/aife/mimo-blog-fe/doc_build/static/image/logo.99baaffe.png" },
                 { name: "通义千问", url: "https://chat.qwen.ai/", cat: "ai", icon: "https://th.bing.com/th?id=OCBZA.B73F50E19DFEAB57CA111B36001945C0C87797D5E5AC215BCAEA773DF9D57E6FA&pid=BZA&rs=0" },
-                { name: "ChatGPT", url: "https://chatgpt.com", cat: "ai", icon: "https://chatgpt.com/favicon.ico" },
-                { name: "DeepSeek", url: "https://chat.deepseek.com", cat: "ai", icon: "https://www.deepseek.com/favicon.ico" },
                 { name: "Claude", url: "https://claude.ai", cat: "ai", icon: "https://claude.ai/favicon.ico" },
                 { name: "Gemini", url: "https://gemini.google.com", cat: "ai", icon: "https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg" },
                 { name: "Kimi", url: "https://kimi.moonshot.cn", cat: "ai", icon: "https://kimi.moonshot.cn/favicon.ico" },
-                { name: "Midjourney", url: "https://www.midjourney.com", cat: "ai", icon: "https://www.midjourney.com/favicon.ico" },
 
                 // --- FORGE_WORKSHOP (开发/工具) ---
                 { name: "GitHub", url: "https://github.com", cat: "dev", icon: "https://github.githubassets.com/favicons/favicon.png" },
@@ -747,13 +774,6 @@
             }
         }
 
-        // 文本转义，防止链接名含特殊字符破坏 DOM / 注入
-        function escapeText(s) {
-            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-            }[c]));
-        }
-
         // 根据字符串生成稳定的霓虹色
         function hashColor(s) {
             const sum = String(s || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0);
@@ -789,6 +809,28 @@
                 clearTimeout(t);
                 t = setTimeout(() => fn.apply(this, args), ms);
             };
+        }
+
+        // 把命中的关键词包一层高亮 <span>，用 DOM 片段避免注入
+        function highlightMatch(text, query) {
+            if (!query) return document.createTextNode(text);
+            const idx = text.toLowerCase().indexOf(query.toLowerCase());
+            if (idx === -1) return document.createTextNode(text);
+            const frag = document.createDocumentFragment();
+            frag.appendChild(document.createTextNode(text.slice(0, idx)));
+            const mark = document.createElement('span');
+            mark.className = 'search-highlight';
+            mark.textContent = text.slice(idx, idx + query.length);
+            frag.appendChild(mark);
+            frag.appendChild(document.createTextNode(text.slice(idx + query.length)));
+            return frag;
+        }
+
+        // 带超时的 fetch：避免弱网下请求长时间挂起
+        function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
         }
 
         // --- 主题切换 ---
@@ -829,7 +871,7 @@
             return wrap;
         }
 
-        function buildCard(link) {
+        function buildCard(link, query) {
             const a = document.createElement('a');
             a.href = link.url;
             a.className = 'link-card';
@@ -843,7 +885,7 @@
             info.className = 'link-info';
             const nameEl = document.createElement('span');
             nameEl.className = 'link-name';
-            nameEl.textContent = link.name;
+            nameEl.appendChild(highlightMatch(link.name, query));
             const urlEl = document.createElement('span');
             urlEl.className = 'link-url';
             urlEl.textContent = safeHostname(link.url);
@@ -858,7 +900,7 @@
             const q = (kw || '').toLowerCase().trim();
             let total = 0;
 
-            config.categories.forEach(cat => {
+            config.categories.forEach((cat, catIdx) => {
                 const list = config.links.filter(l => {
                     if (l.cat !== cat.id) return false;
                     if (!q) return true;
@@ -872,6 +914,7 @@
 
                 const col = document.createElement('div');
                 col.className = 'cat-column';
+                col.style.animationDelay = `${catIdx * 0.1}s`;
 
                 const header = document.createElement('div');
                 header.className = 'cat-header';
@@ -889,7 +932,7 @@
 
                 const ul = document.createElement('div');
                 ul.className = 'links-list';
-                list.forEach(l => ul.appendChild(buildCard(l)));
+                list.forEach(l => ul.appendChild(buildCard(l, q)));
                 col.appendChild(ul);
 
                 renderArea.appendChild(col);
@@ -937,7 +980,7 @@
             // 后台标签页跳过请求，节省流量
             if (document.hidden) return;
             try {
-                const res = await fetch('https://wttr.in/?format=j1');
+                const res = await fetchWithTimeout('https://wttr.in/?format=j1', {}, 8000);
                 const data = await res.json();
                 const cur = data.current_condition[0];
                 const tempC = cur.temp_C;
@@ -1031,20 +1074,51 @@
             } catch (e) { /* 损坏数据忽略 */ }
         }
 
-        // --- 搜索：防抖 + 键盘交互 ---
+        // --- 搜索：防抖 + 键盘导航（↑↓ 选择 / Enter 打开 / Esc 清空） ---
+        let focusIdx = -1;
+
+        function getVisibleCards() {
+            return Array.from(renderArea.querySelectorAll('.link-card'));
+        }
+
+        function setFocus(idx) {
+            const cards = getVisibleCards();
+            cards.forEach(c => c.classList.remove('focused'));
+            if (idx >= 0 && idx < cards.length) {
+                cards[idx].classList.add('focused');
+                cards[idx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+            focusIdx = idx;
+        }
+
         function setupSearch() {
             const input = document.getElementById('search-in');
-            const debouncedRender = debounce(v => render(v), 120);
-            input.addEventListener('input', e => debouncedRender(e.target.value));
-            // 回车直达第一个匹配结果
+            const hint = document.querySelector('.search-hint');
+            const debouncedRender = debounce(v => {
+                render(v);
+                focusIdx = -1;
+            }, 120);
+            input.addEventListener('input', e => {
+                if (hint) hint.classList.toggle('is-hidden', e.target.value.length > 0);
+                debouncedRender(e.target.value);
+            });
             input.addEventListener('keydown', e => {
-                if (e.key === 'Enter') {
-                    const first = renderArea.querySelector('.link-card');
-                    if (first) window.location.href = first.href;
-                }
-                if (e.key === 'Escape') {
+                const cards = getVisibleCards();
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setFocus(Math.min(focusIdx + 1, cards.length - 1));
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setFocus(Math.max(focusIdx - 1, 0));
+                } else if (e.key === 'Enter') {
+                    // 有选中项则打开选中项，否则打开第一个匹配结果
+                    const target = focusIdx >= 0 ? cards[focusIdx] : cards[0];
+                    if (target) window.location.href = target.href;
+                } else if (e.key === 'Escape') {
                     input.value = '';
+                    if (hint) hint.classList.remove('is-hidden');
                     render('');
+                    focusIdx = -1;
                 }
             });
         }
@@ -1105,6 +1179,14 @@
             };
             btn.addEventListener('click', () => toggle());
             backdrop.addEventListener('click', () => toggle(false));
+            // 点击侧栏内的链接后自动收起
+            sidebar.addEventListener('click', e => {
+                if (e.target.closest('a, .link-card')) toggle(false);
+            });
+            // Esc 关闭已展开的侧栏
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && sidebar.classList.contains('open')) toggle(false);
+            });
         }
 
         // --- 可见性变化时刷新一次天气（从后台切回前台） ---
