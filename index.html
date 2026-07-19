@@ -129,12 +129,14 @@
            否则上面的 display:none 会压过这里的 display:block，电脑也看不到光标。 */
         @media (hover: hover) and (pointer: fine) {
             * {
-                cursor: none !important;
+                cursor: revert !important;
             }
+        }
 
-            #neon-cursor {
-                display: block;
-            }
+        /* 使用系统指针：离开页面时浏览器会自动隐藏，无视觉残留。 */
+        #neon-cursor,
+        .click-ripple {
+            display: none !important;
         }
 
         .click-ripple {
