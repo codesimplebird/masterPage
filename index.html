@@ -444,7 +444,7 @@
             background: rgba(128, 128, 128, 0.03);
             border: 1px solid rgba(128, 128, 128, 0.08);
             border-radius: 16px;
-            padding: 15px 20px;
+            padding: 15px 20px 15px 12px;
             display: flex;
             align-items: center;
             gap: 20px;
@@ -479,6 +479,66 @@
         .link-card.focused::before {
             width: 112%;
             opacity: 0.48;
+        }
+
+        /* 拖拽手柄：位于卡片左侧，悬停/聚焦时显现 */
+        .drag-handle {
+            flex-shrink: 0;
+            align-self: stretch;
+            width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-sub);
+            font-size: 1.15rem;
+            line-height: 1;
+            border-radius: 8px;
+            cursor: grab;
+            opacity: 0;
+            transition: opacity 0.25s ease, color 0.2s ease, background 0.2s ease;
+            z-index: 2;
+        }
+
+        .link-card:hover .drag-handle,
+        .link-card.focused .drag-handle {
+            opacity: 0.5;
+        }
+
+        .drag-handle:hover {
+            opacity: 1;
+            color: var(--card-accent);
+            background: color-mix(in srgb, var(--card-accent) 16%, transparent);
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        /* 正在被拖拽的卡片 */
+        .link-card.dragging {
+            opacity: 0.4;
+        }
+
+        /* 落下回弹动画（安卓那种吸附到位手感） */
+        @keyframes card-drop-settle {
+            0% { transform: translateX(12px) scale(1.03); }
+            100% { transform: translateX(12px) scale(1); }
+        }
+
+        .link-card.just-dropped {
+            animation: card-drop-settle 0.18s ease-out;
+        }
+
+        /* 搜索时隐藏手柄并禁用排序（过滤态下排序无意义） */
+        #render-area.is-searching .drag-handle {
+            display: none;
+        }
+
+        /* 触摸设备原生拖拽支持差，隐藏手柄 */
+        @media (hover: none) {
+            .drag-handle {
+                display: none;
+            }
         }
 
         /* 巨型图标 */
@@ -871,6 +931,11 @@
             return wrap;
         }
 
+        // 生成稳定唯一键（url 可能重复，故组合 分类+名称+url）
+        function linkKey(link) {
+            return `${link.cat}\u0001${link.name}\u0001${link.url}`;
+        }
+
         function buildCard(link, query) {
             const a = document.createElement('a');
             a.href = link.url;
@@ -878,6 +943,16 @@
             a.style.setProperty('--card-accent', accentColor(link));
             a.target = '_self';
             a.rel = 'noopener noreferrer';
+            a.draggable = false;              // 默认禁用 <a> 原生拖拽，仅按下手柄时临时启用
+            a.dataset.key = linkKey(link);
+            a.dataset.cat = link.cat;
+
+            const handle = document.createElement('span');
+            handle.className = 'drag-handle';
+            handle.textContent = '⠿';
+            handle.title = '按住拖动，可在本类内调整顺序';
+            handle.setAttribute('aria-hidden', 'true');
+            a.appendChild(handle);
 
             a.appendChild(buildIcon(link));
 
@@ -898,6 +973,7 @@
         function render(kw) {
             renderArea.innerHTML = '';
             const q = (kw || '').toLowerCase().trim();
+            renderArea.classList.toggle('is-searching', Boolean(q));
             let total = 0;
 
             config.categories.forEach((cat, catIdx) => {
@@ -932,7 +1008,8 @@
 
                 const ul = document.createElement('div');
                 ul.className = 'links-list';
-                list.forEach(l => ul.appendChild(buildCard(l, q)));
+                ul.dataset.cat = cat.id;
+                applyOrder(cat.id, list).forEach(l => ul.appendChild(buildCard(l, q)));
                 col.appendChild(ul);
 
                 renderArea.appendChild(col);
@@ -944,6 +1021,162 @@
                 hint.textContent = q ? `// 未匹配到 "${kw}" 的结果` : '// 暂无链接';
                 renderArea.appendChild(hint);
             }
+        }
+
+        // --- 拖拽排序：仅同类列内，顺序存在本机 localStorage（只存顺序，不存数据） ---
+        const ORDER_KEY = 'v14-link-order';
+
+        function loadOrder() {
+            try {
+                return JSON.parse(localStorage.getItem(ORDER_KEY)) || {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        // 按已保存顺序重排某分类的链接；未记录的新链接（改了 config 后新增）保持原相对次序排在末尾
+        function applyOrder(catId, list) {
+            const saved = loadOrder()[catId];
+            if (!saved || !saved.length) return list;
+            const pos = new Map(saved.map((k, i) => [k, i]));
+            return list
+                .map((l, i) => ({ l, i, p: pos.has(linkKey(l)) ? pos.get(linkKey(l)) : Infinity }))
+                .sort((a, b) => (a.p - b.p) || (a.i - b.i))
+                .map(o => o.l);
+        }
+
+        // 把某分类当前 DOM 顺序读出并持久化
+        function saveOrderForCat(catId) {
+            const list = renderArea.querySelector(`.links-list[data-cat="${catId}"]`);
+            if (!list) return;
+            const keys = Array.from(list.querySelectorAll('.link-card')).map(c => c.dataset.key);
+            const all = loadOrder();
+            all[catId] = keys;
+            try { localStorage.setItem(ORDER_KEY, JSON.stringify(all)); } catch (e) { /* ignore */ }
+        }
+
+        // 根据鼠标 Y 坐标，找出应插入到其之前的卡片
+        function getDragAfterElement(list, y) {
+            const cards = Array.from(list.querySelectorAll('.link-card:not(.dragging)'));
+            let closest = null, closestOffset = -Infinity;
+            for (const card of cards) {
+                const box = card.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closestOffset) {
+                    closestOffset = offset;
+                    closest = card;
+                }
+            }
+            return closest;
+        }
+
+        function setupDragSort() {
+            let dragEl = null;
+
+            // FLIP：让被挤开的卡片平滑滑到新位置（安卓式让位动画）
+            function flipReorder(list, mutate) {
+                const cards = Array.from(list.querySelectorAll('.link-card')).filter(c => c !== dragEl);
+                const firstTop = new Map();
+                cards.forEach(c => firstTop.set(c, c.getBoundingClientRect().top)); // 视觉起点
+
+                mutate(); // 执行 DOM 重排
+
+                // 清掉进行中的过渡，取得干净的目标位置
+                cards.forEach(c => { c.style.transition = 'none'; c.style.transform = 'none'; });
+                void list.offsetHeight; // 强制回流
+                cards.forEach(c => {
+                    const delta = firstTop.get(c) - c.getBoundingClientRect().top;
+                    if (delta) c.style.transform = `translateY(${delta}px)`;
+                });
+
+                // 下一帧播放到位
+                requestAnimationFrame(() => {
+                    cards.forEach(c => {
+                        if (c.style.transform && c.style.transform !== 'none') {
+                            c.style.transition = 'transform 0.18s cubic-bezier(0.2, 0, 0, 1)';
+                            c.style.transform = '';
+                        }
+                    });
+                });
+            }
+
+            // 仅当从手柄按下时，才把整卡设为可拖拽（否则保持普通链接点击）
+            renderArea.addEventListener('mousedown', e => {
+                const card = e.target.closest('.link-card');
+                if (!card) return;
+                const onHandle = e.target.closest('.drag-handle');
+                card.draggable = Boolean(onHandle) && !renderArea.classList.contains('is-searching');
+            });
+
+            // 未进入拖拽就松手时，撤销可拖拽标记
+            document.addEventListener('mouseup', () => {
+                if (dragEl) return;
+                renderArea.querySelectorAll('.link-card[draggable="true"]').forEach(c => { c.draggable = false; });
+            });
+
+            renderArea.addEventListener('dragstart', e => {
+                const card = e.target.closest('.link-card');
+                if (!card || !card.draggable) { e.preventDefault(); return; }
+                dragEl = card;
+                card.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                try { e.dataTransfer.setData('text/plain', card.dataset.key); } catch (err) { /* ignore */ }
+            });
+
+            renderArea.addEventListener('dragover', e => {
+                if (!dragEl) return;
+                const list = e.target.closest('.links-list');
+                if (!list || list.dataset.cat !== dragEl.dataset.cat) return; // 只允许同类容器
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                const after = getDragAfterElement(list, e.clientY);
+                const willMove = after == null
+                    ? dragEl.nextSibling !== null
+                    : (after !== dragEl && after !== dragEl.nextSibling);
+                if (!willMove) return;
+                flipReorder(list, () => {
+                    if (after == null) list.appendChild(dragEl);
+                    else list.insertBefore(dragEl, after);
+                });
+            });
+
+            renderArea.addEventListener('drop', e => {
+                if (!dragEl) return;
+                const list = e.target.closest('.links-list');
+                if (list && list.dataset.cat === dragEl.dataset.cat) e.preventDefault();
+            });
+
+            renderArea.addEventListener('dragend', () => {
+                if (!dragEl) return;
+                const cat = dragEl.dataset.cat;
+                const dropped = dragEl;
+                const list = dropped.closest('.links-list');
+                dropped.classList.remove('dragging');
+                dropped.draggable = false;
+
+                // 清理 FLIP 残留的内联样式
+                if (list) {
+                    list.querySelectorAll('.link-card').forEach(c => {
+                        c.style.transition = '';
+                        c.style.transform = '';
+                    });
+                }
+
+                // 落下回弹
+                dropped.classList.remove('just-dropped');
+                void dropped.offsetWidth; // 重置动画
+                dropped.classList.add('just-dropped');
+                dropped.addEventListener('animationend',
+                    () => dropped.classList.remove('just-dropped'), { once: true });
+
+                dragEl = null;
+                saveOrderForCat(cat);
+            });
+
+            // 点击手柄本身不触发链接跳转
+            renderArea.addEventListener('click', e => {
+                if (e.target.closest('.drag-handle')) e.preventDefault();
+            });
         }
 
         // --- 系统同步 ---
@@ -1205,6 +1438,7 @@
             setupSearch();
             setupCursor();
             setupSidebar();
+            setupDragSort();
             loadCachedWeather();
 
             // 核心 DOM 注入与外部 API 请求延迟一帧，为骨架渲染让路
