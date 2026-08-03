@@ -335,6 +335,104 @@
             box-shadow: 0 0 20px var(--neon);
         }
 
+        /* --- Bing 式搜索历史下拉 --- */
+        .search-wrap {
+            position: relative;
+        }
+
+        .search-wrap .search-bar {
+            padding-right: 72px;
+        }
+
+        .search-go {
+            position: absolute;
+            top: 50%;
+            right: 14px;
+            transform: translateY(-50%);
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(128, 128, 128, 0.08);
+            color: var(--neon);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 2;
+        }
+
+        .search-go:hover {
+            background: color-mix(in srgb, var(--neon) 14%, transparent);
+            box-shadow: 0 0 15px color-mix(in srgb, var(--neon) 35%, transparent);
+        }
+
+        .search-history {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            right: 0;
+            background: var(--panel);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            z-index: 1000;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .search-history[hidden] {
+            display: none;
+        }
+
+        .history-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: var(--neon);
+        }
+
+        .history-clear {
+            border: none;
+            background: none;
+            color: var(--text-sub);
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .history-clear:hover {
+            color: var(--neon);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(128, 128, 128, 0.08);
+        }
+
+        .history-item:hover {
+            background: color-mix(in srgb, var(--neon) 8%, transparent);
+        }
+
+        .history-item .h-time {
+            flex-shrink: 0;
+            color: var(--text-sub);
+            font-size: 0.68rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
         /* 搜索命中高亮 */
         .search-highlight {
             background: rgba(0, 242, 255, 0.2);
@@ -521,8 +619,13 @@
 
         /* 落下回弹动画（安卓那种吸附到位手感） */
         @keyframes card-drop-settle {
-            0% { transform: translateX(12px) scale(1.03); }
-            100% { transform: translateX(12px) scale(1); }
+            0% {
+                transform: translateX(12px) scale(1.03);
+            }
+
+            100% {
+                transform: translateX(12px) scale(1);
+            }
         }
 
         .link-card.just-dropped {
@@ -749,10 +852,14 @@
             <p class="search-hint"
                style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">
                 // A simple HTML navigation page · 按 <kbd>/</kbd> 搜索 · <kbd>Esc</kbd> 清空 · <kbd>↑↓</kbd> 导航 ·
-                <kbd>Enter</kbd> 打开
+                <kbd>Enter</kbd> Bing 搜索
             </p>
-            <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
-                   autocomplete="off" aria-label="搜索链接">
+            <div class="search-wrap">
+                <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
+                       autocomplete="off" aria-label="搜索链接">
+                <button type="button" class="search-go" id="search-go" aria-label="Bing 搜索" title="Bing 搜索">🔍</button>
+                <div id="search-history" class="search-history" hidden></div>
+            </div>
         </div>
 
         <div id="render-area" aria-live="polite"></div>
@@ -796,6 +903,7 @@
                 { name: "Claude", url: "https://claude.ai", cat: "ai", icon: "https://claude.ai/favicon.ico" },
                 { name: "Gemini", url: "https://gemini.google.com", cat: "ai", icon: "https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg" },
                 { name: "Kimi", url: "https://kimi.moonshot.cn", cat: "ai", icon: "https://kimi.moonshot.cn/favicon.ico" },
+                { name: "opencode", url: "https://opencode.ai/workspace/wrk_01KRRQTAR3A4YDZB6JK219XP2J/go", cat: "ai", icon: "https://ts4.tc.mm.bing.net/th/id/ODF.b79p6WW7zIomJakbm-Jvcw?w=32&h=32&qlt=91&pcl=fffffa&o=6&pid=1.2" },
 
                 // --- FORGE_WORKSHOP (开发/工具) ---
                 { name: "GitHub", url: "https://github.com", cat: "dev", icon: "https://github.githubassets.com/favicons/favicon.png" },
@@ -1324,16 +1432,105 @@
             focusIdx = idx;
         }
 
+        // --- Bing 式搜索历史（持久化到 localStorage，最多保留 20 条） ---
+        const SEARCH_HISTORY_KEY = 'v14-search-history';
+        const MAX_HISTORY = 20;
+
+        function loadSearchHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveSearchHistory(list) {
+            try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list)); } catch (e) { /* ignore */ }
+        }
+
+        function recordSearch(query) {
+            const list = loadSearchHistory().filter(item => item.q !== query);
+            list.unshift({ q: query, ts: Date.now() });
+            saveSearchHistory(list.slice(0, MAX_HISTORY));
+        }
+
+        function doBingSearch(query) {
+            window.location.href = 'https://www.bing.com/search?q=' + encodeURIComponent(query);
+        }
+
         function setupSearch() {
             const input = document.getElementById('search-in');
             const hint = document.querySelector('.search-hint');
+            const histBox = document.getElementById('search-history');
+            const goBtn = document.getElementById('search-go');
             const debouncedRender = debounce(v => {
                 render(v);
                 focusIdx = -1;
             }, 120);
+
+            // 有输入内容 → Bing 搜索（Enter 与搜索按钮共用）
+            function submitSearch() {
+                const q = input.value.trim();
+                if (!q) { input.focus(); return; }
+                recordSearch(q);
+                doBingSearch(q);
+            }
+            goBtn.addEventListener('click', submitSearch);
+
+            // 重建历史下拉：输入内容时按包含匹配过滤，空框显示全部
+            function renderHistory() {
+                const q = input.value.trim().toLowerCase();
+                const all = loadSearchHistory();
+                const list = q ? all.filter(item => item.q.toLowerCase().includes(q)) : all;
+                histBox.innerHTML = '';
+                if (!list.length) { histBox.hidden = true; return; }
+
+                const head = document.createElement('div');
+                head.className = 'history-head';
+                const label = document.createElement('span');
+                label.textContent = 'SEARCH_HISTORY';
+                const clearBtn = document.createElement('button');
+                clearBtn.type = 'button';
+                clearBtn.className = 'history-clear';
+                clearBtn.textContent = '清除历史';
+                clearBtn.addEventListener('click', () => {
+                    saveSearchHistory([]);
+                    renderHistory();
+                });
+                head.appendChild(label);
+                head.appendChild(clearBtn);
+                histBox.appendChild(head);
+
+                list.slice(0, 10).forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = 'history-item';
+                    row.setAttribute('role', 'option');
+                    const t = document.createElement('span');
+                    t.textContent = item.q;
+                    const time = document.createElement('span');
+                    time.className = 'h-time';
+                    time.textContent = new Date(item.ts).toLocaleDateString('zh-CN', {
+                        month: 'numeric', day: 'numeric'
+                    });
+                    row.appendChild(t);
+                    row.appendChild(time);
+                    // 阻止 mousedown 默认行为，避免输入框先失焦导致下拉关闭
+                    row.addEventListener('mousedown', e => e.preventDefault());
+                    row.addEventListener('click', () => {
+                        input.value = item.q;
+                        recordSearch(item.q);
+                        doBingSearch(item.q);
+                    });
+                    histBox.appendChild(row);
+                });
+                histBox.hidden = false;
+            }
+
+            input.addEventListener('focus', () => renderHistory());
             input.addEventListener('input', e => {
                 if (hint) hint.classList.toggle('is-hidden', e.target.value.length > 0);
                 debouncedRender(e.target.value);
+                renderHistory();
             });
             input.addEventListener('keydown', e => {
                 const cards = getVisibleCards();
@@ -1344,7 +1541,9 @@
                     e.preventDefault();
                     setFocus(Math.max(focusIdx - 1, 0));
                 } else if (e.key === 'Enter') {
-                    // 有选中项则打开选中项，否则打开第一个匹配结果
+                    // 有输入内容 → Bing 搜索；空框 → 保留原有的打开选中链接行为
+                    const q = input.value.trim();
+                    if (q) { submitSearch(); return; }
                     const target = focusIdx >= 0 ? cards[focusIdx] : cards[0];
                     if (target) window.location.href = target.href;
                 } else if (e.key === 'Escape') {
@@ -1352,8 +1551,10 @@
                     if (hint) hint.classList.remove('is-hidden');
                     render('');
                     focusIdx = -1;
+                    histBox.hidden = true;
                 }
             });
+            input.addEventListener('blur', () => setTimeout(() => { histBox.hidden = true; }, 120));
         }
 
         // --- 全局快捷键：/ 聚焦搜索，Esc 清空 ---
