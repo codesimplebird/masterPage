@@ -1,14 +1,14 @@
 categories:
   - id: media
-    name: MEDIA_STATIONS
+    name: Media Stations
   - id: ai
-    name: NEURAL_INTELLIGENCE
+    name: Neural Intelligence
   - id: dev
-    name: FORGE_WORKSHOP
+    name: Forge Workshop
   - id: social
-    name: SOCIAL_NEXUS
+    name: Social Nexus
   - id: search
-    name: SEARCH_ENGINES
+    name: Search Engines
 
 links:
   # --- MEDIA_STATIONS (影音娱乐) ---
@@ -48,6 +48,21 @@ links:
     icon: https://a.msstatic.com/huya/hd/h5/static-source/main/logo2.png
 
   # --- NEURAL_INTELLIGENCE (AI 助手) ---
+  - name: DeepSeek
+    url: https://chat.deepseek.com
+    cat: ai
+    icon: https://www.deepseek.com/favicon.ico
+
+  - name: Qwenstudio
+    url: https://chat.qwen.ai/
+    cat: ai
+    icon: https://assets.alicdn.com/g/qwenweb/qwen-chat-fe/0.2.74/static/images/ms-icon-light-150x150.png
+
+  - name: ChatGPT
+    url: https://chatgpt.com
+    cat: ai
+    icon: https://chatgpt.com/favicon.ico
+
   - name: AI Studio
     url: https://aistudio.google.com
     cat: ai
@@ -62,16 +77,6 @@ links:
     url: https://chat.qwen.ai/
     cat: ai
     icon: https://th.bing.com/th?id=OCBZA.B73F50E19DFEAB57CA111B36001945C0C87797D5E5AC215BCAEA773DF9D57E6FA&pid=BZA&rs=0
-
-  - name: ChatGPT
-    url: https://chatgpt.com
-    cat: ai
-    icon: https://chatgpt.com/favicon.ico
-
-  - name: DeepSeek
-    url: https://chat.deepseek.com
-    cat: ai
-    icon: https://www.deepseek.com/favicon.ico
 
   - name: Claude
     url: https://claude.ai
@@ -88,10 +93,10 @@ links:
     cat: ai
     icon: https://kimi.moonshot.cn/favicon.ico
 
-  - name: Midjourney
-    url: https://www.midjourney.com
+  - name: opencode
+    url: https://opencode.ai/workspace/wrk_01KRRQTAR3A4YDZB6JK219XP2J/go
     cat: ai
-    icon: https://www.midjourney.com/favicon.ico
+    icon: https://ts4.tc.mm.bing.net/th/id/ODF.b79p6WW7zIomJakbm-Jvcw?w=32&h=32&qlt=91&pcl=fffffa&o=6&pid=1.2
 
   # --- FORGE_WORKSHOP (开发/工具) ---
   - name: GitHub
