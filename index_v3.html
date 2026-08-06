@@ -1251,6 +1251,7 @@
             const urlEl = document.createElement('span');
             urlEl.className = 'link-url';
             urlEl.textContent = safeHostname(link.url);
+            urlEl.title = link.url;
             info.appendChild(nameEl);
             info.appendChild(urlEl);
             a.appendChild(info);
