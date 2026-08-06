@@ -1783,7 +1783,22 @@
                     closeHistory();
                 }
             });
-            input.addEventListener('blur', () => setTimeout(closeHistory, 120));
+            // Tab 移入历史时保持下拉打开；移出历史时关闭
+            input.addEventListener('blur', e => {
+                if (e.relatedTarget && histBox.contains(e.relatedTarget)) return;
+                setTimeout(closeHistory, 120);
+            });
+            histBox.addEventListener('blur', e => {
+                if (e.relatedTarget && (histBox.contains(e.relatedTarget) || e.relatedTarget === input)) return;
+                closeHistory();
+            });
+            histBox.addEventListener('keydown', e => {
+                if (e.key === 'Escape') {
+                    e.stopPropagation();
+                    closeHistory();
+                    input.focus();
+                }
+            });
         }
 
         // --- 全局快捷键：/ 聚焦搜索，Esc 清空 ---
@@ -1839,6 +1854,12 @@
                 const o = open == null ? !sidebar.classList.contains('open') : open;
                 sidebar.classList.toggle('open', o);
                 btn.setAttribute('aria-expanded', o ? 'true' : 'false');
+                if (o) {
+                    const first = sidebar.querySelector('a, button, input');
+                    if (first) first.focus();
+                } else if (document.activeElement && sidebar.contains(document.activeElement)) {
+                    btn.focus();
+                }
             };
             btn.addEventListener('click', () => toggle());
             backdrop.addEventListener('click', () => toggle(false));

@@ -1776,7 +1776,22 @@
                     closeHistory();
                 }
             });
-            input.addEventListener('blur', () => setTimeout(closeHistory, 120));
+            // Tab 移入历史时保持下拉打开；移出历史时关闭
+            input.addEventListener('blur', e => {
+                if (e.relatedTarget && histBox.contains(e.relatedTarget)) return;
+                setTimeout(closeHistory, 120);
+            });
+            histBox.addEventListener('blur', e => {
+                if (e.relatedTarget && (histBox.contains(e.relatedTarget) || e.relatedTarget === input)) return;
+                closeHistory();
+            });
+            histBox.addEventListener('keydown', e => {
+                if (e.key === 'Escape') {
+                    e.stopPropagation();
+                    closeHistory();
+                    input.focus();
+                }
+            });
         }
 
         document.addEventListener('keydown', e => {
@@ -1823,6 +1838,12 @@
             const o = open == null ? !els.sidebar.classList.contains('open') : open;
             els.sidebar.classList.toggle('open', o);
             els.menuBtn.setAttribute('aria-expanded', o ? 'true' : 'false');
+            if (o) {
+                const first = els.sidebar.querySelector('a, button, input');
+                if (first) first.focus();
+            } else if (document.activeElement && els.sidebar.contains(document.activeElement)) {
+                els.menuBtn.focus();
+            }
         }
 
         function setupSidebar() {
