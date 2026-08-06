@@ -250,6 +250,22 @@
             opacity: 0.45;
         }
 
+        /* CRT 扫描线（可选）：默认关闭，启用时取消注释并保持低透明度
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.03;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0,
+                transparent 2px,
+                rgba(255, 255, 255, 0.6) 3px
+            );
+        }
+        */
+
         /* --- 侧边栏 --- */
         .sidebar {
             width: var(--sidebar-w);
@@ -1285,6 +1301,7 @@
                 hint.textContent = q ? `// 未匹配到 "${kw}" 的结果` : '// 暂无链接';
                 renderArea.appendChild(hint);
             }
+            lastResultCount = total;
         }
 
         // --- 拖拽排序：仅同类列内，顺序存在本机 localStorage（只存顺序，不存数据） ---
@@ -1591,6 +1608,7 @@
 
         // --- 搜索：防抖 + 键盘导航（↑↓ 选择 / Enter 搜索 / Esc 关闭历史或清空） ---
         let focusIdx = -1;
+        let lastResultCount = 0;
 
         function getVisibleCards() {
             return Array.from(renderArea.querySelectorAll('.link-card'));
@@ -1638,12 +1656,22 @@
         function setupSearch() {
             const input = document.getElementById('search-in');
             const hint = document.querySelector('.search-hint');
+            const hintHtml = hint ? hint.innerHTML : '';
             const histBox = document.getElementById('search-history');
             const searchForm = document.getElementById('search-form');
             let historyIdx = -1;
             const debouncedRender = debounce(v => {
                 render(v);
                 focusIdx = -1;
+                if (hint) {
+                    const q = String(v || '').trim();
+                    if (q) {
+                        hint.innerHTML = `// ${lastResultCount} RESULT${lastResultCount === 1 ? '' : 'S'}`;
+                        hint.classList.remove('is-hidden');
+                    } else {
+                        hint.innerHTML = hintHtml;
+                    }
+                }
             }, 120);
 
             function getHistoryItems() {
@@ -1742,8 +1770,7 @@
                 if (hint) hint.classList.toggle('is-hidden', e.target.value.length > 0);
                 debouncedRender(e.target.value);
                 renderHistory();
-            });
-            input.addEventListener('keydown', e => {
+            });            input.addEventListener('keydown', e => {
                 if (e.key === 'Enter' && (e.isComposing || e.keyCode === 229)) return;
                 const cards = getVisibleCards();
                 const historyItems = getHistoryItems();
@@ -1778,7 +1805,10 @@
                         return;
                     }
                     input.value = '';
-                    if (hint) hint.classList.remove('is-hidden');
+                    if (hint) {
+                        hint.innerHTML = hintHtml;
+                        hint.classList.remove('is-hidden');
+                    }
                     render('');
                     focusIdx = -1;
                     closeHistory();
