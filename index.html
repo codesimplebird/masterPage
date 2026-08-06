@@ -49,6 +49,8 @@
             --text-main: #ffffff;
             --text-sub: #a1a1aa;
             --grid-color: rgba(0, 242, 255, 0.05);
+            --scroll-track: rgba(128, 128, 128, 0.1);
+            --scroll-thumb: rgba(0, 242, 255, 0.55);
             --sidebar-w: 320px;
         }
 
@@ -62,12 +64,40 @@
             --text-main: #14161f;
             --text-sub: #454a5a;
             --grid-color: rgba(0, 0, 0, 0.05);
+            --scroll-track: rgba(0, 0, 0, 0.08);
+            --scroll-thumb: rgba(0, 85, 255, 0.5);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scroll-track);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scroll-thumb);
+            border: 2px solid var(--bg);
+            border-radius: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon);
+        }
+
+        ::selection {
+            background: var(--neon);
+            color: var(--bg);
         }
 
         .sr-only {
@@ -225,6 +255,7 @@
             font-size: 3.2rem;
             font-weight: 700;
             line-height: 1;
+            font-variant-numeric: tabular-nums;
         }
 
         .clock-sec {
