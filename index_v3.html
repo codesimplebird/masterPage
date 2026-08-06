@@ -927,7 +927,7 @@
         <div class="search-container">
             <p class="search-hint" id="search-hint"
                style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">
-                // A simple HTML navigation page · 按 <kbd>/</kbd> 搜索 · <kbd>Esc</kbd> 关闭历史/清空 · <kbd>↑↓</kbd> 导航 · <kbd>Enter</kbd> Bing 搜索</p>
+                // A simple HTML navigation page · 按 <kbd>/</kbd> 或 <kbd>Ctrl+K</kbd> 搜索 · <kbd>Esc</kbd> 关闭历史/清空 · <kbd>↑↓</kbd> 导航 · <kbd>Enter</kbd> Bing 搜索</p>
             <form class="search-wrap" id="search-form" role="search" aria-label="全局搜索">
                 <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
                        autocomplete="off" aria-label="搜索链接" aria-describedby="search-hint" aria-controls="search-history" aria-expanded="false">
@@ -1479,7 +1479,8 @@
         }
         function loadCachedWeather() {
             const obj = LS.get(WEATHER_KEY, null);
-            if (obj && obj.ts && Date.now() - obj.ts < 3600000) {
+            if (obj && obj.ts && typeof obj.tempC === 'string' && typeof obj.desc === 'string') {
+                // 1 小时内的缓存直接用；过期缓存作为占位，等待网络刷新
                 applyWeather(obj.tempC, obj.desc);
             }
         }
@@ -1799,6 +1800,9 @@
             const tag = (document.activeElement && document.activeElement.tagName) || '';
             const typing = tag === 'INPUT' || tag === 'TEXTAREA';
             if (e.key === '/' && !typing) {
+                e.preventDefault();
+                els.searchIn.focus();
+            } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
                 e.preventDefault();
                 els.searchIn.focus();
             }
