@@ -253,6 +253,23 @@
             text-shadow: 0 0 10px var(--neon);
         }
 
+        @media (prefers-reduced-motion: no-preference) {
+            .clock-sec {
+                animation: clockPulse 3s ease-in-out infinite;
+            }
+        }
+
+        @keyframes clockPulse {
+            0%,
+            100% {
+                text-shadow: 0 0 6px var(--neon);
+            }
+
+            50% {
+                text-shadow: 0 0 14px var(--neon), 0 0 24px color-mix(in srgb, var(--neon) 60%, transparent);
+            }
+        }
+
         .clock-date {
             font-size: 0.8rem;
             color: var(--text-sub);
@@ -316,6 +333,15 @@
         .memo .del:hover {
             opacity: 1;
             color: var(--neon);
+        }
+
+        .memo-empty {
+            color: var(--text-sub);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            opacity: 0.6;
+            padding: 12px 0;
+            letter-spacing: 1px;
         }
 
         #todo-in {
@@ -656,7 +682,9 @@
 
         /* 正在被拖拽的卡片 */
         .link-card.dragging {
-            opacity: 0.4;
+            opacity: 0.45;
+            transform: scale(1.03);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 25px color-mix(in srgb, var(--card-accent) 30%, transparent);
         }
 
         /* 落下回弹动画（安卓那种吸附到位手感） */
@@ -1494,9 +1522,23 @@
         function setupMemo() {
             const KEY = 'v14-memos';
 
+            const refreshEmptyHint = () => {
+                const has = els.todoList.querySelector('.memo');
+                const hint = els.todoList.querySelector('.memo-empty');
+                if (!has && !hint) {
+                    const el = document.createElement('div');
+                    el.className = 'memo-empty';
+                    el.textContent = '// NO_MEMOS';
+                    els.todoList.appendChild(el);
+                } else if (has && hint) {
+                    hint.remove();
+                }
+            };
+
             const save = () => {
                 const items = Array.from(els.todoList.querySelectorAll('.memo .txt')).map(s => s.textContent);
                 LS.set(KEY, items);
+                refreshEmptyHint();
             };
 
             const add = (text) => {
@@ -1537,6 +1579,7 @@
             });
 
             (LS.get(KEY, []) || []).forEach(add);
+            refreshEmptyHint();
         }
 
         let focusIdx = -1;
