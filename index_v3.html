@@ -507,6 +507,29 @@
             }
         }
 
+        /* 卡片错峰进场；backwards 填充避免动画结束后覆盖 hover 位移 */
+        .link-card {
+            animation: cardIn 0.5s ease-out backwards;
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 搜索过滤时关闭进场动画，避免输入时反复重放 */
+        #render-area.is-searching .cat-column,
+        #render-area.is-searching .link-card {
+            animation: none;
+        }
+
         .cat-header {
             font-family: 'Orbitron', 'JetBrains Mono', 'Noto Sans SC', sans-serif;
             font-size: 1.08rem;
@@ -1241,7 +1264,11 @@
                 const ul = document.createElement('div');
                 ul.className = 'links-list';
                 ul.dataset.cat = cat.id;
-                applyOrder(cat.id, list).forEach(l => ul.appendChild(buildCard(l, q)));
+                applyOrder(cat.id, list).forEach((l, i) => {
+                    const card = buildCard(l, q);
+                    card.style.animationDelay = `${catIdx * 0.1 + i * 0.05}s`;
+                    ul.appendChild(card);
+                });
                 col.appendChild(ul);
 
                 els.renderArea.appendChild(col);
