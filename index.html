@@ -984,7 +984,7 @@
 
             <div class="stat-label"><span id="batt-label">POWER</span><span id="batt-val">--</span></div>
             <div class="bar-outer">
-                <div class="bar-inner" id="batt-bar" style="width: 100%;"></div>
+                <div class="bar-inner" id="batt-bar" style="width: 0%;"></div>
             </div>
 
             <div class="stat-label"><span>WEEK_FLOW</span><span id="week-val">0%</span></div>
@@ -1836,7 +1836,9 @@
                         submitSearch();
                         return;
                     }
-                    const target = focusIdx >= 0 ? cards[focusIdx] : cards[0];
+                    // 空框且未用 ↑↓ 选中卡片时不跳转：否则「什么都没输入按 Enter」
+                    // 会意外打开第一张卡片，与提示语「Enter Bing 搜索」矛盾
+                    const target = focusIdx >= 0 ? cards[focusIdx] : null;
                     if (target) window.location.href = target.href;
                 } else if (e.key === 'Escape') {
                     if (!histBox.hidden) {

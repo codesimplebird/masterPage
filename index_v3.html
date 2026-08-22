@@ -920,7 +920,7 @@
 
             <div class="stat-label"><span id="batt-label">POWER</span><span id="batt-val">--</span></div>
             <div class="bar-outer">
-                <div class="bar-inner" id="batt-bar" style="width: 100%;"></div>
+                <div class="bar-inner" id="batt-bar" style="width: 0%;"></div>
             </div>
 
             <div class="stat-label"><span>WEEK_FLOW</span><span id="week-val">0%</span></div>
@@ -1141,13 +1141,21 @@
                 .filter(cat => cat && cat.id)
                 .map(cat => ({
                     id: String(cat.id),
-                    name: CATEGORY_LABELS[cat.id] || String(cat.name || cat.id)
+                    // YAML 里的 name 优先：links.yaml 是主数据源，改分类显示名应当生效；
+                    // CATEGORY_LABELS 只是 name 缺失时的兜底
+                    name: String(cat.name || CATEGORY_LABELS[cat.id] || cat.id)
                 }));
             const categoryIds = new Set(categories.map(cat => cat.id));
+            const dropped = [];
             const links = source.links
-                .filter(link => link && link.name && isHttpUrl(link.url)
-                    && categoryIds.has(link.cat)
-                    && (!link.icon || isHttpUrl(link.icon)))
+                .filter(link => {
+                    const ok = link && link.name && isHttpUrl(link.url)
+                        && categoryIds.has(String(link.cat))
+                        && (!link.icon || isHttpUrl(link.icon));
+                    // 不合法的条目会被丢掉，必须留下线索，否则 YAML 写错一个字段就静默少一条链接
+                    if (!ok) dropped.push(link && link.name ? String(link.name) : '(无名条目)');
+                    return ok;
+                })
                 .map(link => ({
                     name: String(link.name),
                     url: String(link.url),
@@ -1155,6 +1163,9 @@
                     icon: String(link.icon || '')
                 }));
 
+            if (dropped.length) {
+                console.warn(`links.yaml 有 ${dropped.length} 条链接因字段非法被忽略：`, dropped);
+            }
             if (!categories.length || !links.length) throw new Error('links.yaml 没有可用数据');
             return { categories, links };
         }
@@ -1833,7 +1844,9 @@
                         submitSearch();
                         return;
                     }
-                    const target = focusIdx >= 0 ? cards[focusIdx] : cards[0];
+                    // 空框且未用 ↑↓ 选中卡片时不跳转：否则「什么都没输入按 Enter」
+                    // 会意外打开第一张卡片，与提示语「Enter Bing 搜索」矛盾
+                    const target = focusIdx >= 0 ? cards[focusIdx] : null;
                     if (target) window.location.href = target.href;
                 } else if (e.key === 'Escape') {
                     if (!histBox.hidden) {
