@@ -1012,13 +1012,25 @@
             </p>
             <form class="search-wrap" id="search-form" role="search" aria-label="全局搜索">
                 <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
-                       autocomplete="off" aria-label="搜索链接" aria-describedby="search-hint" aria-controls="search-history" aria-expanded="false">
+                       autocomplete="off" role="combobox" aria-label="搜索链接" aria-describedby="search-hint"
+                       aria-controls="search-history-list" aria-haspopup="listbox" aria-autocomplete="list"
+                       aria-expanded="false">
                 <button type="submit" class="search-go" id="search-go" aria-label="Bing 搜索" title="Bing 搜索">🔍</button>
-                <div id="search-history" class="search-history" role="listbox" aria-label="搜索历史" hidden></div>
+                <!-- 弹层容器不带 listbox 语义：清除按钮不能作为 option 的兄弟节点存在于 listbox 内 -->
+                <div id="search-history" class="search-history" hidden>
+                    <div class="history-head">
+                        <span>SEARCH_HISTORY</span>
+                        <button type="button" class="history-clear" id="history-clear">清除历史</button>
+                    </div>
+                    <div id="search-history-list" class="history-list" role="listbox" aria-label="搜索历史"></div>
+                </div>
             </form>
         </div>
 
-        <div id="render-area" aria-live="polite"></div>
+        <!-- 结果数专用播报区：live 区域必须足够小，否则每次搜索都会重读整个链接看板 -->
+        <p class="sr-only" id="search-status" role="status" aria-live="polite"></p>
+
+        <div id="render-area"></div>
     </main>
 
     <noscript>
@@ -1683,14 +1695,17 @@
             const input = document.getElementById('search-in');
             const hint = document.querySelector('.search-hint');
             const hintHtml = hint ? hint.innerHTML : '';
+            const searchStatus = document.getElementById('search-status');
             const histBox = document.getElementById('search-history');
+            const histList = document.getElementById('search-history-list');
+            const clearBtn = document.getElementById('history-clear');
             const searchForm = document.getElementById('search-form');
             let historyIdx = -1;
             const debouncedRender = debounce(v => {
                 render(v);
                 focusIdx = -1;
+                const q = String(v || '').trim();
                 if (hint) {
-                    const q = String(v || '').trim();
                     if (q) {
                         hint.innerHTML = `// ${lastResultCount} RESULT${lastResultCount === 1 ? '' : 'S'}`;
                         hint.classList.remove('is-hidden');
@@ -1698,10 +1713,14 @@
                         hint.innerHTML = hintHtml;
                     }
                 }
+                // 只把结果数送进 live 区域；render-area 自身不是 live 区域，否则会重读整个看板
+                if (searchStatus) {
+                    searchStatus.textContent = q ? `${lastResultCount} 个匹配结果` : '';
+                }
             }, 120);
 
             function getHistoryItems() {
-                return Array.from(histBox.querySelectorAll('.history-item'));
+                return Array.from(histList.querySelectorAll('.history-item'));
             }
 
             function closeHistory() {
@@ -1735,34 +1754,27 @@
                 submitSearch();
             });
 
-            // 重建历史下拉：输入内容时按包含匹配过滤，空框显示全部
+            // 头部与清除按钮是静态节点，只绑定一次，避免每次重建下拉都重复绑定
+            clearBtn.addEventListener('mousedown', e => e.preventDefault());
+            clearBtn.addEventListener('click', () => {
+                saveSearchHistory([]);
+                renderHistory();
+                input.focus();
+            });
+
+            // 只重建 option 列表：输入内容时按包含匹配过滤，空框显示全部
             function renderHistory() {
                 const q = input.value.trim().toLowerCase();
                 const all = loadSearchHistory();
                 const list = q ? all.filter(item => item.q.toLowerCase().includes(q)) : all;
-                histBox.innerHTML = '';
+                histList.innerHTML = '';
                 closeHistory();
                 if (!list.length) return;
 
-                const head = document.createElement('div');
-                head.className = 'history-head';
-                const label = document.createElement('span');
-                label.textContent = 'SEARCH_HISTORY';
-                const clearBtn = document.createElement('button');
-                clearBtn.type = 'button';
-                clearBtn.className = 'history-clear';
-                clearBtn.textContent = '清除历史';
-                clearBtn.addEventListener('click', () => {
-                    saveSearchHistory([]);
-                    renderHistory();
-                });
-                head.appendChild(label);
-                head.appendChild(clearBtn);
-                histBox.appendChild(head);
-
                 list.slice(0, 10).forEach((item, idx) => {
-                    const row = document.createElement('button');
-                    row.type = 'button';
+                    // option 用 div 而非 button：ARIA 规定 listbox 的 option 不应是交互控件，
+                    // 键盘选择走输入框上的 aria-activedescendant，焦点始终留在输入框
+                    const row = document.createElement('div');
                     row.className = 'history-item';
                     row.id = `search-history-item-${idx}`;
                     row.dataset.query = item.q;
@@ -1783,7 +1795,7 @@
                         input.value = item.q;
                         submitSearch();
                     });
-                    histBox.appendChild(row);
+                    histList.appendChild(row);
                 });
                 histBox.hidden = false;
                 input.setAttribute('aria-expanded', 'true');
@@ -1796,7 +1808,8 @@
                 if (hint) hint.classList.toggle('is-hidden', e.target.value.length > 0);
                 debouncedRender(e.target.value);
                 renderHistory();
-            });            input.addEventListener('keydown', e => {
+            });
+            input.addEventListener('keydown', e => {
                 if (e.key === 'Enter' && (e.isComposing || e.keyCode === 229)) return;
                 const cards = getVisibleCards();
                 const historyItems = getHistoryItems();
@@ -1835,6 +1848,7 @@
                         hint.innerHTML = hintHtml;
                         hint.classList.remove('is-hidden');
                     }
+                    if (searchStatus) searchStatus.textContent = '';
                     render('');
                     focusIdx = -1;
                     closeHistory();
