@@ -1234,6 +1234,8 @@
             img.loading = 'lazy';
             img.decoding = 'async';
             img.referrerPolicy = 'no-referrer';
+            // 图标属于装饰性资源，降优先级首屏加载，关键文本/首屏内容优先
+            img.fetchpriority = 'low';
             img.alt = name;
             const useFallback = () => {
                 if (!wrap.contains(img)) return;
@@ -1301,25 +1303,32 @@
             info.appendChild(nameEl);
             info.appendChild(urlEl);
             a.appendChild(info);
-            return a;
+
+            // 返回结构与卡片引用：增量搜索需要 el 与 nameEl，render 全量时用 el
+            return { el: a, nameEl, link };
         }
 
-        function render(kw) {
-            els.renderArea.innerHTML = '';
-            const q = (kw || '').toLowerCase().trim();
-            els.renderArea.classList.toggle('is-searching', Boolean(q));
-            let total = 0;
+        // --- 渲染：结构只构建一次，搜索仅做增量显隐/高亮/计数切换 ---
+        // 卡片 DOM 在 buildBoard 时一次性建成（DocumentFragment 单次插入），
+        // 之后 applySearch 不再重建任何卡片节点：只切 display、更新命中高亮与计数。
+        // 这样敲一个键只做 34 次显隐切换，而非重建 374 个节点。
+        let boardState = null; // { columns: [{catId, colEl, listEl, countEl}], cards: [buildCard 返回值] }
+
+        function matchCard(link, cat, q) {
+            if (!q) return true;
+            return (link.name || '').toLowerCase().includes(q)
+                || (link.url || '').toLowerCase().includes(q)
+                || cat.name.toLowerCase().includes(q);
+        }
+
+        function buildBoard() {
+            const frag = document.createDocumentFragment();
+            const columns = [];
+            const cards = [];
 
             config.categories.forEach((cat, catIdx) => {
-                const list = config.links.filter(l => {
-                    if (l.cat !== cat.id) return false;
-                    if (!q) return true;
-                    return (l.name || '').toLowerCase().includes(q)
-                        || (l.url || '').toLowerCase().includes(q)
-                        || cat.name.toLowerCase().includes(q);
-                });
+                const list = config.links.filter(l => l.cat === cat.id);
                 if (list.length === 0) return;
-                total += list.length;
 
                 const col = document.createElement('section');
                 col.className = 'cat-column';
@@ -1337,30 +1346,83 @@
                 header.appendChild(document.createTextNode(cat.name));
                 const cnt = document.createElement('span');
                 cnt.className = 'cat-count';
-                cnt.textContent = `(${list.length})`;
                 header.appendChild(cnt);
                 col.appendChild(header);
+                const countEl = cnt;
 
                 const ul = document.createElement('div');
                 ul.className = 'links-list';
                 ul.dataset.cat = cat.id;
                 applyOrder(cat.id, list).forEach((l, i) => {
-                    const card = buildCard(l, q);
+                    const card = buildCard(l, '');
                     card.style.animationDelay = `${catIdx * 0.1 + i * 0.05}s`;
-                    ul.appendChild(card);
+                    ul.appendChild(card.el);
+                    cards.push({ ...card, catId: cat.id, catName: cat.name });
                 });
                 col.appendChild(ul);
 
-                els.renderArea.appendChild(col);
+                columns.push({ catId: cat.id, colEl: col, listEl: ul, countEl });
+                frag.appendChild(col);
             });
 
-            if (total === 0) {
-                const hint = document.createElement('div');
-                hint.className = 'empty-hint';
-                hint.textContent = q ? `// 未匹配到 "${kw}" 的结果` : '// 暂无链接';
-                els.renderArea.appendChild(hint);
+            els.renderArea.appendChild(frag);
+            boardState = { columns, cards };
+        }
+
+        // 增量搜索：遍历已建的卡片，切换显隐、刷新命中高亮与各分类计数。
+        // display 切换与节点重建相比开销极小，避免每次输入触发整板 innerHTML 重建。
+        function applySearch(kw) {
+            if (!boardState) return;
+            const q = (kw || '').toLowerCase().trim();
+            els.renderArea.classList.toggle('is-searching', Boolean(q));
+            let total = 0;
+
+            for (const card of boardState.cards) {
+                const visible = matchCard(card.link, { name: card.catName }, q);
+                card.el.style.display = visible ? '' : 'none';
+                if (visible) {
+                    total++;
+                    // 只刷新卡片名称的命中高亮，其余节点原样保留
+                    card.nameEl.replaceChildren(highlightMatch(card.link.name, q));
+                }
             }
+
+            for (const col of boardState.columns) {
+                const visibleCount = boardState.cards.reduce((n, c) =>
+                    c.catId === col.catId && c.el.style.display !== 'none' ? n + 1 : n, 0);
+                col.countEl.textContent = `(${visibleCount})`;
+                col.countEl.style.display = visibleCount ? '' : 'none';
+                // 空分类整列隐藏，非空显示（q 为空时全部显示）
+                col.colEl.style.display = visibleCount ? '' : 'none';
+                col.colEl.style.animation = 'none'; // 搜索态禁止再播进场动画
+            }
+
+            // 空结果提示：复用而非重建
+            let hint = els.renderArea.querySelector('.empty-hint');
+            if (total === 0) {
+                if (!hint) {
+                    hint = document.createElement('div');
+                    hint.className = 'empty-hint';
+                    els.renderArea.appendChild(hint);
+                }
+                hint.textContent = q ? `// 未匹配到 "${kw}" 的结果` : '// 暂无链接';
+            } else if (hint) {
+                hint.remove();
+            }
+
             lastResultCount = total;
+        }
+
+        // 首次/数据重建入口：结构变了才全量构建，否则走增量搜索。
+        // 判定重建：boardState 尚不存在，或 config 引用已更新（数据源替换过），
+        // 或渲染区已被清空。
+        function render(kw) {
+            if (!boardState || boardState.configRef !== config || els.renderArea.childElementCount === 0) {
+                boardState = null; // 强制重建
+                buildBoard();
+                if (boardState) boardState.configRef = config;
+            }
+            applySearch(kw);
         }
 
         // --- 拖拽排序：仅同类列内，顺序存在本机 localStorage（只存顺序，不存数据） ---
