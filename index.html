@@ -1205,8 +1205,15 @@
         }
 
         // 生成稳定唯一键（url 可能重复，故组合 分类+名称+url）
+        // 顺序标识只取「分类 + 名称」：修改链接 URL 不会再丢掉用户的自定义位置
         function linkKey(link) {
-            return `${link.cat}\u0001${link.name}\u0001${link.url}`;
+            return `${link.cat}\u0001${link.name}`;
+        }
+
+        // 兼容旧版「分类 + 名称 + URL」三段式顺序键：截断到前两段即可复用已保存的顺序
+        function normalizeOrderKey(key) {
+            const parts = String(key == null ? '' : key).split('\u0001');
+            return parts.length > 2 ? parts.slice(0, 2).join('\u0001') : parts.join('\u0001');
         }
 
         function buildCard(link, query) {
@@ -1319,7 +1326,7 @@
         function applyOrder(catId, list) {
             const saved = loadOrder()[catId];
             if (!saved || !saved.length) return list;
-            const pos = new Map(saved.map((k, i) => [k, i]));
+            const pos = new Map(saved.map((k, i) => [normalizeOrderKey(k), i]));
             return list
                 .map((l, i) => ({ l, i, p: pos.has(linkKey(l)) ? pos.get(linkKey(l)) : Infinity }))
                 .sort((a, b) => (a.p - b.p) || (a.i - b.i))
@@ -1473,26 +1480,43 @@
             document.getElementById('week-bar').style.width = per + '%';
         }
 
-        // --- 天气：带本地缓存 + 后台不重复请求 ---
+        // --- 天气：本地缓存 + TTL 节流（后台标签页与新鲜缓存都不发请求） ---
         const WEATHER_KEY = 'cyber-v14-weather';
+        const WEATHER_TTL_MS = 3600000; // 1 小时内视为新鲜，不重复打 wttr.in
+        let weatherFetching = false;    // 同一时刻只允许一个在途请求
+
         function applyWeather(tempC, desc) {
             document.getElementById('temp-val').textContent = `${tempC}°C`;
             document.getElementById('weather-desc').textContent = String(desc || '').toUpperCase();
         }
-        function loadCachedWeather() {
+
+        // 读出结构合法的缓存；ts 非法时视为无缓存，避免脏数据绕过 TTL
+        function readCachedWeather() {
             try {
                 const raw = localStorage.getItem(WEATHER_KEY);
-                if (!raw) return;
+                if (!raw) return null;
                 const obj = JSON.parse(raw);
-                if (obj && obj.ts && typeof obj.tempC === 'string' && typeof obj.desc === 'string') {
-                    // 1 小时内的缓存直接用；过期缓存作为占位，等待网络刷新
-                    applyWeather(obj.tempC, obj.desc);
+                if (obj && Number.isFinite(obj.ts)
+                    && typeof obj.tempC === 'string' && typeof obj.desc === 'string') {
+                    return obj;
                 }
             } catch (e) { /* ignore */ }
+            return null;
         }
+
+        function loadCachedWeather() {
+            const obj = readCachedWeather();
+            // 无论是否过期都先显示，过期值仅作占位，等网络刷新后覆盖
+            if (obj) applyWeather(obj.tempC, obj.desc);
+        }
+
         async function updateWeather() {
             // 后台标签页跳过请求，节省流量
-            if (document.hidden) return;
+            if (document.hidden || weatherFetching) return;
+            const cached = readCachedWeather();
+            // 缓存仍新鲜就不打网络：切标签、定时器都走这条短路
+            if (cached && Date.now() - cached.ts < WEATHER_TTL_MS) return;
+            weatherFetching = true;
             try {
                 const res = await fetchWithTimeout('https://wttr.in/?format=j1', {}, 8000);
                 const data = await res.json();
@@ -1505,6 +1529,8 @@
                 } catch (e) { /* ignore */ }
             } catch (e) {
                 document.getElementById('weather-desc').textContent = 'OFFLINE';
+            } finally {
+                weatherFetching = false;
             }
         }
 
@@ -1819,7 +1845,8 @@
                 if (e.relatedTarget && histBox.contains(e.relatedTarget)) return;
                 setTimeout(closeHistory, 120);
             });
-            histBox.addEventListener('blur', e => {
+            // 必须用 focusout：blur 不冒泡，而 histBox 自身不可聚焦，监听 blur 永远不触发
+            histBox.addEventListener('focusout', e => {
                 if (e.relatedTarget && (histBox.contains(e.relatedTarget) || e.relatedTarget === input)) return;
                 closeHistory();
             });
