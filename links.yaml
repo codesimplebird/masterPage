@@ -93,11 +93,6 @@ links:
     cat: ai
     icon: https://kimi.moonshot.cn/favicon.ico
 
-  - name: opencode
-    url: https://opencode.ai/workspace/wrk_01KRRQTAR3A4YDZB6JK219XP2J/go
-    cat: ai
-    icon: https://ts4.tc.mm.bing.net/th/id/ODF.b79p6WW7zIomJakbm-Jvcw?w=32&h=32&qlt=91&pcl=fffffa&o=6&pid=1.2
-
   # --- FORGE_WORKSHOP (开发/工具) ---
   - name: GitHub
     url: https://github.com
@@ -128,11 +123,6 @@ links:
     url: https://stackoverflow.com
     cat: dev
     icon: https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico
-
-  - name: OpenWrt
-    url: http://192.168.30.100
-    cat: dev
-    icon: https://openwrt.org/_media/favicon.ico
 
   # --- SOCIAL_NEXUS (社交网络) ---
   - name: Gmail
