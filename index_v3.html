@@ -1431,7 +1431,7 @@
                 ul.dataset.cat = cat.id;
                 applyOrder(cat.id, list).forEach((l, i) => {
                     const card = buildCard(l, '');
-                    card.style.animationDelay = `${catIdx * 0.1 + i * 0.05}s`;
+                    card.el.style.animationDelay = `${catIdx * 0.1 + i * 0.05}s`;
                     ul.appendChild(card.el);
                     cards.push({ ...card, catId: cat.id, catName: cat.name });
                 });
