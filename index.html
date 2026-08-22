@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CYBER-DECK V14.3</title>
     <meta name="description"
-          content="A simple HTML navigation page - your personal cyber deck for quick access to favorite websites.">
+          content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#eef1f6" media="(prefers-color-scheme: light)">
 
@@ -14,7 +14,7 @@
     <script>
         (function () {
             try {
-                var t = localStorage.getItem('cyber-v14-theme');
+                var t = localStorage.getItem('cyber-v14-theme') || localStorage.getItem('cyber-v16-theme');
                 if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
             } catch (e) { /* localStorage 不可用时静默降级 */ }
         })();
@@ -169,7 +169,6 @@
         #neon-cursor.is-pressed .cursor-ring {
             transform: scale(0.58);
         }
-
 
         /* 仅在「精确指针 + 支持悬停」的设备上启用霓虹光标并隐藏系统光标。
            关键：此规则必须放在 #neon-cursor 基础规则之后——
@@ -400,7 +399,7 @@
             letter-spacing: 1px;
         }
 
-        #todo-in {
+        #memo-in {
             width: 100%;
             background: transparent;
             border: none;
@@ -411,7 +410,7 @@
             outline: none;
         }
 
-        #todo-list {
+        #memo-list {
             margin-top: 10px;
             font-size: 0.75rem;
             overflow-y: auto;
@@ -560,23 +559,6 @@
             color: var(--text-sub);
             font-size: 0.68rem;
             font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* 搜索命中高亮 */
-        .search-highlight {
-            background: rgba(0, 242, 255, 0.2);
-            color: var(--neon);
-            border-radius: 2px;
-            padding: 0 1px;
-        }
-
-        /* 输入后淡出快捷键提示 */
-        .search-hint {
-            transition: opacity 0.2s;
-        }
-
-        .search-hint.is-hidden {
-            opacity: 0;
         }
 
         /* 键盘可见焦点环（鼠标点击不显示，键盘 Tab 显示） */
@@ -798,6 +780,23 @@
             }
         }
 
+        /* 搜索命中高亮 */
+        .search-highlight {
+            background: rgba(0, 242, 255, 0.2);
+            color: var(--neon);
+            border-radius: 2px;
+            padding: 0 1px;
+        }
+
+        /* 输入后淡出快捷键提示 */
+        .search-hint {
+            transition: opacity 0.2s;
+        }
+
+        .search-hint.is-hidden {
+            opacity: 0;
+        }
+
         /* 巨型图标 */
         .icon-wrap {
             width: 64px;
@@ -959,7 +958,6 @@
 </head>
 
 <body>
-
     <div id="neon-cursor" aria-hidden="true"><span class="cursor-ring"></span><span class="cursor-core"></span></div>
 
     <div class="bg-grid" aria-hidden="true"></div>
@@ -995,10 +993,10 @@
 
         <div class="side-panel" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
             <div class="stat-label" style="color: var(--neon-alt);">[ MEMO_PAD ]</div>
-            <label for="todo-in" class="sr-only"
+            <label for="memo-in" class="sr-only"
                    style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">新增备忘</label>
-            <input type="text" id="todo-in" placeholder="+ Add new note...">
-            <div id="todo-list" role="list"></div>
+            <input type="text" id="memo-in" placeholder="+ Add new note...">
+            <div id="memo-list" role="list"></div>
         </div>
     </aside>
 
@@ -1007,9 +1005,7 @@
         <div class="search-container">
             <p class="search-hint" id="search-hint"
                style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">
-                // A simple HTML navigation page · 按 <kbd>/</kbd> 或 <kbd>Ctrl+K</kbd> 搜索 · <kbd>Esc</kbd> 关闭历史/清空 · <kbd>↑↓</kbd> 导航 ·
-                <kbd>Enter</kbd> Bing 搜索
-            </p>
+                // A simple HTML navigation page · 按 <kbd>/</kbd> 或 <kbd>Ctrl+K</kbd> 搜索 · <kbd>Esc</kbd> 关闭历史/清空 · <kbd>↑↓</kbd> 导航 · <kbd>Enter</kbd> Bing 搜索</p>
             <form class="search-wrap" id="search-form" role="search" aria-label="全局搜索">
                 <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
                        autocomplete="off" role="combobox" aria-label="搜索链接" aria-describedby="search-hint"
@@ -1052,7 +1048,6 @@
                 { id: 'search', name: 'Search Engines' }
             ],
             links: [
-                // --- MEDIA_STATIONS (影音娱乐) ---
                 { name: "Bilibili", url: "https://t.bilibili.com/", cat: "media", icon: "https://static.hdslb.com/images/favicon.ico" },
                 { name: "YouTube", url: "https://www.youtube.com", cat: "media", icon: "https://www.youtube.com/favicon.ico" },
                 { name: "Netflix", url: "https://www.netflix.com", cat: "media", icon: "https://www.netflix.com/favicon.ico" },
@@ -1061,7 +1056,6 @@
                 { name: "Steam", url: "https://store.steampowered.com/", cat: "media", icon: "https://store.steampowered.com/favicon.ico" },
                 { name: "虎牙直播", url: "https://www.huya.com", cat: "media", icon: "https://a.msstatic.com/huya/hd/h5/static-source/main/logo2.png" },
 
-                // --- NEURAL_INTELLIGENCE (AI 助手) ---
                 { name: "DeepSeek", url: "https://chat.deepseek.com", cat: "ai", icon: "https://www.deepseek.com/favicon.ico" },
                 { name: "Qwenstudio", url: "https://chat.qwen.ai/", cat: "ai", icon: "https://assets.alicdn.com/g/qwenweb/qwen-chat-fe/0.2.74/static/images/ms-icon-light-150x150.png" },
                 { name: "ChatGPT", url: "https://chatgpt.com", cat: "ai", icon: "https://chatgpt.com/favicon.ico" },
@@ -1073,7 +1067,6 @@
                 { name: "Kimi", url: "https://kimi.moonshot.cn", cat: "ai", icon: "https://kimi.moonshot.cn/favicon.ico" },
                 { name: "opencode", url: "https://opencode.ai/workspace/wrk_01KRRQTAR3A4YDZB6JK219XP2J/go", cat: "ai", icon: "https://ts4.tc.mm.bing.net/th/id/ODF.b79p6WW7zIomJakbm-Jvcw?w=32&h=32&qlt=91&pcl=fffffa&o=6&pid=1.2" },
 
-                // --- FORGE_WORKSHOP (开发/工具) ---
                 { name: "GitHub", url: "https://github.com", cat: "dev", icon: "https://github.githubassets.com/favicons/favicon.png" },
                 { name: "Vercel", url: "https://vercel.com", cat: "dev", icon: "https://assets.vercel.com/image/upload/front/favicon/vercel/favicon.ico" },
                 { name: "Notion", url: "https://www.notion.so", cat: "dev", icon: "https://www.notion.so/images/favicon.ico" },
@@ -1082,7 +1075,6 @@
                 { name: "Stack Overflow", url: "https://stackoverflow.com", cat: "dev", icon: "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico" },
                 { name: "OpenWrt", url: "http://192.168.30.100", cat: "dev", icon: "https://openwrt.org/_media/favicon.ico" },
 
-                // --- SOCIAL_NEXUS (社交网络) ---
                 { name: "Gmail", url: "https://mail.google.com", cat: "social", icon: "https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" },
                 { name: "X / Twitter", url: "https://x.com", cat: "social", icon: "https://abs.twimg.com/favicons/twitter.2.ico" },
                 { name: "Discord", url: "https://discord.com", cat: "social", icon: "https://discord.com/favicon.ico" },
@@ -1091,7 +1083,6 @@
                 { name: "微博", url: "https://weibo.com", cat: "social", icon: "https://weibo.com/favicon.ico" },
                 { name: "Telegram", url: "https://web.telegram.org", cat: "social", icon: "https://web.telegram.org/favicon.ico" },
 
-                // --- SEARCH_ENGINES (搜索引擎) ---
                 { name: "Google", url: "https://www.google.com", cat: "search", icon: "https://www.google.com/images/branding/googleg/1x/googleg_standard_color_128dp.png" },
                 { name: "Bing", url: "https://www.bing.com", cat: "search", icon: "https://www.bing.com/favicon.ico" },
                 { name: "DuckDuckGo", url: "https://duckduckgo.com", cat: "search", icon: "https://duckduckgo.com/favicon.ico" },
@@ -1100,14 +1091,36 @@
             ]
         };
 
+        // 全名而非 $：$ 在多数代码库里指 querySelector，这里只做 getElementById
+        const byId = id => document.getElementById(id);
+
+        const els = {
+            themeBtn: byId('theme-btn'),
+            menuBtn: byId('menu-btn'),
+            sidebar: byId('sidebar'),
+            backdrop: byId('sidebar-backdrop'),
+            searchIn: byId('search-in'),
+            searchStatus: byId('search-status'),
+            renderArea: byId('render-area'),
+            timeHm: byId('time-hm'),
+            timeS: byId('time-s'),
+            dateStr: byId('date-str'),
+            weekVal: byId('week-val'),
+            weekBar: byId('week-bar'),
+            tempVal: byId('temp-val'),
+            weatherDesc: byId('weather-desc'),
+            battVal: byId('batt-val'),
+            battBar: byId('batt-bar'),
+            battLabel: byId('batt-label'),
+            memoIn: byId('memo-in'),
+            memoList: byId('memo-list'),
+            neonCursor: byId('neon-cursor')
+        };
+
         // --- 工具函数 ---
         // 安全地把 url 解析成 hostname，失败时回退到原始字符串，避免一条坏链接拖垮整页渲染
         function safeHostname(url) {
-            try {
-                return new URL(url).hostname || url;
-            } catch (e) {
-                return url;
-            }
+            try { return new URL(url).hostname || url; } catch (e) { return url; }
         }
 
         // 根据字符串生成稳定的霓虹色
@@ -1169,32 +1182,62 @@
             return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
         }
 
+        // localStorage 薄封装：隐私模式/配额满时静默降级，不让存储异常打断渲染
+        const LS = {
+            get(key, fallback) {
+                try {
+                    const v = localStorage.getItem(key);
+                    return v != null ? JSON.parse(v) : fallback;
+                } catch (e) { return fallback; }
+            },
+            set(key, value) {
+                try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { }
+            }
+        };
+
+        // 旧版 v16 键迁移到 v14 命名空间（仅当新键尚未写入时）
+        function migrateLegacyStorage() {
+            const keys = [
+                ['cyber-v16-theme', 'cyber-v14-theme'],
+                ['v16-link-order', 'v14-link-order'],
+                ['cyber-v16-weather', 'cyber-v14-weather'],
+                ['v16-memos', 'v14-memos'],
+                ['v16-search-history', 'v14-search-history']
+            ];
+            try {
+                keys.forEach(([oldKey, newKey]) => {
+                    if (localStorage.getItem(newKey) == null) {
+                        const value = localStorage.getItem(oldKey);
+                        if (value != null) localStorage.setItem(newKey, value);
+                    }
+                });
+            } catch (e) { /* ignore */ }
+        }
+
         // --- 主题切换 ---
-        const themeBtn = document.getElementById('theme-btn');
         function currentTheme() {
             return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
         }
+
         function applyTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
-            try { localStorage.setItem('cyber-v14-theme', theme); } catch (e) { /* ignore */ }
+            LS.set('cyber-v14-theme', theme);
         }
-        themeBtn.addEventListener('click', () => applyTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
+
+        els.themeBtn.addEventListener('click', () => applyTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
 
         // --- 渲染 (用 DOM API 构建节点，避免 innerHTML 转义/引号脆弱性) ---
-        const renderArea = document.getElementById('render-area');
-
         function buildIcon(link) {
             const wrap = document.createElement('div');
             wrap.className = 'icon-wrap';
-
             const name = link.name || '?';
             const img = document.createElement('img');
             img.className = 'link-icon';
             img.loading = 'lazy';
             img.decoding = 'async';
             img.referrerPolicy = 'no-referrer';
-            img.alt = name;                       // a11y：图标带 alt
-            const useFallback = () => {           // 失败回退到首字母方块
+            img.alt = name;
+            const useFallback = () => {
                 if (!wrap.contains(img)) return;
                 const fb = document.createElement('div');
                 fb.className = 'icon-fallback';
@@ -1264,16 +1307,15 @@
         }
 
         function render(kw) {
-            renderArea.innerHTML = '';
+            els.renderArea.innerHTML = '';
             const q = (kw || '').toLowerCase().trim();
-            renderArea.classList.toggle('is-searching', Boolean(q));
+            els.renderArea.classList.toggle('is-searching', Boolean(q));
             let total = 0;
 
             config.categories.forEach((cat, catIdx) => {
                 const list = config.links.filter(l => {
                     if (l.cat !== cat.id) return false;
                     if (!q) return true;
-                    // 同时匹配名称、URL、分类名
                     return (l.name || '').toLowerCase().includes(q)
                         || (l.url || '').toLowerCase().includes(q)
                         || cat.name.toLowerCase().includes(q);
@@ -1311,14 +1353,14 @@
                 });
                 col.appendChild(ul);
 
-                renderArea.appendChild(col);
+                els.renderArea.appendChild(col);
             });
 
             if (total === 0) {
                 const hint = document.createElement('div');
                 hint.className = 'empty-hint';
                 hint.textContent = q ? `// 未匹配到 "${kw}" 的结果` : '// 暂无链接';
-                renderArea.appendChild(hint);
+                els.renderArea.appendChild(hint);
             }
             lastResultCount = total;
         }
@@ -1326,17 +1368,9 @@
         // --- 拖拽排序：仅同类列内，顺序存在本机 localStorage（只存顺序，不存数据） ---
         const ORDER_KEY = 'v14-link-order';
 
-        function loadOrder() {
-            try {
-                return JSON.parse(localStorage.getItem(ORDER_KEY)) || {};
-            } catch (e) {
-                return {};
-            }
-        }
-
-        // 按已保存顺序重排某分类的链接；未记录的新链接（改了 config 后新增）保持原相对次序排在末尾
+        // 按已保存顺序重排某分类的链接；未记录的新链接（改了数据后新增）保持原相对次序排在末尾
         function applyOrder(catId, list) {
-            const saved = loadOrder()[catId];
+            const saved = (LS.get(ORDER_KEY, {}) || {})[catId];
             if (!saved || !saved.length) return list;
             const pos = new Map(saved.map((k, i) => [normalizeOrderKey(k), i]));
             return list
@@ -1347,12 +1381,12 @@
 
         // 把某分类当前 DOM 顺序读出并持久化
         function saveOrderForCat(catId) {
-            const list = renderArea.querySelector(`.links-list[data-cat="${catId}"]`);
+            const list = els.renderArea.querySelector(`.links-list[data-cat="${catId}"]`);
             if (!list) return;
             const keys = Array.from(list.querySelectorAll('.link-card')).map(c => c.dataset.key);
-            const all = loadOrder();
+            const all = LS.get(ORDER_KEY, {}) || {};
             all[catId] = keys;
-            try { localStorage.setItem(ORDER_KEY, JSON.stringify(all)); } catch (e) { /* ignore */ }
+            LS.set(ORDER_KEY, all);
         }
 
         // 根据鼠标 Y 坐标，找出应插入到其之前的卡片
@@ -1372,6 +1406,7 @@
 
         function setupDragSort() {
             let dragEl = null;
+            const area = els.renderArea;
 
             // FLIP：让被挤开的卡片平滑滑到新位置（安卓式让位动画）
             function flipReorder(list, mutate) {
@@ -1400,33 +1435,31 @@
                 });
             }
 
-            // 仅当从手柄按下时，才把整卡设为可拖拽（否则保持普通链接点击）
-            renderArea.addEventListener('mousedown', e => {
+            area.addEventListener('mousedown', e => {
                 const card = e.target.closest('.link-card');
                 if (!card) return;
                 const onHandle = e.target.closest('.drag-handle');
-                card.draggable = Boolean(onHandle) && !renderArea.classList.contains('is-searching');
+                card.draggable = Boolean(onHandle) && !area.classList.contains('is-searching');
             });
 
-            // 未进入拖拽就松手时，撤销可拖拽标记
             document.addEventListener('mouseup', () => {
                 if (dragEl) return;
-                renderArea.querySelectorAll('.link-card[draggable="true"]').forEach(c => { c.draggable = false; });
+                area.querySelectorAll('.link-card[draggable="true"]').forEach(c => { c.draggable = false; });
             });
 
-            renderArea.addEventListener('dragstart', e => {
+            area.addEventListener('dragstart', e => {
                 const card = e.target.closest('.link-card');
                 if (!card || !card.draggable) { e.preventDefault(); return; }
                 dragEl = card;
                 card.classList.add('dragging');
                 e.dataTransfer.effectAllowed = 'move';
-                try { e.dataTransfer.setData('text/plain', card.dataset.key); } catch (err) { /* ignore */ }
+                try { e.dataTransfer.setData('text/plain', card.dataset.key); } catch (err) { }
             });
 
-            renderArea.addEventListener('dragover', e => {
+            area.addEventListener('dragover', e => {
                 if (!dragEl) return;
                 const list = e.target.closest('.links-list');
-                if (!list || list.dataset.cat !== dragEl.dataset.cat) return; // 只允许同类容器
+                if (!list || list.dataset.cat !== dragEl.dataset.cat) return;
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
                 const after = getDragAfterElement(list, e.clientY);
@@ -1440,13 +1473,13 @@
                 });
             });
 
-            renderArea.addEventListener('drop', e => {
+            area.addEventListener('drop', e => {
                 if (!dragEl) return;
                 const list = e.target.closest('.links-list');
                 if (list && list.dataset.cat === dragEl.dataset.cat) e.preventDefault();
             });
 
-            renderArea.addEventListener('dragend', () => {
+            area.addEventListener('dragend', () => {
                 if (!dragEl) return;
                 const cat = dragEl.dataset.cat;
                 const dropped = dragEl;
@@ -1473,8 +1506,7 @@
                 saveOrderForCat(cat);
             });
 
-            // 点击手柄本身不触发链接跳转
-            renderArea.addEventListener('click', e => {
+            area.addEventListener('click', e => {
                 if (e.target.closest('.drag-handle')) e.preventDefault();
             });
         }
@@ -1482,14 +1514,15 @@
         // --- 系统同步 ---
         function updateClock() {
             const now = new Date();
-            document.getElementById('time-hm').textContent = now.toTimeString().split(' ')[0].substring(0, 5);
-            document.getElementById('time-s').textContent = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('date-str').textContent =
+            const time = now.toTimeString().split(' ')[0];
+            els.timeHm.textContent = time.substring(0, 5);
+            els.timeS.textContent = time.substring(6, 8);
+            els.dateStr.textContent =
                 now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
             const day = now.getDay() === 0 ? 7 : now.getDay();
             const per = Math.round((day / 7) * 100);
-            document.getElementById('week-val').textContent = per + '%';
-            document.getElementById('week-bar').style.width = per + '%';
+            els.weekVal.textContent = per + '%';
+            els.weekBar.style.width = per + '%';
         }
 
         // --- 天气：本地缓存 + TTL 节流（后台标签页与新鲜缓存都不发请求） ---
@@ -1498,21 +1531,17 @@
         let weatherFetching = false;    // 同一时刻只允许一个在途请求
 
         function applyWeather(tempC, desc) {
-            document.getElementById('temp-val').textContent = `${tempC}°C`;
-            document.getElementById('weather-desc').textContent = String(desc || '').toUpperCase();
+            els.tempVal.textContent = `${tempC}°C`;
+            els.weatherDesc.textContent = String(desc || '').toUpperCase();
         }
 
         // 读出结构合法的缓存；ts 非法时视为无缓存，避免脏数据绕过 TTL
         function readCachedWeather() {
-            try {
-                const raw = localStorage.getItem(WEATHER_KEY);
-                if (!raw) return null;
-                const obj = JSON.parse(raw);
-                if (obj && Number.isFinite(obj.ts)
-                    && typeof obj.tempC === 'string' && typeof obj.desc === 'string') {
-                    return obj;
-                }
-            } catch (e) { /* ignore */ }
+            const obj = LS.get(WEATHER_KEY, null);
+            if (obj && Number.isFinite(obj.ts)
+                && typeof obj.tempC === 'string' && typeof obj.desc === 'string') {
+                return obj;
+            }
             return null;
         }
 
@@ -1536,11 +1565,9 @@
                 const tempC = cur.temp_C;
                 const desc = cur.weatherDesc[0].value;
                 applyWeather(tempC, desc);
-                try {
-                    localStorage.setItem(WEATHER_KEY, JSON.stringify({ tempC, desc, ts: Date.now() }));
-                } catch (e) { /* ignore */ }
+                LS.set(WEATHER_KEY, { tempC, desc, ts: Date.now() });
             } catch (e) {
-                document.getElementById('weather-desc').textContent = 'OFFLINE';
+                els.weatherDesc.textContent = 'OFFLINE';
             } finally {
                 weatherFetching = false;
             }
@@ -1548,55 +1575,47 @@
 
         // --- 电量：带降级（API 不存在时不报错） ---
         function setupBattery() {
-            const valEl = document.getElementById('batt-val');
-            const barEl = document.getElementById('batt-bar');
-            const labelEl = document.getElementById('batt-label');
-            if (navigator.getBattery) {
-                navigator.getBattery().then(b => {
-                    const fn = () => {
-                        const pct = Math.round(b.level * 100);
-                        valEl.textContent = (b.charging ? '⚡ ' : '') + pct + '%';
-                        barEl.classList.toggle('is-charging', Boolean(b.charging));
-                        barEl.style.width = b.level * 100 + '%';
-                    };
-                    fn();
-                    b.addEventListener('levelchange', fn);
-                    b.addEventListener('chargingchange', fn);
-                }).catch(() => { /* 拒绝时走降级 */ });
-            } else {
-                // 桌面端/不支持时给出合理提示，而非假装 100%
-                labelEl.textContent = 'POWER';
-                valEl.textContent = 'N/A';
-                barEl.style.width = '0%';
-                barEl.style.background = 'var(--text-sub)';
-                barEl.style.boxShadow = 'none';
+            if (!navigator.getBattery) {
+                els.battLabel.textContent = 'POWER';
+                els.battVal.textContent = 'N/A';
+                els.battBar.style.width = '0%';
+                els.battBar.style.background = 'var(--text-sub)';
+                els.battBar.style.boxShadow = 'none';
+                return;
             }
+            navigator.getBattery().then(b => {
+                const fn = () => {
+                    const pct = Math.round(b.level * 100);
+                    els.battVal.textContent = (b.charging ? '⚡ ' : '') + pct + '%';
+                    els.battBar.classList.toggle('is-charging', Boolean(b.charging));
+                    els.battBar.style.width = b.level * 100 + '%';
+                };
+                fn();
+                b.addEventListener('levelchange', fn);
+                b.addEventListener('chargingchange', fn);
+            }).catch(() => { });
         }
 
-        // --- 备忘录：事件委托 + 安全持久化（不再依赖全局 save） ---
+        // --- 备忘录：事件委托 + 安全持久化 ---
         function setupMemo() {
-            const tIn = document.getElementById('todo-in');
-            const tList = document.getElementById('todo-list');
             const KEY = 'v14-memos';
 
             const refreshEmptyHint = () => {
-                const has = tList.querySelector('.memo');
-                const hint = tList.querySelector('.memo-empty');
+                const has = els.memoList.querySelector('.memo');
+                const hint = els.memoList.querySelector('.memo-empty');
                 if (!has && !hint) {
                     const el = document.createElement('div');
                     el.className = 'memo-empty';
                     el.textContent = '// NO_MEMOS';
-                    tList.appendChild(el);
+                    els.memoList.appendChild(el);
                 } else if (has && hint) {
                     hint.remove();
                 }
             };
 
             const save = () => {
-                try {
-                    const items = Array.from(tList.querySelectorAll('.memo .txt')).map(s => s.textContent);
-                    localStorage.setItem(KEY, JSON.stringify(items));
-                } catch (e) { /* ignore */ }
+                const items = Array.from(els.memoList.querySelectorAll('.memo .txt')).map(s => s.textContent);
+                LS.set(KEY, items);
                 refreshEmptyHint();
             };
 
@@ -1618,29 +1637,26 @@
 
                 d.appendChild(span);
                 d.appendChild(del);
-                tList.appendChild(d);
+                els.memoList.appendChild(d);
             };
 
-            // 事件委托：所有删除按钮统一处理，闭包内可访问 save
-            tList.addEventListener('click', e => {
+            els.memoList.addEventListener('click', e => {
                 const btn = e.target.closest('.del');
                 if (!btn) return;
                 btn.closest('.memo')?.remove();
                 save();
             });
 
-            tIn.addEventListener('keydown', e => {
+            els.memoIn.addEventListener('keydown', e => {
                 if (e.key === 'Enter' && (e.isComposing || e.keyCode === 229)) return;
-                if (e.key === 'Enter' && tIn.value.trim()) {
-                    add(tIn.value.trim());
-                    tIn.value = '';
+                if (e.key === 'Enter' && els.memoIn.value.trim()) {
+                    add(els.memoIn.value.trim());
+                    els.memoIn.value = '';
                     save();
                 }
             });
 
-            try {
-                JSON.parse(localStorage.getItem(KEY) || '[]').forEach(add);
-            } catch (e) { /* 损坏数据忽略 */ }
+            (LS.get(KEY, []) || []).forEach(add);
             refreshEmptyHint();
         }
 
@@ -1649,7 +1665,7 @@
         let lastResultCount = 0;
 
         function getVisibleCards() {
-            return Array.from(renderArea.querySelectorAll('.link-card'));
+            return Array.from(els.renderArea.querySelectorAll('.link-card'));
         }
 
         function setFocus(idx) {
@@ -1667,18 +1683,14 @@
         const MAX_HISTORY = 20;
 
         function loadSearchHistory() {
-            try {
-                const raw = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]');
-                return Array.isArray(raw)
-                    ? raw.filter(item => item && typeof item.q === 'string' && item.q.trim() && Number.isFinite(item.ts))
-                    : [];
-            } catch (e) {
-                return [];
-            }
+            const raw = LS.get(SEARCH_HISTORY_KEY, []);
+            return Array.isArray(raw)
+                ? raw.filter(item => item && typeof item.q === 'string' && item.q.trim() && Number.isFinite(item.ts))
+                : [];
         }
 
         function saveSearchHistory(list) {
-            try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list)); } catch (e) { /* ignore */ }
+            LS.set(SEARCH_HISTORY_KEY, list);
         }
 
         function recordSearch(query) {
@@ -1692,15 +1704,7 @@
         }
 
         function setupSearch() {
-            const input = document.getElementById('search-in');
-            const hint = document.querySelector('.search-hint');
-            const hintHtml = hint ? hint.innerHTML : '';
-            const searchStatus = document.getElementById('search-status');
-            const histBox = document.getElementById('search-history');
-            const histList = document.getElementById('search-history-list');
-            const clearBtn = document.getElementById('history-clear');
-            const searchForm = document.getElementById('search-form');
-            let historyIdx = -1;
+            const input = els.searchIn;
             const debouncedRender = debounce(v => {
                 render(v);
                 focusIdx = -1;
@@ -1714,10 +1718,17 @@
                     }
                 }
                 // 只把结果数送进 live 区域；render-area 自身不是 live 区域，否则会重读整个看板
-                if (searchStatus) {
-                    searchStatus.textContent = q ? `${lastResultCount} 个匹配结果` : '';
+                if (els.searchStatus) {
+                    els.searchStatus.textContent = q ? `${lastResultCount} 个匹配结果` : '';
                 }
             }, 120);
+            const histBox = byId('search-history');
+            const histList = byId('search-history-list');
+            const clearBtn = byId('history-clear');
+            const searchForm = byId('search-form');
+            const hint = document.querySelector('.search-hint');
+            const hintHtml = hint ? hint.innerHTML : '';
+            let historyIdx = -1;
 
             function getHistoryItems() {
                 return Array.from(histList.querySelectorAll('.history-item'));
@@ -1850,7 +1861,7 @@
                         hint.innerHTML = hintHtml;
                         hint.classList.remove('is-hidden');
                     }
-                    if (searchStatus) searchStatus.textContent = '';
+                    if (els.searchStatus) els.searchStatus.textContent = '';
                     render('');
                     focusIdx = -1;
                     closeHistory();
@@ -1875,23 +1886,21 @@
             });
         }
 
-        // --- 全局快捷键：/ 或 Ctrl+K 聚焦搜索，Esc 清空 ---
+        // --- 全局快捷键：/ 或 Ctrl+K 聚焦搜索 ---
         document.addEventListener('keydown', e => {
             const tag = (document.activeElement && document.activeElement.tagName) || '';
             const typing = tag === 'INPUT' || tag === 'TEXTAREA';
             if (e.key === '/' && !typing) {
                 e.preventDefault();
-                document.getElementById('search-in').focus();
+                els.searchIn.focus();
             } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
                 e.preventDefault();
-                document.getElementById('search-in').focus();
+                els.searchIn.focus();
             }
         });
 
         // --- 光标：rAF 节流，移动端自动禁用 ---
         function setupCursor() {
-            const cursor = document.getElementById('neon-cursor');
-            // 仅在精细指针设备绑定（与 CSS 媒体查询一致）
             if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
             let mx = 0, my = 0, rafId = null;
@@ -1899,54 +1908,54 @@
                 mx = e.clientX; my = e.clientY;
                 if (rafId) return;
                 rafId = requestAnimationFrame(() => {
-                    cursor.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
+                    els.neonCursor.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
                     rafId = null;
                 });
             });
             document.addEventListener('mouseover', e => {
                 const target = e.target.closest('a, button, input, .memo');
                 const card = e.target.closest('.link-card');
-                cursor.classList.toggle('is-action', Boolean(target));
-                cursor.style.color = card ? getComputedStyle(card).getPropertyValue('--card-accent').trim() : 'var(--neon)';
+                els.neonCursor.classList.toggle('is-action', Boolean(target));
+                els.neonCursor.style.color = card ? getComputedStyle(card).getPropertyValue('--card-accent').trim() : 'var(--neon)';
             });
             document.addEventListener('mousedown', e => {
-                cursor.classList.add('is-pressed');
+                els.neonCursor.classList.add('is-pressed');
                 const r = document.createElement('div');
                 r.className = 'click-ripple';
                 r.style.left = e.clientX + 'px';
                 r.style.top = e.clientY + 'px';
-                r.style.setProperty('--ripple-color', cursor.style.color || 'var(--neon)');
+                r.style.setProperty('--ripple-color', els.neonCursor.style.color || 'var(--neon)');
                 document.body.appendChild(r);
                 setTimeout(() => r.remove(), 500);
             });
-            document.addEventListener('mouseup', () => cursor.classList.remove('is-pressed'));
+            document.addEventListener('mouseup', () => els.neonCursor.classList.remove('is-pressed'));
         }
 
         // --- 移动端抽屉 ---
+        function toggleSidebar(open) {
+            const o = open == null ? !els.sidebar.classList.contains('open') : open;
+            els.sidebar.classList.toggle('open', o);
+            els.menuBtn.setAttribute('aria-expanded', o ? 'true' : 'false');
+            if (o) {
+                const first = els.sidebar.querySelector('a, button, input');
+                if (first) first.focus();
+            } else if (document.activeElement && els.sidebar.contains(document.activeElement)) {
+                els.menuBtn.focus();
+            }
+        }
+
         function setupSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const btn = document.getElementById('menu-btn');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            const toggle = (open) => {
-                const o = open == null ? !sidebar.classList.contains('open') : open;
-                sidebar.classList.toggle('open', o);
-                btn.setAttribute('aria-expanded', o ? 'true' : 'false');
-                if (o) {
-                    const first = sidebar.querySelector('a, button, input');
-                    if (first) first.focus();
-                } else if (document.activeElement && sidebar.contains(document.activeElement)) {
-                    btn.focus();
-                }
-            };
-            btn.addEventListener('click', () => toggle());
-            backdrop.addEventListener('click', () => toggle(false));
-            // 点击侧栏内的链接后自动收起
-            sidebar.addEventListener('click', e => {
-                if (e.target.closest('a, .link-card')) toggle(false);
+            els.menuBtn.addEventListener('click', () => toggleSidebar());
+            els.backdrop.addEventListener('click', () => toggleSidebar(false));
+
+            els.sidebar.addEventListener('click', e => {
+                if (e.target.closest('a, .link-card')) toggleSidebar(false);
             });
-            // Esc 关闭已展开的侧栏
+
             document.addEventListener('keydown', e => {
-                if (e.key === 'Escape' && sidebar.classList.contains('open')) toggle(false);
+                if (e.key === 'Escape' && els.sidebar.classList.contains('open')) {
+                    toggleSidebar(false);
+                }
             });
         }
 
@@ -1957,7 +1966,7 @@
 
         // --- 初始化 ---
         function init() {
-            // 非网络依赖任务优先瞬间执行，画出 UI 骨架
+            migrateLegacyStorage();
             updateClock();
             setInterval(updateClock, 1000);
 

@@ -4,20 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V16</title>
-    <meta name="description" content="A cyberpunk-style HTML navigation page for quick access to favorite websites.">
+    <title>CYBER-DECK V14.3 · YAML</title>
+    <meta name="description"
+          content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#eef1f6" media="(prefers-color-scheme: light)">
 
+    <!-- 防闪屏：在首次绘制前就应用已保存的主题，避免 dark→light 闪烁 (FOUC) -->
     <script>
         (function () {
             try {
                 var t = localStorage.getItem('cyber-v14-theme') || localStorage.getItem('cyber-v16-theme');
                 if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-            } catch (e) { }
+            } catch (e) { /* localStorage 不可用时静默降级 */ }
         })();
     </script>
 
+    <!-- 异步非阻塞字体加载 -->
     <link rel="preconnect" href="https://fonts.geekzu.org" crossorigin>
     <link rel="preload" as="style"
           href="https://fonts.geekzu.org/css2?family=Orbitron:wght@500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap">
@@ -28,15 +31,18 @@
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
 
+    <!-- 常用域名预解析，缩短图标/资源首连接耗时 -->
     <link rel="dns-prefetch" href="//www.google.com">
     <link rel="dns-prefetch" href="//github.githubassets.com">
     <link rel="dns-prefetch" href="//static.hdslb.com">
     <link rel="dns-prefetch" href="//www.youtube.com">
     <link rel="dns-prefetch" href="//chatgpt.com">
 
+    <!-- v3 专有：YAML 解析库。必须同步加载，body 末尾的内联脚本要在 loadConfig 前拿到 jsyaml -->
     <script src="js-yaml.min.js"></script>
 
     <style>
+        /* --- 全局变量适配 --- */
         :root {
             --neon: #00f2ff;
             --neon-alt: #9d50ff;
@@ -51,6 +57,7 @@
             --sidebar-w: 320px;
         }
 
+        /* light 主题抬高对比度，满足 WCAG AA */
         [data-theme="light"] {
             --neon: #0055ff;
             --neon-alt: #6200ea;
@@ -118,6 +125,7 @@
             transition: background 0.5s ease, color 0.5s ease;
         }
 
+        /* --- 零延迟霓虹光标（默认隐藏，触屏走系统光标） --- */
         #neon-cursor {
             position: fixed;
             top: 0;
@@ -133,11 +141,42 @@
             transition: color 0.18s ease;
         }
 
-        .cursor-core { position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; margin: -2.5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
-        .cursor-ring { position: absolute; inset: 3px; border: 1px solid currentColor; border-radius: 50%; opacity: 0.78; box-shadow: 0 0 12px color-mix(in srgb, currentColor 55%, transparent), inset 0 0 7px color-mix(in srgb, currentColor 20%, transparent); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.25s ease, opacity 0.25s ease; }
-        #neon-cursor.is-action .cursor-ring { transform: scale(1.38); border-radius: 36% 64% 58% 42%; opacity: 1; }
-        #neon-cursor.is-pressed .cursor-ring { transform: scale(0.58); }
+        .cursor-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            margin: -2.5px;
+            border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+        }
 
+        .cursor-ring {
+            position: absolute;
+            inset: 3px;
+            border: 1px solid currentColor;
+            border-radius: 50%;
+            opacity: 0.78;
+            box-shadow: 0 0 12px color-mix(in srgb, currentColor 55%, transparent), inset 0 0 7px color-mix(in srgb, currentColor 20%, transparent);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.25s ease, opacity 0.25s ease;
+        }
+
+        #neon-cursor.is-action .cursor-ring {
+            transform: scale(1.38);
+            border-radius: 36% 64% 58% 42%;
+            opacity: 1;
+        }
+
+        #neon-cursor.is-pressed .cursor-ring {
+            transform: scale(0.58);
+        }
+
+        /* 仅在「精确指针 + 支持悬停」的设备上启用霓虹光标并隐藏系统光标。
+           关键：此规则必须放在 #neon-cursor 基础规则之后——
+           specificity 相同时后出现的覆盖先出现的，
+           否则上面的 display:none 会压过这里的 display:block，电脑也看不到光标。 */
         @media (hover: hover) and (pointer: fine) {
             * {
                 cursor: revert !important;
@@ -174,6 +213,7 @@
             }
         }
 
+        /* --- 背景装饰 --- */
         body::before {
             content: '';
             position: fixed;
@@ -228,6 +268,7 @@
         }
         */
 
+        /* --- 侧边栏 --- */
         .sidebar {
             width: var(--sidebar-w);
             flex-shrink: 0;
@@ -322,6 +363,7 @@
             box-shadow: 0 0 8px #00ff9d;
         }
 
+        /* 备忘录 */
         .memo {
             padding: 8px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -360,7 +402,7 @@
             letter-spacing: 1px;
         }
 
-        #todo-in {
+        #memo-in {
             width: 100%;
             background: transparent;
             border: none;
@@ -371,13 +413,14 @@
             outline: none;
         }
 
-        #todo-list {
+        #memo-list {
             margin-top: 10px;
             font-size: 0.75rem;
             overflow-y: auto;
             flex: 1;
         }
 
+        /* --- 右侧看板 (列式清单) --- */
         .main-content {
             flex: 1;
             display: flex;
@@ -521,6 +564,7 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
+        /* 键盘可见焦点环（鼠标点击不显示，键盘 Tab 显示） */
         a:focus-visible,
         button:focus-visible,
         input:focus-visible {
@@ -606,8 +650,17 @@
         }
 
         @keyframes categoryPulse {
-            0%, 100% { transform: translateY(0) rotate(0); filter: drop-shadow(0 0 0 transparent); }
-            50% { transform: translateY(-3px) rotate(-5deg); filter: drop-shadow(0 0 8px var(--neon-alt)); }
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0);
+                filter: drop-shadow(0 0 0 transparent);
+            }
+
+            50% {
+                transform: translateY(-3px) rotate(-5deg);
+                filter: drop-shadow(0 0 8px var(--neon-alt));
+            }
         }
 
         .cat-count {
@@ -705,8 +758,13 @@
 
         /* 落下回弹动画（安卓那种吸附到位手感） */
         @keyframes card-drop-settle {
-            0% { transform: translateX(12px) scale(1.03); }
-            100% { transform: translateX(12px) scale(1); }
+            0% {
+                transform: translateX(12px) scale(1.03);
+            }
+
+            100% {
+                transform: translateX(12px) scale(1);
+            }
         }
 
         .link-card.just-dropped {
@@ -725,6 +783,7 @@
             }
         }
 
+        /* 搜索命中高亮 */
         .search-highlight {
             background: rgba(0, 242, 255, 0.2);
             color: var(--neon);
@@ -732,6 +791,7 @@
             padding: 0 1px;
         }
 
+        /* 输入后淡出快捷键提示 */
         .search-hint {
             transition: opacity 0.2s;
         }
@@ -740,6 +800,7 @@
             opacity: 0;
         }
 
+        /* 巨型图标 */
         .icon-wrap {
             width: 64px;
             height: 64px;
@@ -797,6 +858,7 @@
             padding: 20px;
         }
 
+        /* 主题切换 */
         .theme-toggle {
             position: fixed;
             top: 20px;
@@ -820,6 +882,7 @@
             transform: scale(1.1);
         }
 
+        /* 移动端汉堡按钮 */
         .menu-toggle {
             display: none;
             position: fixed;
@@ -845,6 +908,7 @@
             z-index: 99;
         }
 
+        /* --- 响应式：窄屏抽屉式侧栏 --- */
         @media (max-width: 860px) {
             .menu-toggle {
                 display: flex;
@@ -882,6 +946,7 @@
             }
         }
 
+        /* 尊重「减少动态效果」系统设置 */
         @media (prefers-reduced-motion: reduce) {
 
             *,
@@ -931,10 +996,10 @@
 
         <div class="side-panel" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
             <div class="stat-label" style="color: var(--neon-alt);">[ MEMO_PAD ]</div>
-            <label for="todo-in" class="sr-only"
+            <label for="memo-in" class="sr-only"
                    style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">新增备忘</label>
-            <input type="text" id="todo-in" placeholder="+ Add new note...">
-            <div id="todo-list" role="list"></div>
+            <input type="text" id="memo-in" placeholder="+ Add new note...">
+            <div id="memo-list" role="list"></div>
         </div>
     </aside>
 
@@ -1039,35 +1104,39 @@
             search: 'Search Engines'
         };
 
-        const $ = id => document.getElementById(id);
+        // 全名而非 $：$ 在多数代码库里指 querySelector，这里只做 getElementById
+        const byId = id => document.getElementById(id);
 
         const els = {
-            themeBtn: $('theme-btn'),
-            menuBtn: $('menu-btn'),
-            sidebar: $('sidebar'),
-            backdrop: $('sidebar-backdrop'),
-            searchIn: $('search-in'),
-            searchStatus: $('search-status'),
-            renderArea: $('render-area'),
-            timeHm: $('time-hm'),
-            timeS: $('time-s'),
-            dateStr: $('date-str'),
-            weekVal: $('week-val'),
-            weekBar: $('week-bar'),
-            tempVal: $('temp-val'),
-            weatherDesc: $('weather-desc'),
-            battVal: $('batt-val'),
-            battBar: $('batt-bar'),
-            battLabel: $('batt-label'),
-            todoIn: $('todo-in'),
-            todoList: $('todo-list'),
-            neonCursor: $('neon-cursor')
+            themeBtn: byId('theme-btn'),
+            menuBtn: byId('menu-btn'),
+            sidebar: byId('sidebar'),
+            backdrop: byId('sidebar-backdrop'),
+            searchIn: byId('search-in'),
+            searchStatus: byId('search-status'),
+            renderArea: byId('render-area'),
+            timeHm: byId('time-hm'),
+            timeS: byId('time-s'),
+            dateStr: byId('date-str'),
+            weekVal: byId('week-val'),
+            weekBar: byId('week-bar'),
+            tempVal: byId('temp-val'),
+            weatherDesc: byId('weather-desc'),
+            battVal: byId('batt-val'),
+            battBar: byId('batt-bar'),
+            battLabel: byId('batt-label'),
+            memoIn: byId('memo-in'),
+            memoList: byId('memo-list'),
+            neonCursor: byId('neon-cursor')
         };
 
+        // --- 工具函数 ---
+        // 安全地把 url 解析成 hostname，失败时回退到原始字符串，避免一条坏链接拖垮整页渲染
         function safeHostname(url) {
             try { return new URL(url).hostname || url; } catch (e) { return url; }
         }
 
+        // 根据字符串生成稳定的霓虹色
         function hashColor(s) {
             const sum = String(s || '').split('').reduce((a, b) => a + b.charCodeAt(0), 0);
             return `hsl(${Math.abs(sum) % 360}, 60%, 50%)`;
@@ -1095,6 +1164,7 @@
             return match ? brandColors[match] : hashColor(link.name || host);
         }
 
+        // 简单防抖
         function debounce(fn, ms) {
             let t;
             return function (...args) {
@@ -1103,6 +1173,7 @@
             };
         }
 
+        // 把命中的关键词包一层高亮 <span>，用 DOM 片段避免注入
         function highlightMatch(text, query) {
             if (!query) return document.createTextNode(text);
             const idx = text.toLowerCase().indexOf(query.toLowerCase());
@@ -1117,12 +1188,14 @@
             return frag;
         }
 
+        // 带超时的 fetch：避免弱网下请求长时间挂起
         function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), timeoutMs);
             return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
         }
 
+        // 只放行 http/https：拦掉 javascript: 之类的协议
         function isHttpUrl(value) {
             try {
                 const protocol = new URL(String(value), document.baseURI).protocol;
@@ -1185,6 +1258,7 @@
             }
         }
 
+        // localStorage 薄封装：隐私模式/配额满时静默降级，不让存储异常打断渲染
         const LS = {
             get(key, fallback) {
                 try {
@@ -1197,6 +1271,7 @@
             }
         };
 
+        // 旧版 v16 键迁移到 v14 命名空间（仅当新键尚未写入时）
         function migrateLegacyStorage() {
             const keys = [
                 ['cyber-v16-theme', 'cyber-v14-theme'],
@@ -1215,6 +1290,7 @@
             } catch (e) { /* ignore */ }
         }
 
+        // --- 主题切换 ---
         function currentTheme() {
             return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
         }
@@ -1226,6 +1302,7 @@
 
         els.themeBtn.addEventListener('click', () => applyTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
 
+        // --- 渲染 (用 DOM API 构建节点，避免 innerHTML 转义/引号脆弱性) ---
         function buildIcon(link) {
             const wrap = document.createElement('div');
             wrap.className = 'icon-wrap';
@@ -1364,7 +1441,7 @@
             lastResultCount = total;
         }
 
-        /* ===== 拖拽排序（仅本地、仅同类内） ===== */
+        // --- 拖拽排序：仅同类列内，顺序存在本机 localStorage（只存顺序，不存数据） ---
         const ORDER_KEY = 'v14-link-order';
 
         // 按已保存顺序重排某分类的链接；未记录的新链接（改了数据后新增）保持原相对次序排在末尾
@@ -1378,6 +1455,7 @@
                 .map(o => o.l);
         }
 
+        // 把某分类当前 DOM 顺序读出并持久化
         function saveOrderForCat(catId) {
             const list = els.renderArea.querySelector(`.links-list[data-cat="${catId}"]`);
             if (!list) return;
@@ -1387,6 +1465,7 @@
             LS.set(ORDER_KEY, all);
         }
 
+        // 根据鼠标 Y 坐标，找出应插入到其之前的卡片
         function getDragAfterElement(list, y) {
             const cards = Array.from(list.querySelectorAll('.link-card:not(.dragging)'));
             let closest = null, closestOffset = -Infinity;
@@ -1508,6 +1587,7 @@
             });
         }
 
+        // --- 系统同步 ---
         function updateClock() {
             const now = new Date();
             const time = now.toTimeString().split(' ')[0];
@@ -1569,6 +1649,7 @@
             }
         }
 
+        // --- 电量：带降级（API 不存在时不报错） ---
         function setupBattery() {
             if (!navigator.getBattery) {
                 els.battLabel.textContent = 'POWER';
@@ -1591,24 +1672,25 @@
             }).catch(() => { });
         }
 
+        // --- 备忘录：事件委托 + 安全持久化 ---
         function setupMemo() {
             const KEY = 'v14-memos';
 
             const refreshEmptyHint = () => {
-                const has = els.todoList.querySelector('.memo');
-                const hint = els.todoList.querySelector('.memo-empty');
+                const has = els.memoList.querySelector('.memo');
+                const hint = els.memoList.querySelector('.memo-empty');
                 if (!has && !hint) {
                     const el = document.createElement('div');
                     el.className = 'memo-empty';
                     el.textContent = '// NO_MEMOS';
-                    els.todoList.appendChild(el);
+                    els.memoList.appendChild(el);
                 } else if (has && hint) {
                     hint.remove();
                 }
             };
 
             const save = () => {
-                const items = Array.from(els.todoList.querySelectorAll('.memo .txt')).map(s => s.textContent);
+                const items = Array.from(els.memoList.querySelectorAll('.memo .txt')).map(s => s.textContent);
                 LS.set(KEY, items);
                 refreshEmptyHint();
             };
@@ -1631,21 +1713,21 @@
 
                 d.appendChild(span);
                 d.appendChild(del);
-                els.todoList.appendChild(d);
+                els.memoList.appendChild(d);
             };
 
-            els.todoList.addEventListener('click', e => {
+            els.memoList.addEventListener('click', e => {
                 const btn = e.target.closest('.del');
                 if (!btn) return;
                 btn.closest('.memo')?.remove();
                 save();
             });
 
-            els.todoIn.addEventListener('keydown', e => {
+            els.memoIn.addEventListener('keydown', e => {
                 if (e.key === 'Enter' && (e.isComposing || e.keyCode === 229)) return;
-                if (e.key === 'Enter' && els.todoIn.value.trim()) {
-                    add(els.todoIn.value.trim());
-                    els.todoIn.value = '';
+                if (e.key === 'Enter' && els.memoIn.value.trim()) {
+                    add(els.memoIn.value.trim());
+                    els.memoIn.value = '';
                     save();
                 }
             });
@@ -1654,6 +1736,7 @@
             refreshEmptyHint();
         }
 
+        // --- 搜索：防抖 + 键盘导航（↑↓ 选择 / Enter 搜索 / Esc 关闭历史或清空） ---
         let focusIdx = -1;
         let lastResultCount = 0;
 
@@ -1676,18 +1759,14 @@
         const MAX_HISTORY = 20;
 
         function loadSearchHistory() {
-            try {
-                const raw = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]');
-                return Array.isArray(raw)
-                    ? raw.filter(item => item && typeof item.q === 'string' && item.q.trim() && Number.isFinite(item.ts))
-                    : [];
-            } catch (e) {
-                return [];
-            }
+            const raw = LS.get(SEARCH_HISTORY_KEY, []);
+            return Array.isArray(raw)
+                ? raw.filter(item => item && typeof item.q === 'string' && item.q.trim() && Number.isFinite(item.ts))
+                : [];
         }
 
         function saveSearchHistory(list) {
-            try { localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(list)); } catch (e) { /* ignore */ }
+            LS.set(SEARCH_HISTORY_KEY, list);
         }
 
         function recordSearch(query) {
@@ -1719,10 +1798,10 @@
                     els.searchStatus.textContent = q ? `${lastResultCount} 个匹配结果` : '';
                 }
             }, 120);
-            const histBox = $('search-history');
-            const histList = $('search-history-list');
-            const clearBtn = $('history-clear');
-            const searchForm = $('search-form');
+            const histBox = byId('search-history');
+            const histList = byId('search-history-list');
+            const clearBtn = byId('history-clear');
+            const searchForm = byId('search-form');
             const hint = document.querySelector('.search-hint');
             const hintHtml = hint ? hint.innerHTML : '';
             let historyIdx = -1;
@@ -1883,6 +1962,7 @@
             });
         }
 
+        // --- 全局快捷键：/ 或 Ctrl+K 聚焦搜索 ---
         document.addEventListener('keydown', e => {
             const tag = (document.activeElement && document.activeElement.tagName) || '';
             const typing = tag === 'INPUT' || tag === 'TEXTAREA';
@@ -1895,6 +1975,7 @@
             }
         });
 
+        // --- 光标：rAF 节流，移动端自动禁用 ---
         function setupCursor() {
             if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
@@ -1926,6 +2007,7 @@
             document.addEventListener('mouseup', () => els.neonCursor.classList.remove('is-pressed'));
         }
 
+        // --- 移动端抽屉 ---
         function toggleSidebar(open) {
             const o = open == null ? !els.sidebar.classList.contains('open') : open;
             els.sidebar.classList.toggle('open', o);
@@ -1953,10 +2035,12 @@
             });
         }
 
+        // --- 可见性变化时刷新一次天气（从后台切回前台） ---
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) updateWeather();
         });
 
+        // --- 初始化 ---
         function init() {
             migrateLegacyStorage();
             updateClock();
@@ -1970,6 +2054,7 @@
             setupDragSort();
             loadCachedWeather();
 
+            // 核心 DOM 注入与外部 API 请求延迟一帧，为骨架渲染让路
             setTimeout(() => {
                 render();
                 loadConfig().then(loaded => {
