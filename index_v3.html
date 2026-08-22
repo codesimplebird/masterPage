@@ -1470,7 +1470,8 @@
                 col.countEl.style.display = visibleCount ? '' : 'none';
                 // 空分类整列隐藏，非空显示（q 为空时全部显示）
                 col.colEl.style.display = visibleCount ? '' : 'none';
-                col.colEl.style.animation = 'none'; // 搜索态禁止再播进场动画
+                // 搜索态禁止再播进场动画；非搜索态移除内联覆盖，保留首次 slideIn
+                col.colEl.style.animation = q ? 'none' : '';
             }
 
             // 空结果提示：复用而非重建
@@ -1800,8 +1801,11 @@
         let focusIdx = -1;
         let lastResultCount = 0;
 
+        // 增量渲染后不匹配的卡片仍在 DOM 中（display:none），
+        // 键盘导航必须只认可见卡片，否则 ↑↓ 会移进隐藏卡
         function getVisibleCards() {
-            return Array.from(els.renderArea.querySelectorAll('.link-card'));
+            return Array.from(els.renderArea.querySelectorAll('.link-card'))
+                .filter(c => c.style.display !== 'none');
         }
 
         function setFocus(idx) {
