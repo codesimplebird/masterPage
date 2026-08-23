@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V2.14.3 · YAML</title>
+    <title>CYBER-DECK V2.14.4 · YAML</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -987,7 +987,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V2.14.3</span>
+            <span class="version-badge">V2.14.4</span>
         </div>
         <div class="side-panel clock-wrap">
             <div style="font-size: 0.7rem; color: var(--neon); letter-spacing: 2px;">SECURE_TIME</div>
@@ -1419,6 +1419,9 @@
             const frag = document.createDocumentFragment();
             const columns = [];
             const cards = [];
+
+            // 重建必须清空上一版（数据源替换后重画），否则会 append 出两份列表
+            els.renderArea.innerHTML = '';
 
             config.categories.forEach((cat, catIdx) => {
                 const list = config.links.filter(l => l.cat === cat.id);
