@@ -46,8 +46,8 @@ NavigationProfile/
 
 | 文件 | 说明 |
 |------|------|
-| `index.html` | **CYBER-DECK V14.3**，GitHub Pages 默认首页，链接数据内联，可直接 `file://` 打开 |
-| `index_v3.html` | **CYBER-DECK V14.3 · YAML**，运行时加载 `links.yaml`，失败时回退内置 `fallbackConfig` |
+| `index.html` | **CYBER-DECK V2.14.3**，GitHub Pages 默认首页，链接数据内联，可直接 `file://` 打开 |
+| `index_v3.html` | **CYBER-DECK V2.14.3 · YAML**，运行时加载 `links.yaml`，失败时回退内置 `fallbackConfig` |
 | `links.yaml` | v3 的链接数据源，与 index 中的链接配置保持同步 |
 | `js-yaml.min.js` | v3 使用的 js-yaml 4.1.0 解析库 |
 | `archive/` | 历史版本归档，不参与当前部署入口 |
