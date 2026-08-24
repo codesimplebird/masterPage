@@ -24,13 +24,11 @@
 - 分类数据更多可视化（分类图标 hover 动效微调）
 - 链接数量更多时考虑分页或折叠分类
 
-## 最新一次重构要点（Stage A–E）
+## 最新一次优化要点（V2.14.5）
 
-- P0 修复：搜索历史改 `focusout`、天气 TTL + 在途请求锁、拖拽顺序键去 URL 段
-- 无障碍：收窄 live 区域、补 combobox 语义、option 改用 `div[role=option]`
-- 双入口以 index_v3.html 为基准机械生成 index.html，差异收敛到数据加载路径
-- 命名：版本统一为 V14.3、memo 面板 DOM id 改为 `memo-in`/`memo-list`、`$` 改名 `byId`
-- 仓库卫生：新增 `.gitignore` / `.gitattributes`（统一 LF），`.idea/` 移出版本控制
+- 性能与死代码清理：彻底移除无效光标监听（`mousemove`/`mouseover`/`mousedown`）及 DOM 波纹插入；背景网格与噪点层添加 `transform: translateZ(0)` GPU 硬件加速；补齐 `wttr.in` / `icons.duckduckgo.com` DNS 预解析。
+- 核心体验增强：实时平滑周进度算法（秒级匀速流转）；图标加载多级容错链（原图标 → DuckDuckGo Favicon 镜像 → 首字母色块）；中文拼音首字母/别名智能搜索（如 `bili`、`zh`、`gh`、`ds` 等）；多引擎快捷指令分流（`g <q>`、`d <q>`、`gh <q>`、`bd <q>`、默认 Bing）。
+- 双入口严格同步：机械化生成保证 `index.html` 与 `index_v3.html` 100% 结构化对齐。
 
 ## 维护规则提醒
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V2.14.4 · YAML</title>
+    <title>CYBER-DECK V2.14.5 · YAML</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -37,6 +37,8 @@
     <link rel="dns-prefetch" href="//static.hdslb.com">
     <link rel="dns-prefetch" href="//www.youtube.com">
     <link rel="dns-prefetch" href="//chatgpt.com">
+    <link rel="dns-prefetch" href="//wttr.in">
+    <link rel="dns-prefetch" href="//icons.duckduckgo.com">
 
     <!-- v3 专有：YAML 解析库。必须同步加载，body 末尾的内联脚本要在 loadConfig 前拿到 jsyaml -->
     <script src="js-yaml.min.js"></script>
@@ -125,94 +127,6 @@
             transition: background 0.5s ease, color 0.5s ease;
         }
 
-        /* --- 零延迟霓虹光标（默认隐藏，触屏走系统光标） --- */
-        #neon-cursor {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 30px;
-            height: 30px;
-            margin: -15px 0 0 -15px;
-            z-index: 10000;
-            pointer-events: none;
-            transform: translate3d(0, 0, 0);
-            display: none;
-            color: var(--neon);
-            transition: color 0.18s ease;
-        }
-
-        .cursor-core {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            margin: -2.5px;
-            border-radius: 50%;
-            background: currentColor;
-            box-shadow: 0 0 8px currentColor;
-        }
-
-        .cursor-ring {
-            position: absolute;
-            inset: 3px;
-            border: 1px solid currentColor;
-            border-radius: 50%;
-            opacity: 0.78;
-            box-shadow: 0 0 12px color-mix(in srgb, currentColor 55%, transparent), inset 0 0 7px color-mix(in srgb, currentColor 20%, transparent);
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.25s ease, opacity 0.25s ease;
-        }
-
-        #neon-cursor.is-action .cursor-ring {
-            transform: scale(1.38);
-            border-radius: 36% 64% 58% 42%;
-            opacity: 1;
-        }
-
-        #neon-cursor.is-pressed .cursor-ring {
-            transform: scale(0.58);
-        }
-
-        /* 仅在「精确指针 + 支持悬停」的设备上启用霓虹光标并隐藏系统光标。
-           关键：此规则必须放在 #neon-cursor 基础规则之后——
-           specificity 相同时后出现的覆盖先出现的，
-           否则上面的 display:none 会压过这里的 display:block，电脑也看不到光标。 */
-        @media (hover: hover) and (pointer: fine) {
-            * {
-                cursor: revert !important;
-            }
-        }
-
-        /* 使用系统指针：离开页面时浏览器会自动隐藏，无视觉残留。 */
-        #neon-cursor,
-        .click-ripple {
-            display: none !important;
-        }
-
-        .click-ripple {
-            position: fixed;
-            border: 1px solid var(--ripple-color, var(--neon));
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            animation: ripple-ani 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes ripple-ani {
-            0% {
-                width: 0;
-                height: 0;
-                opacity: 1;
-            }
-
-            100% {
-                width: 56px;
-                height: 56px;
-                opacity: 0;
-            }
-        }
-
         /* --- 背景装饰 --- */
         body::before {
             content: '';
@@ -228,6 +142,7 @@
             position: fixed;
             inset: 0;
             z-index: -1;
+            transform: translateZ(0);
             background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 50px 50px;
@@ -239,6 +154,7 @@
             position: fixed;
             inset: 0;
             z-index: -1;
+            transform: translateZ(0);
             pointer-events: none;
             opacity: 0.04;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -975,8 +891,6 @@
 </head>
 
 <body>
-    <div id="neon-cursor" aria-hidden="true"><span class="cursor-ring"></span><span class="cursor-core"></span></div>
-
     <div class="bg-grid" aria-hidden="true"></div>
     <div class="noise-layer" aria-hidden="true"></div>
 
@@ -987,7 +901,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V2.14.4</span>
+            <span class="version-badge">V2.14.5</span>
         </div>
         <div class="side-panel clock-wrap">
             <div style="font-size: 0.7rem; color: var(--neon); letter-spacing: 2px;">SECURE_TIME</div>
@@ -1026,13 +940,13 @@
         <div class="search-container">
             <p class="search-hint" id="search-hint"
                style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">
-                // A simple HTML navigation page · 按 <kbd>/</kbd> 或 <kbd>Ctrl+K</kbd> 搜索 · <kbd>Esc</kbd> 关闭历史/清空 · <kbd>↑↓</kbd> 导航 · <kbd>Enter</kbd> Bing 搜索</p>
+                // A simple HTML navigation page · 按 <kbd>/</kbd> 或 <kbd>Ctrl+K</kbd> 搜索 · <kbd>Esc</kbd> 关闭历史/清空 · <kbd>↑↓</kbd> 导航 · 前缀 <kbd>g</kbd>/<kbd>d</kbd>/<kbd>gh</kbd>/<kbd>bd</kbd> 分流 · <kbd>Enter</kbd> 搜索</p>
             <form class="search-wrap" id="search-form" role="search" aria-label="全局搜索">
                 <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
                        autocomplete="off" role="combobox" aria-label="搜索链接" aria-describedby="search-hint"
                        aria-controls="search-history-list" aria-haspopup="listbox" aria-autocomplete="list"
                        aria-expanded="false">
-                <button type="submit" class="search-go" id="search-go" aria-label="Bing 搜索" title="Bing 搜索">🔍</button>
+                <button type="submit" class="search-go" id="search-go" aria-label="搜索（支持前缀分流：g/d/gh/bd）" title="搜索（g:Google  d:DeepSeek  gh:GitHub  bd:百度）">🔍</button>
                 <!-- 弹层容器不带 listbox 语义：清除按钮不能作为 option 的兄弟节点存在于 listbox 内 -->
                 <div id="search-history" class="search-history" hidden>
                     <div class="history-head">
@@ -1142,8 +1056,7 @@
             battBar: byId('batt-bar'),
             battLabel: byId('batt-label'),
             memoIn: byId('memo-in'),
-            memoList: byId('memo-list'),
-            neonCursor: byId('neon-cursor')
+            memoList: byId('memo-list')
         };
 
         // --- 工具函数 ---
@@ -1323,6 +1236,7 @@
             const wrap = document.createElement('div');
             wrap.className = 'icon-wrap';
             const name = link.name || '?';
+            const host = safeHostname(link.url);
             const img = document.createElement('img');
             img.className = 'link-icon';
             img.loading = 'lazy';
@@ -1331,24 +1245,32 @@
             // 图标属于装饰性资源，降优先级首屏加载，关键文本/首屏内容优先
             img.fetchpriority = 'low';
             img.alt = name;
+            let triedFallback = false;
             const useFallback = () => {
                 if (!wrap.contains(img)) return;
-                const fb = document.createElement('div');
-                fb.className = 'icon-fallback';
-                fb.style.background = hashColor(name);
-                fb.textContent = name[0].toUpperCase();
-                wrap.replaceChild(fb, img);
+                // 只有当 safeHostname 成功解析出真实 hostname（不含 /）时才尝试 DuckDuckGo；
+                // 若 URL 格式非法 safeHostname 会原样返回带路径的字符串，此时直接降级为字母色块
+                if (!triedFallback && host && !host.includes('/')) {
+                    triedFallback = true;
+                    img.src = `https://icons.duckduckgo.com/ip2/${host}.ico`;
+                } else {
+                    const fb = document.createElement('div');
+                    fb.className = 'icon-fallback';
+                    fb.style.background = hashColor(name);
+                    fb.textContent = name[0].toUpperCase();
+                    wrap.replaceChild(fb, img);
+                }
             };
             img.onerror = useFallback;
             if (link.icon) {
                 img.src = link.icon;
                 wrap.appendChild(img);
+            } else if (host) {
+                triedFallback = true;
+                img.src = `https://icons.duckduckgo.com/ip2/${host}.ico`;
+                wrap.appendChild(img);
             } else {
-                const fb = document.createElement('div');
-                fb.className = 'icon-fallback';
-                fb.style.background = hashColor(name);
-                fb.textContent = name[0].toUpperCase();
-                wrap.appendChild(fb);
+                useFallback();
             }
             return wrap;
         }
@@ -1408,11 +1330,40 @@
         // 这样敲一个键只做 34 次显隐切换，而非重建 374 个节点。
         let boardState = null; // { columns: [{catId, colEl, listEl, countEl}], cards: [buildCard 返回值] }
 
+        const siteAliases = {
+            'bilibili': ['b站', 'blbl', 'bili', '弹幕', '哔哩哔哩'],
+            'youtube': ['ytb', '油管'],
+            'netflix': ['网飞', '奈飞'],
+            'twitch': ['ttv'],
+            'huya': ['虎牙', 'hy'],
+            'chatgpt': ['gpt', 'openai'],
+            'deepseek': ['ds', '深度求索', '深度'],
+            'qwen': ['通义千问', '千问', 'tyqw', '阿里'],
+            'claude': ['anthropic'],
+            'gemini': ['google ai', '谷歌ai'],
+            'kimi': ['moonshot', '月之暗面'],
+            'github': ['gh', 'git'],
+            'stackoverflow': ['so', '技术问答'],
+            'zhihu': ['zh', '知乎'],
+            'weibo': ['wb', '微博'],
+            'telegram': ['tg', '电报'],
+            'google': ['gg', '谷歌'],
+            'bing': ['必应'],
+            'baidu': ['bd', '百度']
+        };
+
         function matchCard(link, cat, q) {
             if (!q) return true;
-            return (link.name || '').toLowerCase().includes(q)
-                || (link.url || '').toLowerCase().includes(q)
-                || cat.name.toLowerCase().includes(q);
+            const nameLower = (link.name || '').toLowerCase();
+            const urlLower = (link.url || '').toLowerCase();
+            const catLower = (cat.name || '').toLowerCase();
+            if (nameLower.includes(q) || urlLower.includes(q) || catLower.includes(q)) return true;
+            for (const [key, aliasList] of Object.entries(siteAliases)) {
+                if (nameLower.includes(key) || urlLower.includes(key)) {
+                    if (aliasList.some(a => a.toLowerCase().includes(q))) return true;
+                }
+            }
+            return false;
         }
 
         function buildBoard() {
@@ -1678,7 +1629,8 @@
             els.dateStr.textContent =
                 now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
             const day = now.getDay() === 0 ? 7 : now.getDay();
-            const per = Math.round((day / 7) * 100);
+            const weekSeconds = (day - 1) * 86400 + now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+            const per = ((weekSeconds / (7 * 86400)) * 100).toFixed(1);
             els.weekVal.textContent = per + '%';
             els.weekBar.style.width = per + '%';
         }
@@ -1860,8 +1812,34 @@
             saveSearchHistory(list.slice(0, MAX_HISTORY));
         }
 
-        function doBingSearch(query) {
-            window.location.href = 'https://www.bing.com/search?q=' + encodeURIComponent(query);
+        function doEngineSearch(query) {
+            const trimmed = query.trim();
+            const prefixMatch = trimmed.match(/^([a-zA-Z]+)\s+(.+)$/);
+            if (prefixMatch) {
+                const engine = prefixMatch[1].toLowerCase();
+                const term = encodeURIComponent(prefixMatch[2].trim());
+                if (engine === 'g') {
+                    window.location.href = 'https://www.google.com/search?q=' + term;
+                    return;
+                }
+                if (engine === 'd' || engine === 'ds') {
+                    window.location.href = 'https://chat.deepseek.com/?q=' + term;
+                    return;
+                }
+                if (engine === 'gh') {
+                    window.location.href = 'https://github.com/search?q=' + term;
+                    return;
+                }
+                if (engine === 'bd') {
+                    window.location.href = 'https://www.baidu.com/s?wd=' + term;
+                    return;
+                }
+                if (engine === 'b') {
+                    window.location.href = 'https://www.bing.com/search?q=' + term;
+                    return;
+                }
+            }
+            window.location.href = 'https://www.bing.com/search?q=' + encodeURIComponent(trimmed);
         }
 
         function setupSearch() {
@@ -1913,13 +1891,13 @@
                 active.scrollIntoView({ block: 'nearest' });
             }
 
-            // 有输入内容 → Bing 搜索（Enter 与搜索按钮共用）
+            // 有输入内容 → 触发搜索（Enter 与搜索按钮共用）
             function submitSearch() {
                 const q = input.value.trim();
                 if (!q) { input.focus(); return; }
                 closeHistory();
                 recordSearch(q);
-                doBingSearch(q);
+                doEngineSearch(q);
             }
             searchForm.addEventListener('submit', e => {
                 e.preventDefault();
@@ -1998,7 +1976,7 @@
                     e.preventDefault();
                     setFocus(Math.max(focusIdx - 1, 0));
                 } else if (e.key === 'Enter') {
-                    // 有输入内容 → Bing 搜索；空框 → 保留原有的打开选中链接行为
+                    // 有输入内容 → 触发搜索；空框 → 保留原有的打开选中链接行为
                     e.preventDefault();
                     if (historyIdx >= 0 && historyItems[historyIdx]) {
                         input.value = historyItems[historyIdx].dataset.query;
@@ -2009,7 +1987,7 @@
                         return;
                     }
                     // 空框且未用 ↑↓ 选中卡片时不跳转：否则「什么都没输入按 Enter」
-                    // 会意外打开第一张卡片，与提示语「Enter Bing 搜索」矛盾
+                    // 会意外打开第一张卡片
                     const target = focusIdx >= 0 ? cards[focusIdx] : null;
                     if (target) window.location.href = target.href;
                 } else if (e.key === 'Escape') {
@@ -2060,38 +2038,6 @@
             }
         });
 
-        // --- 光标：rAF 节流，移动端自动禁用 ---
-        function setupCursor() {
-            if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-
-            let mx = 0, my = 0, rafId = null;
-            document.addEventListener('mousemove', e => {
-                mx = e.clientX; my = e.clientY;
-                if (rafId) return;
-                rafId = requestAnimationFrame(() => {
-                    els.neonCursor.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
-                    rafId = null;
-                });
-            });
-            document.addEventListener('mouseover', e => {
-                const target = e.target.closest('a, button, input, .memo');
-                const card = e.target.closest('.link-card');
-                els.neonCursor.classList.toggle('is-action', Boolean(target));
-                els.neonCursor.style.color = card ? getComputedStyle(card).getPropertyValue('--card-accent').trim() : 'var(--neon)';
-            });
-            document.addEventListener('mousedown', e => {
-                els.neonCursor.classList.add('is-pressed');
-                const r = document.createElement('div');
-                r.className = 'click-ripple';
-                r.style.left = e.clientX + 'px';
-                r.style.top = e.clientY + 'px';
-                r.style.setProperty('--ripple-color', els.neonCursor.style.color || 'var(--neon)');
-                document.body.appendChild(r);
-                setTimeout(() => r.remove(), 500);
-            });
-            document.addEventListener('mouseup', () => els.neonCursor.classList.remove('is-pressed'));
-        }
-
         // --- 移动端抽屉 ---
         function toggleSidebar(open) {
             const o = open == null ? !els.sidebar.classList.contains('open') : open;
@@ -2134,7 +2080,6 @@
             setupBattery();
             setupMemo();
             setupSearch();
-            setupCursor();
             setupSidebar();
             setupDragSort();
             loadCachedWeather();
