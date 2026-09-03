@@ -4,18 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V2.14.5</title>
+    <title>CYBER-DECK V2.14.9</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#eef1f6" media="(prefers-color-scheme: light)">
 
-    <!-- 防闪屏：在首次绘制前就应用已保存的主题，避免 dark→light 闪烁 (FOUC) -->
+    <!-- 防闪屏：在首次绘制前就应用已保存的主题、卡片缩放与鼠标特效配置，避免闪烁 (FOUC) -->
     <script>
         (function () {
             try {
                 var t = localStorage.getItem('cyber-v14-theme') || localStorage.getItem('cyber-v16-theme');
                 if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+                var s = localStorage.getItem('v14-card-scale');
+                if (s && !isNaN(s)) document.documentElement.style.setProperty('--card-scale', s);
+                var fx = localStorage.getItem('v14-mouse-fx');
+                if (fx) {
+                    var c = JSON.parse(fx);
+                    if (c.enabled === false) document.documentElement.setAttribute('data-fx-master', 'off');
+                    if (c.glow === false) document.documentElement.setAttribute('data-fx-glow', 'false');
+                    if (c.crosshair === false) document.documentElement.setAttribute('data-fx-crosshair', 'false');
+                    if (c.pulse === false) document.documentElement.setAttribute('data-fx-pulse', 'false');
+                    if (c.trail === false) document.documentElement.setAttribute('data-fx-trail', 'false');
+                }
             } catch (e) { /* localStorage 不可用时静默降级 */ }
         })();
     </script>
@@ -54,6 +65,7 @@
             --scroll-track: rgba(128, 128, 128, 0.1);
             --scroll-thumb: rgba(0, 242, 255, 0.55);
             --sidebar-w: 320px;
+            --card-scale: 1;
         }
 
         /* light 主题抬高对比度，满足 WCAG AA */
@@ -197,16 +209,83 @@
         }
 
         .side-panel {
+            position: relative;
             background: rgba(128, 128, 128, 0.05);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 14px;
             padding: 18px;
             border-left: 4px solid var(--neon);
+        }
+
+        /* 战术边角拐角标（HUD Corner Brackets） */
+        .side-panel::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid var(--neon);
+            border-right: 2px solid var(--neon);
+            border-top-right-radius: 10px;
+            pointer-events: none;
+            opacity: 0.65;
+        }
+
+        .weather-panel {
+            cursor: pointer;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+
+        .weather-panel:hover {
+            border-color: var(--neon);
+            box-shadow: 0 0 16px color-mix(in srgb, var(--neon) 20%, transparent);
         }
 
         .clock-wrap {
             font-family: 'JetBrains Mono', monospace;
             text-align: center;
+        }
+
+        .clock-label {
+            font-size: 0.7rem;
+            color: var(--neon);
+            letter-spacing: 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        /* 状态心跳微光信标（Status Heartbeat Beacon） */
+        .status-beacon {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--neon);
+            box-shadow: 0 0 8px var(--neon);
+            display: inline-block;
+            animation: beaconPulse 2.4s ease-in-out infinite;
+        }
+
+        @keyframes beaconPulse {
+            0%,
+            100% {
+                transform: scale(0.85);
+                opacity: 0.45;
+            }
+
+            50% {
+                transform: scale(1.15);
+                opacity: 1;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .status-beacon {
+                animation: none;
+                opacity: 0.85;
+            }
         }
 
         /* 版本徽章：SECURE_TIME 上方的低调霓虹角标 */
@@ -270,12 +349,15 @@
             font-family: 'JetBrains Mono';
         }
 
+        /* 机械分段式 LED 刻度槽（Segmented Ticker Bar） */
         .bar-outer {
-            height: 4px;
+            height: 6px;
             background: rgba(128, 128, 128, 0.1);
             border-radius: 2px;
             overflow: hidden;
             margin-bottom: 12px;
+            -webkit-mask-image: repeating-linear-gradient(90deg, #000 0, #000 4px, transparent 4px, transparent 6px);
+            mask-image: repeating-linear-gradient(90deg, #000 0, #000 4px, transparent 4px, transparent 6px);
         }
 
         .bar-inner {
@@ -288,6 +370,67 @@
         .bar-inner.is-charging {
             background: #00ff9d;
             box-shadow: 0 0 8px #00ff9d;
+        }
+
+        .bar-inner.is-low {
+            background: #ff3366;
+            box-shadow: 0 0 8px #ff3366;
+        }
+
+        /* 赛博滑动条：卡片与外框尺寸实时缩放 */
+        .cyber-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(128, 128, 128, 0.15);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            margin: 8px 0 3px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .cyber-slider:hover,
+        .cyber-slider:focus-visible {
+            border-color: var(--neon);
+            box-shadow: 0 0 10px color-mix(in srgb, var(--neon) 30%, transparent);
+        }
+
+        .cyber-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--neon);
+            box-shadow: 0 0 8px var(--neon);
+            cursor: grab;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .cyber-slider::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.25);
+            box-shadow: 0 0 16px var(--neon);
+        }
+
+        .cyber-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border: none;
+            border-radius: 50%;
+            background: var(--neon);
+            box-shadow: 0 0 8px var(--neon);
+            cursor: grab;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .cyber-slider::-moz-range-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.25);
+            box-shadow: 0 0 16px var(--neon);
         }
 
         /* 备忘录 */
@@ -388,7 +531,37 @@
         }
 
         .search-wrap .search-bar {
-            padding-right: 72px;
+            padding-right: 106px;
+        }
+
+        .search-clear {
+            position: absolute;
+            top: 50%;
+            right: 60px;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-sub);
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 2;
+        }
+
+        .search-clear:hover {
+            color: var(--neon);
+            background: rgba(128, 128, 128, 0.12);
+            border-color: var(--border);
+        }
+
+        .search-clear[hidden] {
+            display: none;
         }
 
         .search-go {
@@ -507,7 +680,7 @@
         }
 
         .cat-column {
-            min-width: 320px;
+            min-width: calc(320px * var(--card-scale));
             display: flex;
             flex-direction: column;
             animation: slideIn 0.6s ease-out both;
@@ -598,21 +771,21 @@
         .links-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: calc(12px * var(--card-scale));
         }
 
         .link-card {
             --card-accent: var(--neon);
             background: rgba(128, 128, 128, 0.03);
             border: 1px solid rgba(128, 128, 128, 0.08);
-            border-radius: 16px;
-            padding: 15px 20px 15px 12px;
+            border-radius: calc(14px * var(--card-scale));
+            padding: calc(13px * var(--card-scale)) calc(18px * var(--card-scale)) calc(13px * var(--card-scale)) calc(10px * var(--card-scale));
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: calc(15px * var(--card-scale));
             text-decoration: none;
             color: inherit;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
             position: relative;
             overflow: hidden;
             isolation: isolate;
@@ -647,12 +820,12 @@
         .drag-handle {
             flex-shrink: 0;
             align-self: stretch;
-            width: 20px;
+            width: calc(20px * var(--card-scale));
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-sub);
-            font-size: 1.15rem;
+            font-size: calc(1.15rem * var(--card-scale));
             line-height: 1;
             border-radius: 8px;
             cursor: grab;
@@ -720,23 +893,49 @@
 
         /* 输入后淡出快捷键提示 */
         .search-hint {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.76rem;
+            color: var(--text-sub);
             transition: opacity 0.2s;
         }
 
         .search-hint.is-hidden {
             opacity: 0;
+            pointer-events: none;
         }
 
-        /* 巨型图标 */
+        .hint-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(128, 128, 128, 0.08);
+            border: 1px solid rgba(128, 128, 128, 0.15);
+            padding: 2px 7px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .hint-tag kbd {
+            color: var(--neon);
+            font-weight: 700;
+        }
+
+        /* 精致图标与内嵌光影 */
         .icon-wrap {
-            width: 64px;
-            height: 64px;
+            width: calc(48px * var(--card-scale));
+            height: calc(48px * var(--card-scale));
             flex-shrink: 0;
-            border-radius: 12px;
+            border-radius: calc(10px * var(--card-scale));
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
 
         .link-icon {
@@ -751,7 +950,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
+            font-size: calc(1.4rem * var(--card-scale));
             font-weight: bold;
             color: #fff;
             font-family: 'JetBrains Mono';
@@ -762,21 +961,45 @@
             flex-direction: column;
             gap: 2px;
             min-width: 0;
+            flex: 1;
         }
 
         .link-name {
             color: var(--text-main);
-            font-size: 1rem;
+            font-size: calc(0.96rem * var(--card-scale));
             font-weight: 600;
+        }
+
+        .link-url-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            min-width: 0;
         }
 
         .link-url {
             color: var(--text-sub);
-            font-size: 0.7rem;
+            font-size: calc(0.7rem * var(--card-scale));
             font-family: 'JetBrains Mono';
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .link-arrow {
+            font-size: calc(0.72rem * var(--card-scale));
+            color: var(--card-accent);
+            opacity: 0;
+            transform: translate(-3px, 3px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            flex-shrink: 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .link-card:hover .link-arrow,
+        .link-card.focused .link-arrow {
+            opacity: 0.85;
+            transform: translate(0, 0);
         }
 
         .empty-hint {
@@ -873,6 +1096,253 @@
             }
         }
 
+        /* 方案二：全局环境光跟随磁吸暗流（Ambient Neon Spotlight） */
+        .ambient-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 360px;
+            height: 360px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle, color-mix(in srgb, var(--neon) 18%, transparent) 0%, color-mix(in srgb, var(--neon-alt) 8%, transparent) 40%, transparent 70%);
+            opacity: 0;
+            transform: translate3d(-1000px, -1000px, 0);
+            transition: opacity 0.4s ease;
+            will-change: transform, opacity;
+        }
+
+        .ambient-glow.is-active {
+            opacity: 1;
+        }
+
+        /* 方案三：电磁脉冲点击冲击波（Tactical EMP / Neon Pulse Click） */
+        .click-pulse {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--pulse-color, var(--neon));
+            box-shadow: 0 0 14px var(--pulse-color, var(--neon)), inset 0 0 8px var(--pulse-color, var(--neon));
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            transform: translate3d(-100px, -100px, 0) scale(0.2);
+            will-change: transform, opacity;
+        }
+
+        .click-pulse.animate {
+            animation: pulseWave 0.42s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes pulseWave {
+            0% {
+                opacity: 0.85;
+                transform: translate3d(var(--px), var(--py), 0) scale(0.25);
+            }
+
+            60% {
+                opacity: 0.55;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate3d(var(--px), var(--py), 0) scale(1.65);
+            }
+        }
+
+        /* 战术 HUD 准星（Tactical Crosshair） */
+        .hud-crosshair {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 26px;
+            height: 26px;
+            pointer-events: none;
+            z-index: 9997;
+            transform: translate3d(-100px, -100px, 0);
+            will-change: transform;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hud-crosshair.is-active {
+            opacity: 1;
+        }
+
+        .crosshair-ring {
+            position: absolute;
+            inset: 0;
+            border: 1px dashed var(--neon);
+            border-radius: 50%;
+            opacity: 0.65;
+            transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.4, 1), border-color 0.22s, opacity 0.22s;
+        }
+
+        .crosshair-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--neon);
+            box-shadow: 0 0 6px var(--neon);
+            transition: background-color 0.22s, transform 0.22s;
+        }
+
+        .hud-crosshair.is-locked .crosshair-ring {
+            transform: scale(1.45) rotate(45deg);
+            border-color: var(--neon-alt);
+            border-style: solid;
+            opacity: 0.9;
+        }
+
+        .hud-crosshair.is-locked .crosshair-dot {
+            background: var(--neon-alt);
+            box-shadow: 0 0 8px var(--neon-alt);
+            transform: scale(1.25);
+        }
+
+        /* 激光光子粒子尾迹（Laser Spark Trail） */
+        .laser-trail {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9996;
+            overflow: hidden;
+        }
+
+        .trail-spark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--neon);
+            box-shadow: 0 0 8px var(--neon);
+            pointer-events: none;
+            opacity: 0;
+            transform: translate3d(-100px, -100px, 0);
+            will-change: transform, opacity;
+        }
+
+        .trail-spark.active {
+            animation: sparkFade 0.38s ease-out forwards;
+        }
+
+        @keyframes sparkFade {
+            0% {
+                opacity: 0.85;
+                transform: translate3d(var(--sx), var(--sy), 0) scale(1.4);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate3d(var(--sx), var(--sy), 0) scale(0.2);
+            }
+        }
+
+        /* 动效开关与选项面板 */
+        .fx-panel {
+            padding: 12px 14px;
+        }
+
+        .fx-master-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 2px 7px;
+            border-radius: 4px;
+            border: 1px solid var(--neon);
+            background: color-mix(in srgb, var(--neon) 15%, transparent);
+            color: var(--neon);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .fx-master-badge.is-off {
+            border-color: rgba(128, 128, 128, 0.3);
+            background: rgba(128, 128, 128, 0.1);
+            color: var(--text-sub);
+        }
+
+        .fx-master-badge:hover {
+            box-shadow: 0 0 8px color-mix(in srgb, var(--neon) 40%, transparent);
+        }
+
+        .fx-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .fx-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 6px;
+            border-radius: 6px;
+            border: 1px solid rgba(128, 128, 128, 0.18);
+            background: rgba(128, 128, 128, 0.04);
+            color: var(--text-sub);
+            font-family: 'JetBrains Mono', 'Noto Sans SC', sans-serif;
+            font-size: 0.68rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .fx-chip .chip-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(128, 128, 128, 0.4);
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .fx-chip.is-active {
+            border-color: color-mix(in srgb, var(--neon) 40%, transparent);
+            background: color-mix(in srgb, var(--neon) 9%, transparent);
+            color: var(--text-main);
+        }
+
+        .fx-chip.is-active .chip-dot {
+            background: var(--neon);
+            box-shadow: 0 0 6px var(--neon);
+        }
+
+        .fx-chip:hover {
+            border-color: var(--neon);
+        }
+
+        /* 动效开关全局静默规则 */
+        [data-fx-master="off"] .ambient-glow,
+        [data-fx-master="off"] .click-pulse,
+        [data-fx-master="off"] .hud-crosshair,
+        [data-fx-master="off"] .laser-trail,
+        [data-fx-glow="false"] .ambient-glow,
+        [data-fx-pulse="false"] .click-pulse,
+        [data-fx-crosshair="false"] .hud-crosshair,
+        [data-fx-trail="false"] .laser-trail {
+            display: none !important;
+        }
+
+        @media (hover: none) {
+            .ambient-glow,
+            .hud-crosshair,
+            .laser-trail {
+                display: none !important;
+            }
+        }
+
         /* 尊重「减少动态效果」系统设置 */
         @media (prefers-reduced-motion: reduce) {
 
@@ -883,6 +1353,13 @@
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.001ms !important;
             }
+
+            .ambient-glow,
+            .click-pulse,
+            .hud-crosshair,
+            .laser-trail {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -890,6 +1367,20 @@
 <body>
     <div class="bg-grid" aria-hidden="true"></div>
     <div class="noise-layer" aria-hidden="true"></div>
+    <div class="ambient-glow" id="ambient-glow" aria-hidden="true"></div>
+    <div class="click-pulse" id="click-pulse" aria-hidden="true"></div>
+    <div class="hud-crosshair" id="hud-crosshair" aria-hidden="true">
+        <div class="crosshair-ring"></div>
+        <div class="crosshair-dot"></div>
+    </div>
+    <div class="laser-trail" id="laser-trail" aria-hidden="true">
+        <span class="trail-spark"></span>
+        <span class="trail-spark"></span>
+        <span class="trail-spark"></span>
+        <span class="trail-spark"></span>
+        <span class="trail-spark"></span>
+        <span class="trail-spark"></span>
+    </div>
 
     <button class="theme-toggle" id="theme-btn" type="button" aria-label="切换深色/浅色主题" title="切换主题">🌓</button>
     <button class="menu-toggle" id="menu-btn" type="button" aria-label="打开侧边面板" aria-expanded="false">☰</button>
@@ -898,18 +1389,18 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V2.14.5</span>
+            <span class="version-badge">V2.14.9</span>
         </div>
         <div class="side-panel clock-wrap">
-            <div style="font-size: 0.7rem; color: var(--neon); letter-spacing: 2px;">SECURE_TIME</div>
+            <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
             <div>
                 <span class="clock-time" id="time-hm">00:00</span><span class="clock-sec" id="time-s">00</span>
             </div>
             <div class="clock-date" id="date-str">BOOTING...</div>
         </div>
 
-        <div class="side-panel">
-            <div class="stat-label"><span>WEATHER</span><span id="weather-desc">LOADING</span></div>
+        <div class="side-panel weather-panel" id="weather-panel" title="点击立即刷新天气" role="button" tabindex="0" aria-label="天气监视器，点击可手动刷新">
+            <div class="stat-label"><span>WEATHER ↻</span><span id="weather-desc">LOADING</span></div>
             <div style="font-size: 2rem; font-weight: bold; color: var(--neon); margin: 5px 0;" id="temp-val">--°C</div>
 
             <div class="stat-label"><span id="batt-label">POWER</span><span id="batt-val">--</span></div>
@@ -920,6 +1411,35 @@
             <div class="stat-label"><span>WEEK_FLOW</span><span id="week-val">0%</span></div>
             <div class="bar-outer">
                 <div class="bar-inner" id="week-bar" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="side-panel scale-panel" id="scale-panel">
+            <div class="stat-label">
+                <span>CARD_SCALE</span>
+                <span id="scale-val" title="双击重置为 100%" role="button" tabindex="0" style="cursor: pointer;">100%</span>
+            </div>
+            <input type="range" id="card-scale-slider" class="cyber-slider" min="0.75" max="1.35" step="0.05" value="1" aria-label="调节卡片与框体缩放比例">
+        </div>
+
+        <div class="side-panel fx-panel" id="fx-panel">
+            <div class="stat-label">
+                <span>MOUSE_FX</span>
+                <button type="button" class="fx-master-badge" id="fx-master-btn" aria-label="鼠标动效总开关" title="切换鼠标动效总开关">ON</button>
+            </div>
+            <div class="fx-grid">
+                <button type="button" class="fx-chip is-active" id="fx-glow-chip" data-fx="glow" aria-pressed="true" title="随动环境漫反射柔光">
+                    <span class="chip-dot"></span><span>环境微光</span>
+                </button>
+                <button type="button" class="fx-chip is-active" id="fx-crosshair-chip" data-fx="crosshair" aria-pressed="true" title="科幻准星与目标锁定圈">
+                    <span class="chip-dot"></span><span>战术准星</span>
+                </button>
+                <button type="button" class="fx-chip is-active" id="fx-pulse-chip" data-fx="pulse" aria-pressed="true" title="点击电磁冲击波（品牌色）">
+                    <span class="chip-dot"></span><span>点击脉冲</span>
+                </button>
+                <button type="button" class="fx-chip is-active" id="fx-trail-chip" data-fx="trail" aria-pressed="true" title="移动等离子光子火花流光">
+                    <span class="chip-dot"></span><span>粒子尾迹</span>
+                </button>
             </div>
         </div>
 
@@ -935,14 +1455,21 @@
     <main class="main-content">
         <h1 class="sr-only">CYBER-DECK 个人导航</h1>
         <div class="search-container">
-            <p class="search-hint" id="search-hint"
-               style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">
-                // A simple HTML navigation page · 按 <kbd>/</kbd> 或 <kbd>Ctrl+K</kbd> 搜索 · <kbd>Esc</kbd> 关闭历史/清空 · <kbd>↑↓</kbd> 导航 · 前缀 <kbd>g</kbd>/<kbd>d</kbd>/<kbd>gh</kbd>/<kbd>bd</kbd> 分流 · <kbd>Enter</kbd> 搜索</p>
+            <div class="search-hint" id="search-hint">
+                <span class="hint-tag"><kbd>/</kbd> 聚焦</span>
+                <span class="hint-tag"><kbd>Esc</kbd> 清空</span>
+                <span class="hint-tag"><kbd>↑↓</kbd> 导航</span>
+                <span class="hint-tag"><kbd>g</kbd> 谷歌</span>
+                <span class="hint-tag"><kbd>d</kbd> DeepSeek</span>
+                <span class="hint-tag"><kbd>gh</kbd> GitHub</span>
+                <span class="hint-tag"><kbd>bd</kbd> 百度</span>
+            </div>
             <form class="search-wrap" id="search-form" role="search" aria-label="全局搜索">
                 <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
                        autocomplete="off" role="combobox" aria-label="搜索链接" aria-describedby="search-hint"
                        aria-controls="search-history-list" aria-haspopup="listbox" aria-autocomplete="list"
                        aria-expanded="false">
+                <button type="button" class="search-clear" id="search-clear" aria-label="清空搜索" title="清空搜索" hidden>✕</button>
                 <button type="submit" class="search-go" id="search-go" aria-label="搜索（支持前缀分流：g/d/gh/bd）" title="搜索（g:Google  d:DeepSeek  gh:GitHub  bd:百度）">🔍</button>
                 <!-- 弹层容器不带 listbox 语义：清除按钮不能作为 option 的兄弟节点存在于 listbox 内 -->
                 <div id="search-history" class="search-history" hidden>
@@ -1020,7 +1547,6 @@
                 { name: "WolframAlpha", url: "https://www.wolframalpha.com", cat: "search", icon: "https://www.wolframalpha.com/_cdn/favicon.ico" }
             ]
         };
-
         // 全名而非 $：$ 在多数代码库里指 querySelector，这里只做 getElementById
         const byId = id => document.getElementById(id);
 
@@ -1030,6 +1556,7 @@
             sidebar: byId('sidebar'),
             backdrop: byId('sidebar-backdrop'),
             searchIn: byId('search-in'),
+            searchClear: byId('search-clear'),
             searchStatus: byId('search-status'),
             renderArea: byId('render-area'),
             timeHm: byId('time-hm'),
@@ -1039,6 +1566,11 @@
             weekBar: byId('week-bar'),
             tempVal: byId('temp-val'),
             weatherDesc: byId('weather-desc'),
+            weatherPanel: byId('weather-panel'),
+            scaleSlider: byId('card-scale-slider'),
+            scaleVal: byId('scale-val'),
+            ambientGlow: byId('ambient-glow'),
+            clickPulse: byId('click-pulse'),
             battVal: byId('batt-val'),
             battBar: byId('batt-bar'),
             battLabel: byId('batt-label'),
@@ -1110,7 +1642,6 @@
             const timer = setTimeout(() => controller.abort(), timeoutMs);
             return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
         }
-
         // localStorage 薄封装：隐私模式/配额满时静默降级，不让存储异常打断渲染
         const LS = {
             get(key, fallback) {
@@ -1236,12 +1767,22 @@
             const nameEl = document.createElement('span');
             nameEl.className = 'link-name';
             nameEl.appendChild(highlightMatch(link.name, query));
+
+            const urlRow = document.createElement('span');
+            urlRow.className = 'link-url-row';
             const urlEl = document.createElement('span');
             urlEl.className = 'link-url';
             urlEl.textContent = safeHostname(link.url);
             urlEl.title = link.url;
+            const arrowEl = document.createElement('span');
+            arrowEl.className = 'link-arrow';
+            arrowEl.textContent = '↗';
+            arrowEl.setAttribute('aria-hidden', 'true');
+            urlRow.appendChild(urlEl);
+            urlRow.appendChild(arrowEl);
+
             info.appendChild(nameEl);
-            info.appendChild(urlEl);
+            info.appendChild(urlRow);
             a.appendChild(info);
 
             // 返回结构与卡片引用：增量搜索需要 el 与 nameEl，render 全量时用 el
@@ -1259,6 +1800,8 @@
             'youtube': ['ytb', '油管'],
             'netflix': ['网飞', '奈飞'],
             'twitch': ['ttv'],
+            'spotify': ['音乐', '播客', '歌单'],
+            'steam': ['游戏', 'v社', 'steam游戏'],
             'huya': ['虎牙', 'hy'],
             'chatgpt': ['gpt', 'openai'],
             'deepseek': ['ds', '深度求索', '深度'],
@@ -1266,7 +1809,13 @@
             'claude': ['anthropic'],
             'gemini': ['google ai', '谷歌ai'],
             'kimi': ['moonshot', '月之暗面'],
+            'xiaomi': ['小米', 'mimo', '小米ai'],
+            'midjourney': ['mj', '生图', 'ai绘图'],
             'github': ['gh', 'git'],
+            'vercel': ['前端托管', '部署'],
+            'notion': ['笔记', '文档', '知识库'],
+            'figma': ['设计', 'ui', '原型'],
+            'canva': ['可画', '海报', '平面'],
             'stackoverflow': ['so', '技术问答'],
             'zhihu': ['zh', '知乎'],
             'weibo': ['wb', '微博'],
@@ -1315,7 +1864,8 @@
                 emoji.textContent = categoryEmojis[cat.id] || '✦';
                 emoji.setAttribute('aria-hidden', 'true');
                 header.appendChild(emoji);
-                header.appendChild(document.createTextNode(cat.name));
+                const idxStr = String(catIdx + 1).padStart(2, '0');
+                header.appendChild(document.createTextNode(`// ${idxStr} · ${cat.name}`));
                 const cnt = document.createElement('span');
                 cnt.className = 'cat-count';
                 header.appendChild(cnt);
@@ -1585,13 +2135,14 @@
             if (obj) applyWeather(obj.tempC, obj.desc);
         }
 
-        async function updateWeather() {
+        async function updateWeather(force = false) {
             // 后台标签页跳过请求，节省流量
             if (document.hidden || weatherFetching) return;
             const cached = readCachedWeather();
-            // 缓存仍新鲜就不打网络：切标签、定时器都走这条短路
-            if (cached && Date.now() - cached.ts < WEATHER_TTL_MS) return;
+            // 缓存仍新鲜且非强制刷新就不打网络：切标签、定时器都走这条短路
+            if (!force && cached && Date.now() - cached.ts < WEATHER_TTL_MS) return;
             weatherFetching = true;
+            if (force) els.weatherDesc.textContent = 'SYNCING...';
             try {
                 const res = await fetchWithTimeout('https://wttr.in/?format=j1', {}, 8000);
                 const data = await res.json();
@@ -1605,6 +2156,18 @@
             } finally {
                 weatherFetching = false;
             }
+        }
+
+        function setupWeatherInteractive() {
+            if (!els.weatherPanel) return;
+            const trigger = () => updateWeather(true);
+            els.weatherPanel.addEventListener('click', trigger);
+            els.weatherPanel.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    trigger();
+                }
+            });
         }
 
         // --- 电量：带降级（API 不存在时不报错） ---
@@ -1622,6 +2185,7 @@
                     const pct = Math.round(b.level * 100);
                     els.battVal.textContent = (b.charging ? '⚡ ' : '') + pct + '%';
                     els.battBar.classList.toggle('is-charging', Boolean(b.charging));
+                    els.battBar.classList.toggle('is-low', !b.charging && b.level <= 0.2);
                     els.battBar.style.width = b.level * 100 + '%';
                 };
                 fn();
@@ -1836,6 +2400,24 @@
                 input.focus();
             });
 
+            // 搜索框内联一键清空按钮
+            if (els.searchClear) {
+                els.searchClear.addEventListener('mousedown', e => e.preventDefault());
+                els.searchClear.addEventListener('click', () => {
+                    input.value = '';
+                    els.searchClear.hidden = true;
+                    if (hint) {
+                        hint.innerHTML = hintHtml;
+                        hint.classList.remove('is-hidden');
+                    }
+                    if (els.searchStatus) els.searchStatus.textContent = '';
+                    render('');
+                    focusIdx = -1;
+                    closeHistory();
+                    input.focus();
+                });
+            }
+
             // 只重建 option 列表：输入内容时按包含匹配过滤，空框显示全部
             function renderHistory() {
                 const q = input.value.trim().toLowerCase();
@@ -1867,6 +2449,7 @@
                     row.addEventListener('mousedown', e => e.preventDefault());
                     row.addEventListener('click', () => {
                         input.value = item.q;
+                        if (els.searchClear) els.searchClear.hidden = false;
                         submitSearch();
                     });
                     histList.appendChild(row);
@@ -1879,7 +2462,9 @@
             input.addEventListener('input', e => {
                 historyIdx = -1;
                 input.removeAttribute('aria-activedescendant');
-                if (hint) hint.classList.toggle('is-hidden', e.target.value.length > 0);
+                const hasVal = e.target.value.length > 0;
+                if (hint) hint.classList.toggle('is-hidden', hasVal);
+                if (els.searchClear) els.searchClear.hidden = !hasVal;
                 debouncedRender(e.target.value);
                 renderHistory();
             });
@@ -1920,6 +2505,7 @@
                         return;
                     }
                     input.value = '';
+                    if (els.searchClear) els.searchClear.hidden = true;
                     if (hint) {
                         hint.innerHTML = hintHtml;
                         hint.classList.remove('is-hidden');
@@ -1995,6 +2581,239 @@
             if (!document.hidden) updateWeather();
         });
 
+        // --- 卡片与外框缩放调节 ---
+        function setupCardScale() {
+            const KEY = 'v14-card-scale';
+            const slider = els.scaleSlider;
+            const label = els.scaleVal;
+            if (!slider || !label) return;
+
+            const applyScale = (val, save = true) => {
+                const num = parseFloat(val);
+                if (isNaN(num)) return;
+                const clamped = Math.max(0.75, Math.min(1.35, Math.round(num * 100) / 100));
+                document.documentElement.style.setProperty('--card-scale', clamped);
+                slider.value = clamped;
+                label.textContent = Math.round(clamped * 100) + '%';
+                if (save) LS.set(KEY, clamped);
+            };
+
+            const saved = LS.get(KEY, 1);
+            applyScale(saved, false);
+
+            slider.addEventListener('input', e => {
+                applyScale(e.target.value, true);
+            });
+
+            // 双击或在数值标签上按 Enter/Space 快速重置回 100%
+            const reset = () => applyScale(1, true);
+            label.addEventListener('dblclick', reset);
+            label.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    reset();
+                }
+            });
+            slider.addEventListener('dblclick', reset);
+        }
+
+        // --- 鼠标特效系统：环境微光 / 战术准星 / 电磁脉冲 / 粒子尾迹 + 开关选项面板 ---
+        function setupMouseEffects() {
+            const FX_KEY = 'v14-mouse-fx';
+            const defaultCfg = {
+                enabled: true,
+                glow: true,
+                crosshair: true,
+                pulse: true,
+                trail: true
+            };
+
+            const saved = LS.get(FX_KEY, null);
+            const cfg = Object.assign({}, defaultCfg, saved || {});
+
+            const masterBtn = byId('fx-master-btn');
+            const chips = Array.from(document.querySelectorAll('.fx-chip'));
+            const glowEl = els.ambientGlow;
+            const pulseEl = els.clickPulse;
+            const crosshairEl = byId('hud-crosshair');
+            const trailSparks = Array.from(document.querySelectorAll('.trail-spark'));
+
+            // 更新 DOM 属性与面板外观
+            function syncFxState() {
+                document.documentElement.setAttribute('data-fx-master', cfg.enabled ? 'on' : 'off');
+                document.documentElement.setAttribute('data-fx-glow', String(cfg.glow));
+                document.documentElement.setAttribute('data-fx-crosshair', String(cfg.crosshair));
+                document.documentElement.setAttribute('data-fx-pulse', String(cfg.pulse));
+                document.documentElement.setAttribute('data-fx-trail', String(cfg.trail));
+
+                if (masterBtn) {
+                    masterBtn.textContent = cfg.enabled ? 'ON' : 'OFF';
+                    masterBtn.classList.toggle('is-off', !cfg.enabled);
+                }
+
+                chips.forEach(ch => {
+                    const key = ch.dataset.fx;
+                    const on = Boolean(cfg[key]);
+                    ch.classList.toggle('is-active', on);
+                    ch.setAttribute('aria-pressed', String(on));
+                });
+
+                if (!cfg.enabled || !cfg.glow) {
+                    if (glowEl) glowEl.classList.remove('is-active');
+                }
+                if (!cfg.enabled || !cfg.crosshair) {
+                    if (crosshairEl) crosshairEl.classList.remove('is-active', 'is-locked');
+                }
+                if (!cfg.enabled || !cfg.trail) {
+                    trailSparks.forEach(sp => sp.classList.remove('active'));
+                }
+
+                LS.set(FX_KEY, cfg);
+            }
+
+            syncFxState();
+
+            // 绑定总开关
+            if (masterBtn) {
+                masterBtn.addEventListener('click', () => {
+                    cfg.enabled = !cfg.enabled;
+                    // 如果开启总开关但子项全关，则默认全部开启
+                    if (cfg.enabled && !cfg.glow && !cfg.crosshair && !cfg.pulse && !cfg.trail) {
+                        cfg.glow = cfg.crosshair = cfg.pulse = cfg.trail = true;
+                    }
+                    syncFxState();
+                });
+            }
+
+            // 绑定子项切换
+            chips.forEach(ch => {
+                ch.addEventListener('click', () => {
+                    const key = ch.dataset.fx;
+                    cfg[key] = !cfg[key];
+                    // 如果至少开启了一项，主开关自动置为 ON
+                    if (cfg[key]) cfg.enabled = true;
+                    // 如果所有子项都被关闭，主开关置为 OFF
+                    if (!cfg.glow && !cfg.crosshair && !cfg.pulse && !cfg.trail) {
+                        cfg.enabled = false;
+                    }
+                    syncFxState();
+                });
+            });
+
+            // 触屏设备或减少动态效果时，仅允许配置面板工作，不绑定鼠标帧循环
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+                window.matchMedia('(hover: none)').matches) {
+                return;
+            }
+
+            // 1. 全局环境光跟随 & 战术准星移动
+            let glowX = -1000, glowY = -1000;
+            let targetX = -1000, targetY = -1000;
+            let rafActive = false;
+            let lastTrailX = -1000, lastTrailY = -1000;
+            let sparkIdx = 0;
+
+            function updateMotion() {
+                if (!cfg.enabled || (!cfg.glow && !cfg.crosshair)) {
+                    rafActive = false;
+                    return;
+                }
+
+                const dx = targetX - glowX;
+                const dy = targetY - glowY;
+                glowX += dx * 0.16;
+                glowY += dy * 0.16;
+
+                if (cfg.glow && glowEl) {
+                    glowEl.style.transform = `translate3d(${glowX - 180}px, ${glowY - 180}px, 0)`;
+                }
+
+                if (cfg.crosshair && crosshairEl) {
+                    crosshairEl.style.transform = `translate3d(${glowX - 13}px, ${glowY - 13}px, 0)`;
+                }
+
+                if (Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4) {
+                    requestAnimationFrame(updateMotion);
+                } else {
+                    rafActive = false;
+                }
+            }
+
+            window.addEventListener('pointermove', e => {
+                targetX = e.clientX;
+                targetY = e.clientY;
+
+                // 首次移动时直接对齐，避免光斑/准星从 (-1000, -1000) 飞入屏幕
+                if (glowX === -1000) {
+                    glowX = targetX;
+                    glowY = targetY;
+                    lastTrailX = targetX;
+                    lastTrailY = targetY;
+                }
+
+                if (cfg.enabled) {
+                    if (cfg.glow && glowEl && !glowEl.classList.contains('is-active')) {
+                        glowEl.classList.add('is-active');
+                    }
+                    if (cfg.crosshair && crosshairEl && !crosshairEl.classList.contains('is-active')) {
+                        crosshairEl.classList.add('is-active');
+                    }
+                }
+
+                const needsMotion = cfg.enabled && (cfg.glow || cfg.crosshair);
+                if (needsMotion && !rafActive) {
+                    rafActive = true;
+                    requestAnimationFrame(updateMotion);
+                }
+
+                // 2. 粒子光子尾迹（每移动 > 16px 释放 1 颗光斑）
+                if (cfg.enabled && cfg.trail && trailSparks.length) {
+                    const distSq = (targetX - lastTrailX) ** 2 + (targetY - lastTrailY) ** 2;
+                    if (distSq > 256) {
+                        lastTrailX = targetX;
+                        lastTrailY = targetY;
+                        const sp = trailSparks[sparkIdx];
+                        sparkIdx = (sparkIdx + 1) % trailSparks.length;
+                        sp.style.setProperty('--sx', (targetX - 2) + 'px');
+                        sp.style.setProperty('--sy', (targetY - 2) + 'px');
+                        sp.classList.remove('active');
+                        void sp.offsetWidth;
+                        sp.classList.add('active');
+                    }
+                }
+
+                // 3. 战术准星探测锁定交互目标
+                if (cfg.enabled && cfg.crosshair && crosshairEl) {
+                    const target = e.target;
+                    const isInteractable = Boolean(target && target.closest('a, button, input, .link-card, [role="button"]'));
+                    crosshairEl.classList.toggle('is-locked', isInteractable);
+                }
+            }, { passive: true });
+
+            document.addEventListener('mouseleave', () => {
+                if (glowEl) glowEl.classList.remove('is-active');
+                if (crosshairEl) crosshairEl.classList.remove('is-active');
+            });
+
+            // 4. 电磁脉冲点击冲击波（自适应卡片专属霓虹品牌色）
+            window.addEventListener('pointerdown', e => {
+                if (e.button !== 0 || !cfg.enabled || !cfg.pulse || !pulseEl) return;
+
+                const card = e.target.closest('.link-card');
+                let color = '';
+                if (card) {
+                    color = card.style.getPropertyValue('--card-accent') || '';
+                }
+                pulseEl.style.setProperty('--pulse-color', color || 'var(--neon)');
+                pulseEl.style.setProperty('--px', (e.clientX - 25) + 'px');
+                pulseEl.style.setProperty('--py', (e.clientY - 25) + 'px');
+
+                pulseEl.classList.remove('animate');
+                void pulseEl.offsetWidth;
+                pulseEl.classList.add('animate');
+            }, { passive: true });
+        }
+
         // --- 初始化 ---
         function init() {
             migrateLegacyStorage();
@@ -2002,6 +2821,9 @@
             setInterval(updateClock, 1000);
 
             setupBattery();
+            setupWeatherInteractive();
+            setupCardScale();
+            setupMouseEffects();
             setupMemo();
             setupSearch();
             setupSidebar();

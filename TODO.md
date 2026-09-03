@@ -24,10 +24,16 @@
 - 分类数据更多可视化（分类图标 hover 动效微调）
 - 链接数量更多时考虑分页或折叠分类
 
-## 最新一次优化要点（V2.14.5）
+## 最新一次优化要点（V2.14.9）
 
-- 性能与死代码清理：彻底移除无效光标监听（`mousemove`/`mouseover`/`mousedown`）及 DOM 波纹插入；背景网格与噪点层添加 `transform: translateZ(0)` GPU 硬件加速；补齐 `wttr.in` / `icons.duckduckgo.com` DNS 预解析。
-- 核心体验增强：实时平滑周进度算法（秒级匀速流转）；图标加载多级容错链（原图标 → DuckDuckGo Favicon 镜像 → 首字母色块）；中文拼音首字母/别名智能搜索（如 `bili`、`zh`、`gh`、`ds` 等）；多引擎快捷指令分流（`g <q>`、`d <q>`、`gh <q>`、`bd <q>`、默认 Bing）。
+- 完整赛博鼠标特效矩阵与控制面板（`MOUSE_FX`）：
+  - 侧边栏控制面板：总开关按钮（`ON`/`OFF`）+ 4 组独立赛博芯片（LED 状态点、自适应高亮、持久化保存在 `v14-mouse-fx`，首屏 FOUC 预载无缝生效）。
+  - 四大硬核动效：
+    1. 环境微光（Ambient Spotlight）：柔和背景跟随，物理惯性阻尼，静止 0% 空闲占用。
+    2. 战术准星（Tactical HUD Crosshair）：精密圆环与中心点，移入卡片/按钮锁定放大并旋转 45° 变紫。
+    3. 点击脉冲（Tactical EMP Wave）：点击产生激光电磁光环，自适应提取网站专属品牌霓虹色。
+    4. 粒子尾迹（Laser Spark Trail）：光标快速滑动时释放高能等离子光斑火花流光。
+  - 纯 GPU 合成层驱动与无障碍适配：固定常驻对象池，零 GC 内存垃圾回收，触屏与 `prefers-reduced-motion` 自动静默屏蔽。
 - 双入口严格同步：机械化生成保证 `index.html` 与 `index_v3.html` 100% 结构化对齐。
 
 ## 维护规则提醒
