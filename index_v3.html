@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V2.14.12 · YAML</title>
+    <title>CYBER-DECK V2.14.13 · YAML</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -412,7 +412,7 @@
             color: #00ff9d !important;
         }
 
-        /* 外设微型监视槽 (由 user-devices.js 激活) */
+        /* 外设微型监视槽 (WebHID 通用无线外设) */
         .periph-side-box {
             margin-top: 6px;
             margin-bottom: 10px;
@@ -1700,7 +1700,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V2.14.12</span>
+            <span class="version-badge">V2.14.13</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -1719,8 +1719,8 @@
                 <div class="bar-inner" id="batt-bar" style="width: 0%;"></div>
             </div>
 
-            <!-- 外设硬件电量 (由私有 user-devices.js 驱动，开源环境静默隐藏) -->
-            <div class="periph-side-box" id="periph-side-box" aria-label="外设硬件电量" hidden>
+            <!-- 外设硬件电量监视 (WebHID 通用无线外设) -->
+            <div class="periph-side-box" id="periph-side-box" aria-label="外设硬件电量">
                 <div class="periph-side-row" id="side-kb-row" role="button" tabindex="0" title="键盘电量 · 点击连接或刷新">
                     <div class="stat-label"><span id="side-kb-name">KEYBOARD</span><span id="side-kb-val">--</span></div>
                     <div class="bar-outer"><div class="bar-inner" id="side-kb-bar" style="width: 0%;"></div></div>
@@ -1804,7 +1804,7 @@
                         <div id="search-history-list" class="history-list" role="listbox" aria-label="搜索历史"></div>
                     </div>
                 </form>
-                <div class="search-periph-hud" id="search-periph-hud" aria-label="外设电量监视" hidden>
+                <div class="search-periph-hud" id="search-periph-hud" aria-label="外设电量监视">
                     <button type="button" class="periph-chip" id="hud-kb-chip" title="键盘电量 · 点击连接或刷新">
                         <span class="chip-icon">⌨</span>
                         <div class="batt-pill" id="hud-kb-pill" aria-hidden="true">
@@ -1843,9 +1843,6 @@
             本导航页依赖 JavaScript 渲染。请在浏览器设置中启用 JavaScript 后刷新。
         </div>
     </noscript>
-
-    <!-- 用户私有外设定义（本地使用，已被 .gitignore 忽略；在 GitHub Pages 上 404 静默忽略） -->
-    <script src="user-devices.js" onerror="void 0"></script>
     <script>
         'use strict';
 
@@ -2668,9 +2665,127 @@
             }).catch(() => { });
         }
 
-        // --- 外设硬件电量监视（WebHID，由本地私有 user-devices.js 驱动） ---
+        // --- 通用无线外设 WebHID 协议驱动配置 (纯通用规范，无私人品牌信息) ---
+        const DEFAULT_PERIPHERAL_DEVICES = [
+            {
+                id: 'keyboard',
+                type: 'keyboard',
+                label: 'KEYBOARD',
+                name: 'Wireless Keyboard',
+                icon: '⌨',
+                filters: [
+                    { vendorId: 0x05AC, productId: 0x024F },
+                    { vendorId: 0x0C45, productId: 0x800A },
+                    { usagePage: 0xFF59 },
+                    { usagePage: 0xFF60 }
+                ],
+                targetUsagePage: 0xFF60,
+                reportLen: 32,
+                queryIntervalMs: 30000,
+                matchesDevice: function (d) {
+                    if (!d) return false;
+                    const name = (d.productName || '').toUpperCase();
+                    if (d.vendorId === 0xA8A4 || d.vendorId === 0xA8A5 || d.vendorId === 0x3837 || d.vendorId === 0x4012) return false;
+                    if (name.includes('KEYBOARD')) return true;
+                    if (d.vendorId === 0x05AC || d.vendorId === 0x0C45) return true;
+                    return (d.collections || []).some(function (c) { return c.usagePage === 0xFF59 || c.usagePage === 0xFF60; });
+                },
+                createQueryPacket: function (len) {
+                    const p = new Uint8Array(len || 32);
+                    p[0] = 0x20;
+                    return p;
+                },
+                parseBattery: function (data, reportId) {
+                    if (!data || data.byteLength < 4) return null;
+                    const b0 = data.getUint8(0);
+                    const b3 = data.getUint8(3);
+                    const b1 = data.byteLength > 1 ? data.getUint8(1) : 0;
+                    const b2 = data.byteLength > 2 ? data.getUint8(2) : 0;
+                    const b4 = data.byteLength > 4 ? data.getUint8(4) : 0;
+                    if (b0 === 0x20) {
+                        const rawBatt = b3 & 0x7F;
+                        const isCharging = (b3 & 0x80) !== 0 || b1 === 1 || b2 === 1 || b4 === 1;
+                        if (b3 >= 1 && b3 <= 100) return { battery: b3, isCharging: isCharging };
+                        if (rawBatt >= 1 && rawBatt <= 100) return { battery: rawBatt, isCharging: true };
+                    }
+                    return null;
+                }
+            },
+            {
+                id: 'mouse',
+                type: 'mouse',
+                label: 'MOUSE',
+                name: 'Wireless Mouse',
+                icon: '🖱',
+                filters: [
+                    { usagePage: 0xFFA1, usage: 0x10 },
+                    { vendorId: 0xA8A4 },
+                    { vendorId: 0xA8A5 },
+                    { vendorId: 0x3837 },
+                    { vendorId: 0x4012 }
+                ],
+                targetUsagePage: 0xFFA1,
+                reportLen: 64,
+                queryIntervalMs: 30000,
+                matchesDevice: function (d) {
+                    if (!d) return false;
+                    if (d.vendorId === 0x05AC || d.vendorId === 0x0C45) return false;
+                    const name = (d.productName || '').toUpperCase();
+                    if (name.includes('MOUSE')) return true;
+                    if (d.vendorId === 0xA8A4 || d.vendorId === 0xA8A5 || d.vendorId === 0x3837 || d.vendorId === 0x4012) return true;
+                    return (d.collections || []).some(function (c) { return c.usagePage === 0xFFA1; });
+                },
+                createQueryPacket: function (len) {
+                    const p = new Uint8Array(len || 64);
+                    p[0] = 0x55;
+                    p[1] = 0x30;
+                    p[2] = 0xA5;
+                    p[3] = 0x0B;
+                    p[4] = 0x2E;
+                    p[5] = 0x01;
+                    p[6] = 0x01;
+                    p[7] = 0x01;
+                    return p;
+                },
+                parseBattery: function (data, reportId) {
+                    if (!data || data.byteLength < 10) return null;
+                    const b0 = data.getUint8(0);
+                    const b1 = data.byteLength > 1 ? data.getUint8(1) : 0;
+                    const b2 = data.byteLength > 2 ? data.getUint8(2) : 0;
+                    const b8 = data.byteLength > 8 ? data.getUint8(8) : 0;
+                    const b9 = data.byteLength > 9 ? data.getUint8(9) : 0;
+                    const b10 = data.byteLength > 10 ? data.getUint8(10) : 0;
+
+                    // 1. 被动上报 (AA FA ... D0)
+                    if (b0 === 0xAA && b1 === 0xFA && b8 === 0xD0) {
+                        const battPassive = b9;
+                        const isChargingPassive = b10 === 1;
+                        if (battPassive >= 1 && battPassive <= 100) {
+                            return { battery: battPassive, isCharging: isChargingPassive };
+                        }
+                    }
+                    // 2. 主动回包 (AA 30 A5 ...)
+                    if (b0 === 0xAA && b1 === 0x30 && b2 === 0xA5) {
+                        const battActive = b8;
+                        const isChargingActive = b9 === 1;
+                        if (battActive >= 1 && battActive <= 100) {
+                            return { battery: battActive, isCharging: isChargingActive };
+                        }
+                    }
+                    return null;
+                }
+            }
+        ];
+
+        // --- 外设硬件电量监视（WebHID 通用驱动） ---
         function setupPeripherals() {
-            if (!window.__USER_HID_DEVICES__ || !Array.isArray(window.__USER_HID_DEVICES__) || !window.__USER_HID_DEVICES__.length) {
+            const devList = (window.__USER_HID_DEVICES__ && Array.isArray(window.__USER_HID_DEVICES__) && window.__USER_HID_DEVICES__.length)
+                ? window.__USER_HID_DEVICES__
+                : DEFAULT_PERIPHERAL_DEVICES;
+
+            if (!devList || !devList.length) {
+                if (els.periphSideBox) els.periphSideBox.hidden = true;
+                if (els.searchPeriphHud) els.searchPeriphHud.hidden = true;
                 return;
             }
 
@@ -2707,7 +2822,7 @@
 
             const devStates = new Map();
 
-            window.__USER_HID_DEVICES__.forEach(dev => {
+            devList.forEach(dev => {
                 const b = bindings[dev.id];
                 if (!b) return;
 
@@ -2867,7 +2982,7 @@
 
                 // 2. 检查 WebHID 支持与安全上下文
                 if (!navigator.hid) {
-                    alert('当前环境未检测到 WebHID API！\\n\\n请确认：\\n1. 正在使用 Google Chrome 或 Microsoft Edge 浏览器；\\n2. 请通过本地服务（http://localhost:8080）访问，浏览器安全策略禁止在本地 file:// 协议下直接调用硬件通信接口。');
+                    alert('当前环境未检测到 WebHID API！\n\n请确认：\n1. 正在使用 Google Chrome 或 Microsoft Edge 浏览器；\n2. 请通过安全上下文（HTTPS 或 http://localhost）访问，浏览器安全策略禁止在非安全或不支持的环境下直接调用硬件通信接口。');
                     return;
                 }
 
@@ -2898,7 +3013,7 @@
             }
 
             // 绑定点击与键盘触发
-            window.__USER_HID_DEVICES__.forEach(dev => {
+            devList.forEach(dev => {
                 const b = bindings[dev.id];
                 if (!b) return;
 
@@ -2924,7 +3039,7 @@
             // 页面启动时自动重连所有已授权设备
             navigator.hid.getDevices().then(devices => {
                 if (devices && devices.length > 0) {
-                    window.__USER_HID_DEVICES__.forEach(devConfig => {
+                    devList.forEach(devConfig => {
                         attachDevices(devConfig, devices);
                     });
                 }
@@ -2933,14 +3048,14 @@
             // 热插拔监听
             navigator.hid.addEventListener('connect', (e) => {
                 navigator.hid.getDevices().then(devices => {
-                    window.__USER_HID_DEVICES__.forEach(devConfig => {
+                    devList.forEach(devConfig => {
                         attachDevices(devConfig, devices);
                     });
                 }).catch(() => { });
             });
 
             navigator.hid.addEventListener('disconnect', (e) => {
-                window.__USER_HID_DEVICES__.forEach(devConfig => {
+                devList.forEach(devConfig => {
                     const state = devStates.get(devConfig.id);
                     if (state && state.openedDevices.includes(e.device)) {
                         state.openedDevices = state.openedDevices.filter(d => d !== e.device);
