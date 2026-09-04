@@ -14,3 +14,9 @@ Desktop.ini
 *.tmp
 *.bak
 *~
+
+# 独立测试与沙盒实验目录（不上传）
+test/
+
+# 用户私有外设配置（不上传 GitHub，保护硬件隐私）
+user-devices.js

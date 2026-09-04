@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V2.14.9</title>
+    <title>CYBER-DECK V2.14.12</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -362,19 +362,82 @@
 
         .bar-inner {
             height: 100%;
-            background: var(--neon);
-            box-shadow: 0 0 8px var(--neon);
-            transition: width 0.6s;
+            background: #00b4ff;
+            box-shadow: 0 0 8px #00b4ff;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease, box-shadow 0.4s ease;
         }
 
+        /* 充电中高能绿 */
         .bar-inner.is-charging {
-            background: #00ff9d;
-            box-shadow: 0 0 8px #00ff9d;
+            background: #00ff9d !important;
+            box-shadow: 0 0 8px #00ff9d !important;
         }
 
+        /* 低于 30%：红色警示 */
+        .bar-inner.level-low,
         .bar-inner.is-low {
-            background: #ff3366;
-            box-shadow: 0 0 8px #ff3366;
+            background: #ff3366 !important;
+            box-shadow: 0 0 8px #ff3366 !important;
+        }
+
+        /* 30% - 60%：科技蓝 */
+        .bar-inner.level-mid {
+            background: #00b4ff !important;
+            box-shadow: 0 0 8px #00b4ff !important;
+        }
+
+        /* 60% 以上：充盈安全绿 */
+        .bar-inner.level-high {
+            background: #00ff9d !important;
+            box-shadow: 0 0 8px #00ff9d !important;
+        }
+
+        /* 侧边栏电量数值文本跟随高亮 */
+        .stat-label .level-low {
+            color: #ff3366 !important;
+        }
+
+        .stat-label .level-mid {
+            color: #00b4ff !important;
+        }
+
+        .stat-label .level-high {
+            color: #00ff9d !important;
+        }
+
+        .stat-label .is-charging {
+            color: #00ff9d !important;
+        }
+
+        /* 外设微型监视槽 (由 user-devices.js 激活) */
+        .periph-side-box {
+            margin-top: 6px;
+            margin-bottom: 10px;
+            padding: 8px 10px 4px;
+            background: color-mix(in srgb, var(--text-main) 4%, transparent);
+            border-left: 2px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .periph-side-box[hidden] {
+            display: none !important;
+        }
+
+        .periph-side-row {
+            cursor: pointer;
+            padding: 2px 0;
+            transition: opacity 0.2s ease;
+            outline: none;
+        }
+
+        .periph-side-row:hover,
+        .periph-side-row:focus-visible {
+            opacity: 0.85;
+        }
+
+        .periph-side-row .bar-outer {
+            margin-bottom: 6px;
+            height: 4px;
         }
 
         /* 赛博滑动条：卡片与外框尺寸实时缩放 */
@@ -525,9 +588,240 @@
             box-shadow: 0 0 20px var(--neon);
         }
 
-        /* --- Bing 式搜索历史下拉 --- */
+        /* --- 搜索栏与外设 HUD 布局 --- */
+        .search-row {
+            display: flex;
+            align-items: stretch;
+            gap: 12px;
+            width: 100%;
+        }
+
         .search-wrap {
             position: relative;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .search-periph-hud {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .search-periph-hud[hidden] {
+            display: none !important;
+        }
+
+        .periph-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 0 14px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
+            user-select: none;
+            outline: none;
+            white-space: nowrap;
+        }
+
+        .periph-chip:hover,
+        .periph-chip:focus-visible {
+            border-color: var(--neon);
+            box-shadow: 0 0 14px color-mix(in srgb, var(--neon) 40%, transparent);
+            color: var(--neon);
+        }
+
+        .periph-chip.is-charging {
+            border-color: #00ff88;
+            color: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
+        }
+
+        .periph-chip.is-low {
+            border-color: #ff3366;
+            color: #ff3366;
+        }
+
+        .periph-chip .chip-icon {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .periph-chip .chip-val {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* 手机式精密电池图标与进度条 */
+        .batt-pill {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            user-select: none;
+            margin-left: 2px;
+        }
+
+        .batt-body {
+            position: relative;
+            width: 26px;
+            height: 13px;
+            border: 1.5px solid var(--border);
+            border-radius: 3.5px;
+            padding: 1.5px;
+            background: rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        [data-theme="light"] .batt-body {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .batt-cap {
+            width: 2px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 0 1.5px 1.5px 0;
+            margin-left: 1px;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+
+        .batt-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 1.5px;
+            background: var(--neon);
+            box-shadow: 0 0 6px color-mix(in srgb, var(--neon) 60%, transparent);
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+        }
+
+        .batt-bolt {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 9px;
+            line-height: 1;
+            color: #00ff9d;
+            text-shadow: 0 0 4px rgba(0, 255, 157, 0.8);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .batt-bolt[hidden] {
+            display: none !important;
+        }
+
+        /* 充电中高能流动动画（仿手机充电等离子波） */
+        @keyframes batt-shimmer {
+            0% { background-position: -30px 0; }
+            100% { background-position: 30px 0; }
+        }
+
+        @keyframes batt-bolt-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+            50% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+        }
+
+        .periph-chip.is-charging .batt-body {
+            border-color: #00ff9d;
+            box-shadow: 0 0 6px rgba(0, 255, 157, 0.35);
+        }
+
+        .periph-chip.is-charging .batt-cap {
+            background: #00ff9d;
+        }
+
+        .periph-chip.is-charging .batt-fill {
+            background: linear-gradient(90deg, #00d277, #72ffb6 50%, #00d277 100%);
+            background-size: 30px 100%;
+            animation: batt-shimmer 1.2s linear infinite;
+            box-shadow: 0 0 8px rgba(0, 255, 157, 0.7);
+        }
+
+        .periph-chip.is-charging .batt-bolt {
+            animation: batt-bolt-pulse 1.2s ease-in-out infinite;
+        }
+
+        /* 低电量警报 (<30%) */
+        @keyframes batt-low-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+
+        .periph-chip.level-low,
+        .periph-chip.is-low {
+            border-color: #ff3366;
+            color: #ff3366;
+        }
+
+        .periph-chip.level-low .batt-body,
+        .periph-chip.is-low .batt-body {
+            border-color: #ff3366;
+            box-shadow: 0 0 6px rgba(255, 51, 102, 0.35);
+        }
+
+        .periph-chip.level-low .batt-cap,
+        .periph-chip.is-low .batt-cap {
+            background: #ff3366;
+        }
+
+        .periph-chip.level-low .batt-fill,
+        .periph-chip.is-low .batt-fill {
+            background: #ff3366;
+            box-shadow: 0 0 6px #ff3366;
+            animation: batt-low-pulse 1.2s ease-in-out infinite;
+        }
+
+        /* 30% - 60% 科技蓝 */
+        .periph-chip.level-mid {
+            border-color: #00b4ff;
+            color: #00b4ff;
+        }
+
+        .periph-chip.level-mid .batt-body {
+            border-color: #00b4ff;
+        }
+
+        .periph-chip.level-mid .batt-cap {
+            background: #00b4ff;
+        }
+
+        .periph-chip.level-mid .batt-fill {
+            background: #00b4ff;
+            box-shadow: 0 0 6px rgba(0, 180, 255, 0.6);
+        }
+
+        /* 60% 以上 充盈安全绿 */
+        .periph-chip.level-high {
+            border-color: #00ff9d;
+            color: #00ff9d;
+        }
+
+        .periph-chip.level-high .batt-body {
+            border-color: #00ff9d;
+        }
+
+        .periph-chip.level-high .batt-cap {
+            background: #00ff9d;
+        }
+
+        .periph-chip.level-high .batt-fill {
+            background: #00ff9d;
+            box-shadow: 0 0 6px rgba(0, 255, 157, 0.6);
         }
 
         .search-wrap .search-bar {
@@ -1094,6 +1388,20 @@
                 min-width: 0;
                 width: 100%;
             }
+
+            .search-row {
+                flex-wrap: wrap;
+            }
+
+            .search-periph-hud {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .periph-chip {
+                min-height: 40px;
+                padding: 0 12px;
+            }
         }
 
         /* 方案二：全局环境光跟随磁吸暗流（Ambient Neon Spotlight） */
@@ -1389,7 +1697,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V2.14.9</span>
+            <span class="version-badge">V2.14.12</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -1406,6 +1714,18 @@
             <div class="stat-label"><span id="batt-label">POWER</span><span id="batt-val">--</span></div>
             <div class="bar-outer">
                 <div class="bar-inner" id="batt-bar" style="width: 0%;"></div>
+            </div>
+
+            <!-- 外设硬件电量 (由私有 user-devices.js 驱动，开源环境静默隐藏) -->
+            <div class="periph-side-box" id="periph-side-box" aria-label="外设硬件电量" hidden>
+                <div class="periph-side-row" id="side-kb-row" role="button" tabindex="0" title="键盘电量 · 点击连接或刷新">
+                    <div class="stat-label"><span id="side-kb-name">KEYBOARD</span><span id="side-kb-val">--</span></div>
+                    <div class="bar-outer"><div class="bar-inner" id="side-kb-bar" style="width: 0%;"></div></div>
+                </div>
+                <div class="periph-side-row" id="side-mouse-row" role="button" tabindex="0" title="鼠标电量 · 点击连接或刷新">
+                    <div class="stat-label"><span id="side-mouse-name">MOUSE</span><span id="side-mouse-val">--</span></div>
+                    <div class="bar-outer"><div class="bar-inner" id="side-mouse-bar" style="width: 0%;"></div></div>
+                </div>
             </div>
 
             <div class="stat-label"><span>WEEK_FLOW</span><span id="week-val">0%</span></div>
@@ -1464,22 +1784,48 @@
                 <span class="hint-tag"><kbd>gh</kbd> GitHub</span>
                 <span class="hint-tag"><kbd>bd</kbd> 百度</span>
             </div>
-            <form class="search-wrap" id="search-form" role="search" aria-label="全局搜索">
-                <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
-                       autocomplete="off" role="combobox" aria-label="搜索链接" aria-describedby="search-hint"
-                       aria-controls="search-history-list" aria-haspopup="listbox" aria-autocomplete="list"
-                       aria-expanded="false">
-                <button type="button" class="search-clear" id="search-clear" aria-label="清空搜索" title="清空搜索" hidden>✕</button>
-                <button type="submit" class="search-go" id="search-go" aria-label="搜索（支持前缀分流：g/d/gh/bd）" title="搜索（g:Google  d:DeepSeek  gh:GitHub  bd:百度）">🔍</button>
-                <!-- 弹层容器不带 listbox 语义：清除按钮不能作为 option 的兄弟节点存在于 listbox 内 -->
-                <div id="search-history" class="search-history" hidden>
-                    <div class="history-head">
-                        <span>SEARCH_HISTORY</span>
-                        <button type="button" class="history-clear" id="history-clear">清除历史</button>
+            <div class="search-row">
+                <form class="search-wrap" id="search-form" role="search" aria-label="全局搜索">
+                    <input type="text" class="search-bar" id="search-in" placeholder="Query Global Intelligence..."
+                           autocomplete="off" role="combobox" aria-label="搜索链接" aria-describedby="search-hint"
+                           aria-controls="search-history-list" aria-haspopup="listbox" aria-autocomplete="list"
+                           aria-expanded="false">
+                    <button type="button" class="search-clear" id="search-clear" aria-label="清空搜索" title="清空搜索" hidden>✕</button>
+                    <button type="submit" class="search-go" id="search-go" aria-label="搜索（支持前缀分流：g/d/gh/bd）" title="搜索（g:Google  d:DeepSeek  gh:GitHub  bd:百度）">🔍</button>
+                    <!-- 弹层容器不带 listbox 语义：清除按钮不能作为 option 的兄弟节点存在于 listbox 内 -->
+                    <div id="search-history" class="search-history" hidden>
+                        <div class="history-head">
+                            <span>SEARCH_HISTORY</span>
+                            <button type="button" class="history-clear" id="history-clear">清除历史</button>
+                        </div>
+                        <div id="search-history-list" class="history-list" role="listbox" aria-label="搜索历史"></div>
                     </div>
-                    <div id="search-history-list" class="history-list" role="listbox" aria-label="搜索历史"></div>
+                </form>
+                <div class="search-periph-hud" id="search-periph-hud" aria-label="外设电量监视" hidden>
+                    <button type="button" class="periph-chip" id="hud-kb-chip" title="键盘电量 · 点击连接或刷新">
+                        <span class="chip-icon">⌨</span>
+                        <div class="batt-pill" id="hud-kb-pill" aria-hidden="true">
+                            <div class="batt-body">
+                                <div class="batt-fill" id="hud-kb-fill" style="width: 0%;"></div>
+                                <span class="batt-bolt" id="hud-kb-bolt" hidden>⚡</span>
+                            </div>
+                            <div class="batt-cap"></div>
+                        </div>
+                        <span class="chip-val" id="hud-kb-val">--</span>
+                    </button>
+                    <button type="button" class="periph-chip" id="hud-mouse-chip" title="鼠标电量 · 点击连接或刷新">
+                        <span class="chip-icon">🖱</span>
+                        <div class="batt-pill" id="hud-mouse-pill" aria-hidden="true">
+                            <div class="batt-body">
+                                <div class="batt-fill" id="hud-mouse-fill" style="width: 0%;"></div>
+                                <span class="batt-bolt" id="hud-mouse-bolt" hidden>⚡</span>
+                            </div>
+                            <div class="batt-cap"></div>
+                        </div>
+                        <span class="chip-val" id="hud-mouse-val">--</span>
+                    </button>
                 </div>
-            </form>
+            </div>
         </div>
 
         <!-- 结果数专用播报区：live 区域必须足够小，否则每次搜索都会重读整个链接看板 -->
@@ -1495,6 +1841,8 @@
         </div>
     </noscript>
 
+    <!-- 用户私有外设定义（本地使用，已被 .gitignore 忽略；在 GitHub Pages 上 404 静默忽略） -->
+    <script src="user-devices.js" onerror="void 0"></script>
     <script>
         'use strict';
 
@@ -1574,6 +1922,26 @@
             battVal: byId('batt-val'),
             battBar: byId('batt-bar'),
             battLabel: byId('batt-label'),
+            periphSideBox: byId('periph-side-box'),
+            sideKbRow: byId('side-kb-row'),
+            sideKbName: byId('side-kb-name'),
+            sideKbVal: byId('side-kb-val'),
+            sideKbBar: byId('side-kb-bar'),
+            sideMouseRow: byId('side-mouse-row'),
+            sideMouseName: byId('side-mouse-name'),
+            sideMouseVal: byId('side-mouse-val'),
+            sideMouseBar: byId('side-mouse-bar'),
+            searchPeriphHud: byId('search-periph-hud'),
+            hudKbChip: byId('hud-kb-chip'),
+            hudKbPill: byId('hud-kb-pill'),
+            hudKbFill: byId('hud-kb-fill'),
+            hudKbBolt: byId('hud-kb-bolt'),
+            hudKbVal: byId('hud-kb-val'),
+            hudMouseChip: byId('hud-mouse-chip'),
+            hudMousePill: byId('hud-mouse-pill'),
+            hudMouseFill: byId('hud-mouse-fill'),
+            hudMouseBolt: byId('hud-mouse-bolt'),
+            hudMouseVal: byId('hud-mouse-val'),
             memoIn: byId('memo-in'),
             memoList: byId('memo-list')
         };
@@ -2170,6 +2538,34 @@
             });
         }
 
+        // --- 电量等级颜色分级辅助函数 (<30% 红色, 30%-60% 蓝色, >60% 绿色, 充电高能绿) ---
+        function applyBatteryTier(barEl, valEl, pct, isCharging) {
+            if (barEl) {
+                barEl.classList.remove('level-low', 'level-mid', 'level-high', 'is-low', 'is-charging');
+                if (isCharging) {
+                    barEl.classList.add('is-charging');
+                } else if (pct < 30) {
+                    barEl.classList.add('level-low', 'is-low');
+                } else if (pct <= 60) {
+                    barEl.classList.add('level-mid');
+                } else {
+                    barEl.classList.add('level-high');
+                }
+            }
+            if (valEl) {
+                valEl.classList.remove('level-low', 'level-mid', 'level-high', 'is-charging');
+                if (isCharging) {
+                    valEl.classList.add('is-charging');
+                } else if (pct < 30) {
+                    valEl.classList.add('level-low');
+                } else if (pct <= 60) {
+                    valEl.classList.add('level-mid');
+                } else {
+                    valEl.classList.add('level-high');
+                }
+            }
+        }
+
         // --- 电量：带降级（API 不存在时不报错） ---
         function setupBattery() {
             if (!navigator.getBattery) {
@@ -2183,15 +2579,317 @@
             navigator.getBattery().then(b => {
                 const fn = () => {
                     const pct = Math.round(b.level * 100);
-                    els.battVal.textContent = (b.charging ? '⚡ ' : '') + pct + '%';
-                    els.battBar.classList.toggle('is-charging', Boolean(b.charging));
-                    els.battBar.classList.toggle('is-low', !b.charging && b.level <= 0.2);
-                    els.battBar.style.width = b.level * 100 + '%';
+                    const isCharging = Boolean(b.charging);
+                    els.battVal.textContent = (isCharging ? '⚡ ' : '') + pct + '%';
+                    els.battBar.style.width = pct + '%';
+                    applyBatteryTier(els.battBar, els.battVal, pct, isCharging);
                 };
                 fn();
                 b.addEventListener('levelchange', fn);
                 b.addEventListener('chargingchange', fn);
             }).catch(() => { });
+        }
+
+        // --- 外设硬件电量监视（WebHID，由本地私有 user-devices.js 驱动） ---
+        function setupPeripherals() {
+            if (!window.__USER_HID_DEVICES__ || !Array.isArray(window.__USER_HID_DEVICES__) || !window.__USER_HID_DEVICES__.length) {
+                return;
+            }
+
+            // 揭示 HUD 与侧边栏容器
+            if (els.periphSideBox) els.periphSideBox.hidden = false;
+            if (els.searchPeriphHud) els.searchPeriphHud.hidden = false;
+
+            const bindings = {
+                keyboard: {
+                    chip: els.hudKbChip,
+                    chipVal: els.hudKbVal,
+                    chipFill: els.hudKbFill,
+                    chipBolt: els.hudKbBolt,
+                    row: els.sideKbRow,
+                    sideName: els.sideKbName,
+                    sideVal: els.sideKbVal,
+                    sideBar: els.sideKbBar,
+                    defaultIcon: '⌨',
+                    defaultLabel: 'KEYBOARD'
+                },
+                mouse: {
+                    chip: els.hudMouseChip,
+                    chipVal: els.hudMouseVal,
+                    chipFill: els.hudMouseFill,
+                    chipBolt: els.hudMouseBolt,
+                    row: els.sideMouseRow,
+                    sideName: els.sideMouseName,
+                    sideVal: els.sideMouseVal,
+                    sideBar: els.sideMouseBar,
+                    defaultIcon: '🖱',
+                    defaultLabel: 'MOUSE'
+                }
+            };
+
+            const devStates = new Map();
+
+            window.__USER_HID_DEVICES__.forEach(dev => {
+                const b = bindings[dev.id];
+                if (!b) return;
+
+                const state = {
+                    config: dev,
+                    openedDevices: [],
+                    battery: null,
+                    isCharging: false,
+                    lastBattery: null,
+                    pollTimer: null,
+                    onInput: null
+                };
+
+                state.onInput = (e) => {
+                    try {
+                        const parsed = dev.parseBattery(e.data, e.reportId);
+                        if (parsed && typeof parsed.battery === 'number') {
+                            updateDeviceUI(dev.id, parsed.battery, parsed.isCharging);
+                        }
+                    } catch (err) { }
+                };
+
+                devStates.set(dev.id, state);
+
+                if (b.sideName) b.sideName.textContent = (dev.icon || b.defaultIcon) + ' ' + (dev.label || b.defaultLabel);
+                const title = (dev.name || b.defaultLabel) + ' · 点击连接或刷新';
+                if (b.chip) b.chip.title = title;
+                if (b.row) b.row.title = title;
+            });
+
+            function updateDeviceUI(devId, battery, isCharging) {
+                const b = bindings[devId];
+                if (!b) return;
+                const state = devStates.get(devId);
+                if (state) {
+                    if (state.lastBattery !== null && battery > state.lastBattery) {
+                        isCharging = true;
+                    }
+                    state.lastBattery = battery;
+                    state.battery = battery;
+                    state.isCharging = Boolean(isCharging);
+                }
+
+                const chargingMark = isCharging ? '⚡ ' : '';
+                const pct = Math.min(100, Math.max(0, battery));
+
+                if (b.sideVal) b.sideVal.textContent = chargingMark + pct + '%';
+                if (b.sideBar) {
+                    b.sideBar.style.width = pct + '%';
+                }
+                applyBatteryTier(b.sideBar, b.sideVal, pct, Boolean(isCharging));
+
+                if (b.chipVal) b.chipVal.textContent = (isCharging ? '⚡' : '') + pct + '%';
+                if (b.chipFill) b.chipFill.style.width = pct + '%';
+                if (b.chipBolt) b.chipBolt.hidden = !isCharging;
+                if (b.chip) {
+                    b.chip.classList.remove('level-low', 'level-mid', 'level-high', 'is-low', 'is-charging');
+                    if (isCharging) {
+                        b.chip.classList.add('is-charging');
+                    } else if (pct < 30) {
+                        b.chip.classList.add('level-low', 'is-low');
+                    } else if (pct <= 60) {
+                        b.chip.classList.add('level-mid');
+                    } else {
+                        b.chip.classList.add('level-high');
+                    }
+                    const devName = state && state.config ? state.config.name : b.defaultLabel;
+                    b.chip.title = `${devName}: ${pct}%${isCharging ? ' (充电中)' : ''} · 点击刷新`;
+                }
+                if (b.row) {
+                    const devName = state && state.config ? state.config.name : b.defaultLabel;
+                    b.row.title = `${devName}: ${pct}%${isCharging ? ' (充电中)' : ''} · 点击刷新`;
+                }
+            }
+
+            async function queryDevice(state) {
+                if (!state || !state.openedDevices || state.openedDevices.length === 0 || !state.config.createQueryPacket) return;
+
+                for (const d of state.openedDevices) {
+                    if (!d.opened) continue;
+                    const c0 = (d.collections && d.collections[0]) || {};
+                    const outReports = c0.outputReports || [];
+
+                    if (outReports.length > 0) {
+                        for (const outRep of outReports) {
+                            const repId = outRep.reportId || 0;
+                            const bits = (outRep.items || []).reduce((sum, it) => sum + ((it.reportSize || 0) * (it.reportCount || 0)), 0);
+                            const expectedLen = (bits > 0) ? Math.ceil(bits / 8) : (state.config.reportLen || 64);
+                            const packet = state.config.createQueryPacket(expectedLen);
+                            try {
+                                await d.sendReport(repId, packet);
+                            } catch (e1) {
+                                try {
+                                    await d.sendReport(0, packet);
+                                } catch (e2) { }
+                            }
+                        }
+                    } else {
+                        try {
+                            const packet = state.config.createQueryPacket(state.config.reportLen || 64);
+                            await d.sendReport(0, packet);
+                        } catch (e) { }
+                    }
+                }
+            }
+
+            async function attachDevices(devConfig, candidateDevices) {
+                if (!candidateDevices || candidateDevices.length === 0) return;
+                const state = devStates.get(devConfig.id);
+                if (!state) return;
+
+                const matched = candidateDevices.filter(d => devConfig.matchesDevice(d));
+                if (matched.length === 0) return;
+
+                // 优先把包含 targetUsagePage 的通道排在前面
+                matched.sort((a, b) => {
+                    const hasA = (a.collections || []).some(c => c.usagePage === devConfig.targetUsagePage);
+                    const hasB = (b.collections || []).some(c => c.usagePage === devConfig.targetUsagePage);
+                    return (hasB ? 1 : 0) - (hasA ? 1 : 0);
+                });
+
+                for (const d of matched) {
+                    try {
+                        if (!d.opened) {
+                            await d.open();
+                        }
+                        d.removeEventListener('inputreport', state.onInput);
+                        d.addEventListener('inputreport', state.onInput);
+                        if (!state.openedDevices.includes(d)) {
+                            state.openedDevices.push(d);
+                        }
+                    } catch (err) {
+                        // 系统保护的基础键盘/鼠标接口开启失败时静默跳过，继续打开专属厂商遥测通道
+                    }
+                }
+
+                if (state.openedDevices.length > 0) {
+                    setTimeout(() => queryDevice(state), 200);
+                    if (!state.pollTimer) {
+                        state.pollTimer = setInterval(() => queryDevice(state), devConfig.queryIntervalMs || 30000);
+                    }
+                }
+            }
+
+            async function handleTrigger(devConfig) {
+                const state = devStates.get(devConfig.id);
+                const b = bindings[devConfig.id];
+
+                // 1. 如果已有打开接口，立即执行查询刷新
+                if (state && state.openedDevices && state.openedDevices.length > 0) {
+                    if (b && b.chipVal && b.chipVal.textContent === '--') {
+                        b.chipVal.textContent = '...';
+                    }
+                    await queryDevice(state);
+                    return;
+                }
+
+                // 2. 检查 WebHID 支持与安全上下文
+                if (!navigator.hid) {
+                    alert('当前环境未检测到 WebHID API！\\n\\n请确认：\\n1. 正在使用 Google Chrome 或 Microsoft Edge 浏览器；\\n2. 请通过本地服务（http://localhost:8080）访问，浏览器安全策略禁止在本地 file:// 协议下直接调用硬件通信接口。');
+                    return;
+                }
+
+                // 3. 尝试从已授权设备中静默恢复
+                try {
+                    const existing = await navigator.hid.getDevices();
+                    await attachDevices(devConfig, existing);
+                    if (state && state.openedDevices && state.openedDevices.length > 0) return;
+                } catch (e) { }
+
+                // 4. 弹出设备选择框
+                try {
+                    if (b && b.chipVal && b.chipVal.textContent === '--') b.chipVal.textContent = '...';
+                    let selected = await navigator.hid.requestDevice({ filters: devConfig.filters || [] });
+                    if (!selected || selected.length === 0) {
+                        selected = await navigator.hid.requestDevice({ filters: [] });
+                    }
+                    if (selected && selected.length > 0) {
+                        const allGranted = await navigator.hid.getDevices();
+                        await attachDevices(devConfig, allGranted.length > 0 ? allGranted : selected);
+                    } else {
+                        if (b && b.chipVal && b.chipVal.textContent === '...') b.chipVal.textContent = '--';
+                    }
+                } catch (e) {
+                    if (b && b.chipVal && b.chipVal.textContent === '...') b.chipVal.textContent = '--';
+                    console.warn('[CYBER-HID] 授权取消或异常:', e);
+                }
+            }
+
+            // 绑定点击与键盘触发
+            window.__USER_HID_DEVICES__.forEach(dev => {
+                const b = bindings[dev.id];
+                if (!b) return;
+
+                const onAction = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleTrigger(dev);
+                };
+
+                if (b.chip) b.chip.addEventListener('click', onAction);
+                if (b.row) {
+                    b.row.addEventListener('click', onAction);
+                    b.row.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            onAction(e);
+                        }
+                    });
+                }
+            });
+
+            if (!navigator.hid) return;
+
+            // 页面启动时自动重连所有已授权设备
+            navigator.hid.getDevices().then(devices => {
+                if (devices && devices.length > 0) {
+                    window.__USER_HID_DEVICES__.forEach(devConfig => {
+                        attachDevices(devConfig, devices);
+                    });
+                }
+            }).catch(() => { });
+
+            // 热插拔监听
+            navigator.hid.addEventListener('connect', (e) => {
+                navigator.hid.getDevices().then(devices => {
+                    window.__USER_HID_DEVICES__.forEach(devConfig => {
+                        attachDevices(devConfig, devices);
+                    });
+                }).catch(() => { });
+            });
+
+            navigator.hid.addEventListener('disconnect', (e) => {
+                window.__USER_HID_DEVICES__.forEach(devConfig => {
+                    const state = devStates.get(devConfig.id);
+                    if (state && state.openedDevices.includes(e.device)) {
+                        state.openedDevices = state.openedDevices.filter(d => d !== e.device);
+                        if (state.openedDevices.length === 0) {
+                            if (state.pollTimer) {
+                                clearInterval(state.pollTimer);
+                                state.pollTimer = null;
+                            }
+                            const b = bindings[devConfig.id];
+                            if (b) {
+                                if (b.sideVal) {
+                                    b.sideVal.textContent = 'OFF';
+                                    b.sideVal.classList.remove('level-low', 'level-mid', 'level-high', 'is-charging');
+                                }
+                                if (b.sideBar) {
+                                    b.sideBar.style.width = '0%';
+                                    b.sideBar.classList.remove('level-low', 'level-mid', 'level-high', 'is-low', 'is-charging');
+                                }
+                                if (b.chipVal) b.chipVal.textContent = '--';
+                                if (b.chipFill) b.chipFill.style.width = '0%';
+                                if (b.chipBolt) b.chipBolt.hidden = true;
+                                if (b.chip) b.chip.classList.remove('level-low', 'level-mid', 'level-high', 'is-low', 'is-charging');
+                            }
+                        }
+                    }
+                });
+            });
         }
 
         // --- 备忘录：事件委托 + 安全持久化 ---
@@ -2821,6 +3519,7 @@
             setInterval(updateClock, 1000);
 
             setupBattery();
+            setupPeripherals();
             setupWeatherInteractive();
             setupCardScale();
             setupMouseEffects();
