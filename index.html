@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V2.14.13</title>
+    <title>CYBER-DECK V2.14.14</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -1697,7 +1697,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V2.14.13</span>
+            <span class="version-badge">V2.14.14</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -2618,17 +2618,26 @@
                     return p;
                 },
                 parseBattery: function (data, reportId) {
-                    if (!data || data.byteLength < 4) return null;
+                    if (!data || data.byteLength < 3) return null;
                     const b0 = data.getUint8(0);
-                    const b3 = data.getUint8(3);
                     const b1 = data.byteLength > 1 ? data.getUint8(1) : 0;
                     const b2 = data.byteLength > 2 ? data.getUint8(2) : 0;
+                    const b3 = data.byteLength > 3 ? data.getUint8(3) : 0;
                     const b4 = data.byteLength > 4 ? data.getUint8(4) : 0;
                     if (b0 === 0x20) {
                         const rawBatt = b3 & 0x7F;
                         const isCharging = (b3 & 0x80) !== 0 || b1 === 1 || b2 === 1 || b4 === 1;
                         if (b3 >= 1 && b3 <= 100) return { battery: b3, isCharging: isCharging };
                         if (rawBatt >= 1 && rawBatt <= 100) return { battery: rawBatt, isCharging: true };
+                        if (b2 >= 1 && b2 <= 100) return { battery: b2, isCharging: isCharging };
+                    } else if (reportId === 0x20) {
+                        if (b3 >= 1 && b3 <= 100) {
+                            const isCharging = (b3 & 0x80) !== 0 || b1 === 1 || b2 === 1 || b4 === 1;
+                            return { battery: b3, isCharging: isCharging };
+                        } else if (b2 >= 1 && b2 <= 100) {
+                            const isCharging = (b2 & 0x80) !== 0 || b0 === 1 || b1 === 1 || b3 === 1;
+                            return { battery: b2, isCharging: isCharging };
+                        }
                     }
                     return null;
                 }
@@ -2753,10 +2762,22 @@
                     openedDevices: [],
                     battery: null,
                     isCharging: false,
+                    isChargingLocked: false,
                     lastBattery: null,
                     pollTimer: null,
                     onInput: null
                 };
+
+                // 恢复此前缓存的硬件遥测状态（防止刷新页面时丢失上次已知电量与充电锁定状态）
+                const saved = LS.get('cyber-v14-periph-' + dev.id, null);
+                if (saved && typeof saved === 'object') {
+                    if (typeof saved.battery === 'number') {
+                        state.battery = saved.battery;
+                        state.lastBattery = typeof saved.lastBattery === 'number' ? saved.lastBattery : saved.battery;
+                        state.isChargingLocked = Boolean(saved.isChargingLocked);
+                        state.isCharging = Boolean(saved.isCharging);
+                    }
+                }
 
                 state.onInput = (e) => {
                     try {
@@ -2770,22 +2791,53 @@
                 devStates.set(dev.id, state);
 
                 if (b.sideName) b.sideName.textContent = (dev.icon || b.defaultIcon) + ' ' + (dev.label || b.defaultLabel);
-                const title = (dev.name || b.defaultLabel) + ' · 点击连接或刷新';
+                const title = (dev.name || b.defaultLabel) + (dev.id === 'keyboard' ? ' · 单击刷新 / 双击切换充电' : ' · 点击连接或刷新');
                 if (b.chip) b.chip.title = title;
                 if (b.row) b.row.title = title;
+
+                if (typeof state.battery === 'number') {
+                    updateDeviceUI(dev.id, state.battery, state.isCharging, false);
+                }
             });
 
-            function updateDeviceUI(devId, battery, isCharging) {
+            function updateDeviceUI(devId, battery, isCharging, persist = true) {
                 const b = bindings[devId];
                 if (!b) return;
                 const state = devStates.get(devId);
                 if (state) {
-                    if (state.lastBattery !== null && battery > state.lastBattery) {
+                    if (isCharging) {
+                        state.isChargingLocked = true;
+                    } else if (devId === 'keyboard') {
+                        // 键盘在 2.4G 无线模式下仅回传数值，不单独置位硬件充电 bit
+                        // 采用电量增长与趋势保持算法锁定充电状态，直到物理电量下降时解除锁定
+                        if (state.lastBattery !== null) {
+                            if (battery > state.lastBattery) {
+                                state.isChargingLocked = true;
+                            } else if (battery < state.lastBattery) {
+                                state.isChargingLocked = false;
+                            }
+                        }
+                    } else {
+                        // 鼠标具备明确硬件充电位 (0x01)，以硬件回传为准实时同步
+                        state.isChargingLocked = Boolean(isCharging);
+                    }
+
+                    if (state.isChargingLocked) {
                         isCharging = true;
                     }
                     state.lastBattery = battery;
                     state.battery = battery;
                     state.isCharging = Boolean(isCharging);
+
+                    if (persist) {
+                        LS.set('cyber-v14-periph-' + devId, {
+                            battery: state.battery,
+                            lastBattery: state.lastBattery,
+                            isCharging: state.isCharging,
+                            isChargingLocked: state.isChargingLocked,
+                            time: Date.now()
+                        });
+                    }
                 }
 
                 const chargingMark = isCharging ? '⚡ ' : '';
@@ -2812,11 +2864,13 @@
                         b.chip.classList.add('level-high');
                     }
                     const devName = state && state.config ? state.config.name : b.defaultLabel;
-                    b.chip.title = `${devName}: ${pct}%${isCharging ? ' (充电中)' : ''} · 点击刷新`;
+                    const tipSuffix = devId === 'keyboard' ? ' · 单击刷新 / 双击切换充电' : ' · 点击刷新';
+                    b.chip.title = `${devName}: ${pct}%${isCharging ? ' (充电中)' : ''}${tipSuffix}`;
                 }
                 if (b.row) {
                     const devName = state && state.config ? state.config.name : b.defaultLabel;
-                    b.row.title = `${devName}: ${pct}%${isCharging ? ' (充电中)' : ''} · 点击刷新`;
+                    const tipSuffix = devId === 'keyboard' ? ' · 单击刷新 / 双击切换充电' : ' · 点击刷新';
+                    b.row.title = `${devName}: ${pct}%${isCharging ? ' (充电中)' : ''}${tipSuffix}`;
                 }
             }
 
@@ -2934,7 +2988,7 @@
                 }
             }
 
-            // 绑定点击与键盘触发
+            // 绑定点击、双击与键盘触发
             devList.forEach(dev => {
                 const b = bindings[dev.id];
                 if (!b) return;
@@ -2945,9 +2999,23 @@
                     handleTrigger(dev);
                 };
 
-                if (b.chip) b.chip.addEventListener('click', onAction);
+                const onDblClick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const state = devStates.get(dev.id);
+                    if (state) {
+                        state.isChargingLocked = !state.isChargingLocked;
+                        updateDeviceUI(dev.id, typeof state.battery === 'number' ? state.battery : 100, state.isChargingLocked);
+                    }
+                };
+
+                if (b.chip) {
+                    b.chip.addEventListener('click', onAction);
+                    b.chip.addEventListener('dblclick', onDblClick);
+                }
                 if (b.row) {
                     b.row.addEventListener('click', onAction);
+                    b.row.addEventListener('dblclick', onDblClick);
                     b.row.addEventListener('keydown', (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             onAction(e);
