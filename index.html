@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V3.0.1</title>
+    <title>CYBER-DECK V3.0.2</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -1839,7 +1839,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V3.0.1</span>
+            <span class="version-badge">V3.0.2</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -2749,7 +2749,7 @@
                 ],
                 targetUsagePage: 0xFF60,
                 reportLen: 32,
-                queryIntervalMs: 15000,
+                queryIntervalMs: 180000,
                 matchesDevice: function (d) {
                     if (!d) return false;
                     const name = (d.productName || '').toUpperCase();
@@ -2803,7 +2803,7 @@
                 ],
                 targetUsagePage: 0xFFA1,
                 reportLen: 64,
-                queryIntervalMs: 30000,
+                queryIntervalMs: 180000,
                 matchesDevice: function (d) {
                     if (!d) return false;
                     if (d.vendorId === 0x05AC || d.vendorId === 0x0C45) return false;
@@ -3059,9 +3059,17 @@
             }
 
             async function queryDevice(state) {
+                if (document.hidden) return;
                 if (!state || !state.openedDevices || state.openedDevices.length === 0 || !state.config.createQueryPacket) return;
 
-                for (const d of state.openedDevices) {
+                const targetUsagePage = state.config.targetUsagePage;
+                let targets = state.openedDevices;
+                if (targetUsagePage) {
+                    const matched = state.openedDevices.filter(d => (d.collections || []).some(c => c.usagePage === targetUsagePage));
+                    if (matched.length > 0) targets = matched;
+                }
+
+                for (const d of targets) {
                     if (!d.opened) continue;
                     const c0 = (d.collections && d.collections[0]) || {};
                     const outReports = c0.outputReports || [];
@@ -3086,6 +3094,22 @@
                             await d.sendReport(0, packet);
                         } catch (e) { }
                     }
+                }
+            }
+
+            function startDevicePolling(state) {
+                if (document.hidden) return;
+                if (!state.pollTimer) {
+                    state.pollTimer = setInterval(() => {
+                        if (!document.hidden) queryDevice(state);
+                    }, state.config.queryIntervalMs || 180000);
+                }
+            }
+
+            function stopDevicePolling(state) {
+                if (state.pollTimer) {
+                    clearInterval(state.pollTimer);
+                    state.pollTimer = null;
                 }
             }
 
@@ -3128,9 +3152,7 @@
                         }
                     }
                     setTimeout(() => queryDevice(state), 200);
-                    if (!state.pollTimer) {
-                        state.pollTimer = setInterval(() => queryDevice(state), devConfig.queryIntervalMs || 15000);
-                    }
+                    startDevicePolling(state);
                 }
             }
 
@@ -3260,10 +3282,7 @@
                     if (state && state.openedDevices.includes(e.device)) {
                         state.openedDevices = state.openedDevices.filter(d => d !== e.device);
                         if (state.openedDevices.length === 0) {
-                            if (state.pollTimer) {
-                                clearInterval(state.pollTimer);
-                                state.pollTimer = null;
-                            }
+                            stopDevicePolling(state);
                             const b = bindings[devConfig.id];
                             if (b) {
                                 if (b.sideVal) {
@@ -3283,6 +3302,22 @@
                         }
                     }
                 });
+            });
+
+            // 页面可见性管理：后台休眠与超低功耗绿色节能架构
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    // 切入后台/最小化/息屏锁屏时彻底停用轮询，允许无线外设进入深度休眠(<0.05mA)
+                    devStates.forEach(state => stopDevicePolling(state));
+                } else {
+                    // 切回前台时即刻下发一次查询刷新，并恢复低频节能轮询
+                    devStates.forEach(state => {
+                        if (state.openedDevices && state.openedDevices.length > 0) {
+                            queryDevice(state);
+                            startDevicePolling(state);
+                        }
+                    });
+                }
             });
         }
 
