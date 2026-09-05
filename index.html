@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V2.14.15</title>
+    <title>CYBER-DECK V2.14.17</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -614,15 +614,16 @@
         }
 
         .periph-chip {
+            position: relative;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            padding: 0 14px;
+            padding: 0 12px;
             background: var(--panel);
-            border: 1px solid var(--border);
+            border: 1px solid var(--batt-color, var(--border));
             border-radius: 15px;
-            color: var(--text-main);
+            color: var(--batt-color, var(--text-main));
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
             cursor: pointer;
@@ -631,6 +632,8 @@
             user-select: none;
             outline: none;
             white-space: nowrap;
+            overflow: hidden;
+            box-shadow: 0 0 8px color-mix(in srgb, var(--batt-color, var(--border)) 20%, transparent);
         }
 
         .periph-chip:hover,
@@ -640,15 +643,59 @@
             color: var(--neon);
         }
 
-        .periph-chip.is-charging {
-            border-color: #00ff88;
-            color: #00ff88;
-            box-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
+        /* 保证大框内部的所有文字、图标浮在流体波浪之上清晰可辨 */
+        .periph-chip > *:not(.chip-liquid-fill) {
+            position: relative;
+            z-index: 2;
         }
 
-        .periph-chip.is-low {
-            border-color: #ff3366;
-            color: #ff3366;
+        /* 大框内部的高透流体波浪容器 */
+        .chip-liquid-fill {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            background: color-mix(in srgb, var(--batt-color, var(--neon)) 22%, transparent);
+            box-shadow: inset 0 0 5px color-mix(in srgb, var(--batt-color, var(--neon)) 35%, transparent),
+                        2px 0 6px color-mix(in srgb, var(--batt-color, var(--neon)) 50%, transparent);
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 大框流体第一层：高透渐变光底 (透明度高，随电量右侧高亮) */
+        .chip-liquid-fill::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                color-mix(in srgb, var(--batt-color, var(--neon)) 15%, transparent) 0%,
+                color-mix(in srgb, var(--batt-color, var(--neon)) 35%, transparent) 75%,
+                color-mix(in srgb, var(--batt-color, var(--neon)) 60%, transparent) 100%
+            );
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        /* 大框流体第二层：从左向右奔流的宽幅起伏波浪 */
+        .chip-liquid-fill::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            bottom: -6px;
+            left: 0;
+            width: 300%;
+            background-image:
+                radial-gradient(ellipse 14px 7px at 14px 6px, color-mix(in srgb, var(--batt-color, var(--neon)) 65%, transparent) 45%, transparent 60%),
+                radial-gradient(ellipse 14px 7px at 28px 22px, color-mix(in srgb, var(--batt-color, var(--neon)) 45%, transparent) 45%, transparent 60%);
+            background-size: 28px 100%;
+            background-repeat: repeat-x;
+            animation: batt-liquid-wave 2.2s linear infinite;
+            mix-blend-mode: screen;
+            pointer-events: none;
         }
 
         .periph-chip .chip-icon {
@@ -674,38 +721,81 @@
             position: relative;
             width: 26px;
             height: 13px;
-            border: 1.5px solid var(--border);
+            border: 1.5px solid var(--batt-color, var(--border));
             border-radius: 3.5px;
             padding: 1.5px;
-            background: rgba(0, 0, 0, 0.35);
+            background: rgba(0, 0, 0, 0.45);
             display: flex;
             align-items: center;
             overflow: hidden;
             box-sizing: border-box;
+            box-shadow: 0 0 6px color-mix(in srgb, var(--batt-color, var(--border)) 35%, transparent);
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         [data-theme="light"] .batt-body {
-            background: rgba(0, 0, 0, 0.06);
+            background: rgba(0, 0, 0, 0.08);
         }
 
         .batt-cap {
             width: 2px;
             height: 6px;
-            background: var(--border);
+            background: var(--batt-color, var(--border));
             border-radius: 0 1.5px 1.5px 0;
             margin-left: 1px;
             box-sizing: border-box;
             transition: background-color 0.3s ease;
         }
 
+        /* 核心高透流体波浪容器 */
         .batt-fill {
+            position: relative;
             height: 100%;
             width: 0%;
             border-radius: 1.5px;
-            background: var(--neon);
-            box-shadow: 0 0 6px color-mix(in srgb, var(--neon) 60%, transparent);
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+            background: color-mix(in srgb, var(--batt-color, var(--neon)) 28%, transparent);
+            box-shadow: inset 0 0 3px color-mix(in srgb, var(--batt-color, var(--neon)) 45%, transparent),
+                        1px 0 4px color-mix(in srgb, var(--batt-color, var(--neon)) 65%, transparent);
+            overflow: hidden;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 第一层：高透渐变光底 (透明度高，随电量右侧高亮) */
+        .batt-fill::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg,
+                color-mix(in srgb, var(--batt-color, var(--neon)) 25%, transparent) 0%,
+                color-mix(in srgb, var(--batt-color, var(--neon)) 55%, transparent) 70%,
+                color-mix(in srgb, var(--batt-color, var(--neon)) 80%, transparent) 100%
+            );
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        /* 第二层：从左向右流动的波浪层 (动态液体波浪起伏) */
+        .batt-fill::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            bottom: -2px;
+            left: 0;
+            width: 300%;
+            background-image:
+                radial-gradient(ellipse 6px 3.5px at 6px 3px, color-mix(in srgb, var(--batt-color, var(--neon)) 75%, transparent) 45%, transparent 60%),
+                radial-gradient(ellipse 6px 3.5px at 12px 9px, color-mix(in srgb, var(--batt-color, var(--neon)) 55%, transparent) 45%, transparent 60%);
+            background-size: 12px 100%;
+            background-repeat: repeat-x;
+            animation: batt-liquid-wave 2.2s linear infinite;
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        @keyframes batt-liquid-wave {
+            0% { transform: translateX(-33.333%); }
+            100% { transform: translateX(0); }
         }
 
         .batt-bolt {
@@ -715,55 +805,107 @@
             transform: translate(-50%, -50%);
             font-size: 9px;
             line-height: 1;
-            color: #00ff9d;
-            text-shadow: 0 0 4px rgba(0, 255, 157, 0.8);
+            color: #fff;
+            text-shadow: 0 0 6px #72ffb6, 0 0 10px #00ff9d;
             pointer-events: none;
-            z-index: 1;
+            z-index: 2;
         }
 
         .batt-bolt[hidden] {
             display: none !important;
         }
 
-        /* 充电中高能流动动画（仿手机充电等离子波） */
-        @keyframes batt-shimmer {
-            0% { background-position: -30px 0; }
-            100% { background-position: 30px 0; }
+        /* 充电中高能激荡状态：更为显眼、高频激涌的等离子光斑浪 */
+        .periph-chip.is-charging {
+            --batt-color: #00ff9d;
+            border-color: #00ff9d;
+            color: #00ff9d;
+            box-shadow: 0 0 14px rgba(0, 255, 157, 0.5), inset 0 0 6px rgba(0, 255, 157, 0.2);
+            animation: batt-charge-breath 2s ease-in-out infinite alternate;
         }
 
-        @keyframes batt-bolt-pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
-            50% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
+        .periph-chip.is-charging .chip-liquid-fill {
+            background: color-mix(in srgb, #00ff9d 30%, transparent);
+            box-shadow: inset 0 0 8px rgba(0, 255, 157, 0.6), 2px 0 10px rgba(0, 255, 157, 0.9);
+        }
+
+        .periph-chip.is-charging .chip-liquid-fill::before {
+            background: linear-gradient(
+                90deg,
+                rgba(0, 255, 157, 0.25) 0%,
+                rgba(114, 255, 182, 0.75) 45%,
+                rgba(255, 255, 255, 0.9) 75%,
+                rgba(0, 255, 157, 0.7) 100%
+            );
+            background-size: 200% 100%;
+            animation: batt-charge-surge 1.2s ease-in-out infinite alternate;
+            opacity: 0.95;
+        }
+
+        .periph-chip.is-charging .chip-liquid-fill::after {
+            animation: batt-liquid-wave 0.75s linear infinite;
+            filter: drop-shadow(0 0 4px #00ff9d);
+            opacity: 1;
         }
 
         .periph-chip.is-charging .batt-body {
             border-color: #00ff9d;
-            box-shadow: 0 0 6px rgba(0, 255, 157, 0.35);
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.6), inset 0 0 5px rgba(0, 255, 157, 0.35);
+            animation: batt-charge-breath 2s ease-in-out infinite alternate;
         }
 
         .periph-chip.is-charging .batt-cap {
             background: #00ff9d;
+            box-shadow: 0 0 6px rgba(0, 255, 157, 0.8);
         }
 
         .periph-chip.is-charging .batt-fill {
-            background: linear-gradient(90deg, #00d277, #72ffb6 50%, #00d277 100%);
-            background-size: 30px 100%;
-            animation: batt-shimmer 1.2s linear infinite;
-            box-shadow: 0 0 8px rgba(0, 255, 157, 0.7);
+            background: color-mix(in srgb, #00ff9d 35%, transparent);
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.9);
+        }
+
+        .periph-chip.is-charging .batt-fill::before {
+            background: linear-gradient(
+                90deg,
+                rgba(0, 255, 157, 0.35) 0%,
+                rgba(114, 255, 182, 0.85) 45%,
+                rgba(255, 255, 255, 0.95) 75%,
+                rgba(0, 255, 157, 0.8) 100%
+            );
+            background-size: 200% 100%;
+            animation: batt-charge-surge 1.2s ease-in-out infinite alternate;
+            opacity: 0.9;
+        }
+
+        .periph-chip.is-charging .batt-fill::after {
+            animation: batt-liquid-wave 0.75s linear infinite;
+            filter: drop-shadow(0 0 3px #00ff9d);
+            opacity: 1;
         }
 
         .periph-chip.is-charging .batt-bolt {
             animation: batt-bolt-pulse 1.2s ease-in-out infinite;
         }
 
-        /* 低电量警报 (<30%) */
-        @keyframes batt-low-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.35; }
+        @keyframes batt-charge-breath {
+            0% { box-shadow: 0 0 6px rgba(0, 255, 157, 0.35), inset 0 0 3px rgba(0, 255, 157, 0.2); }
+            100% { box-shadow: 0 0 12px rgba(0, 255, 157, 0.7), inset 0 0 6px rgba(0, 255, 157, 0.5); }
         }
 
+        @keyframes batt-charge-surge {
+            0% { background-position: 0% 50%; opacity: 0.7; }
+            100% { background-position: 100% 50%; opacity: 1; }
+        }
+
+        @keyframes batt-bolt-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; text-shadow: 0 0 10px #72ffb6, 0 0 15px #00ff9d; }
+        }
+
+        /* 低电量警报 (<30%) 珊瑚红 */
         .periph-chip.level-low,
         .periph-chip.is-low {
+            --batt-color: #ff3366;
             border-color: #ff3366;
             color: #ff3366;
         }
@@ -771,7 +913,7 @@
         .periph-chip.level-low .batt-body,
         .periph-chip.is-low .batt-body {
             border-color: #ff3366;
-            box-shadow: 0 0 6px rgba(255, 51, 102, 0.35);
+            box-shadow: 0 0 6px rgba(255, 51, 102, 0.45);
         }
 
         .periph-chip.level-low .batt-cap,
@@ -779,49 +921,49 @@
             background: #ff3366;
         }
 
+        .periph-chip.level-low .chip-liquid-fill,
+        .periph-chip.is-low .chip-liquid-fill,
         .periph-chip.level-low .batt-fill,
         .periph-chip.is-low .batt-fill {
-            background: #ff3366;
-            box-shadow: 0 0 6px #ff3366;
-            animation: batt-low-pulse 1.2s ease-in-out infinite;
+            box-shadow: inset 0 0 4px rgba(255, 51, 102, 0.5), 1px 0 6px #ff3366;
+            animation: batt-low-pulse 1.6s ease-in-out infinite;
+        }
+
+        @keyframes batt-low-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         /* 30% - 60% 科技蓝 */
         .periph-chip.level-mid {
+            --batt-color: #00b4ff;
             border-color: #00b4ff;
             color: #00b4ff;
         }
 
         .periph-chip.level-mid .batt-body {
             border-color: #00b4ff;
+            box-shadow: 0 0 6px rgba(0, 180, 255, 0.4);
         }
 
         .periph-chip.level-mid .batt-cap {
             background: #00b4ff;
         }
 
-        .periph-chip.level-mid .batt-fill {
-            background: #00b4ff;
-            box-shadow: 0 0 6px rgba(0, 180, 255, 0.6);
-        }
-
         /* 60% 以上 充盈安全绿 */
         .periph-chip.level-high {
+            --batt-color: #00ff9d;
             border-color: #00ff9d;
             color: #00ff9d;
         }
 
         .periph-chip.level-high .batt-body {
             border-color: #00ff9d;
+            box-shadow: 0 0 6px rgba(0, 255, 157, 0.4);
         }
 
         .periph-chip.level-high .batt-cap {
             background: #00ff9d;
-        }
-
-        .periph-chip.level-high .batt-fill {
-            background: #00ff9d;
-            box-shadow: 0 0 6px rgba(0, 255, 157, 0.6);
         }
 
         .search-wrap .search-bar {
@@ -1697,7 +1839,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V2.14.15</span>
+            <span class="version-badge">V2.14.17</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -1803,6 +1945,7 @@
                 </form>
                 <div class="search-periph-hud" id="search-periph-hud" aria-label="外设电量监视">
                     <button type="button" class="periph-chip" id="hud-kb-chip" title="键盘电量 · 点击连接或刷新">
+                        <div class="chip-liquid-fill" id="hud-kb-liquid" style="width: 0%;"></div>
                         <span class="chip-icon">⌨</span>
                         <div class="batt-pill" id="hud-kb-pill" aria-hidden="true">
                             <div class="batt-body">
@@ -1814,6 +1957,7 @@
                         <span class="chip-val" id="hud-kb-val">--</span>
                     </button>
                     <button type="button" class="periph-chip" id="hud-mouse-chip" title="鼠标电量 · 点击连接或刷新">
+                        <div class="chip-liquid-fill" id="hud-mouse-liquid" style="width: 0%;"></div>
                         <span class="chip-icon">🖱</span>
                         <div class="batt-pill" id="hud-mouse-pill" aria-hidden="true">
                             <div class="batt-body">
@@ -1930,11 +2074,13 @@
             sideMouseBar: byId('side-mouse-bar'),
             searchPeriphHud: byId('search-periph-hud'),
             hudKbChip: byId('hud-kb-chip'),
+            hudKbLiquid: byId('hud-kb-liquid'),
             hudKbPill: byId('hud-kb-pill'),
             hudKbFill: byId('hud-kb-fill'),
             hudKbBolt: byId('hud-kb-bolt'),
             hudKbVal: byId('hud-kb-val'),
             hudMouseChip: byId('hud-mouse-chip'),
+            hudMouseLiquid: byId('hud-mouse-liquid'),
             hudMousePill: byId('hud-mouse-pill'),
             hudMouseFill: byId('hud-mouse-fill'),
             hudMouseBolt: byId('hud-mouse-bolt'),
@@ -2603,7 +2749,7 @@
                 ],
                 targetUsagePage: 0xFF60,
                 reportLen: 32,
-                queryIntervalMs: 30000,
+                queryIntervalMs: 15000,
                 matchesDevice: function (d) {
                     if (!d) return false;
                     const name = (d.productName || '').toUpperCase();
@@ -2683,21 +2829,23 @@
                     const b0 = data.getUint8(0);
                     const b1 = data.byteLength > 1 ? data.getUint8(1) : 0;
                     const b2 = data.byteLength > 2 ? data.getUint8(2) : 0;
+                    const b3 = data.byteLength > 3 ? data.getUint8(3) : 0;
                     const b8 = data.byteLength > 8 ? data.getUint8(8) : 0;
                     const b9 = data.byteLength > 9 ? data.getUint8(9) : 0;
                     const b10 = data.byteLength > 10 ? data.getUint8(10) : 0;
 
-                    // 1. 被动上报 (AA FA ... D0)
+                    // 1. 被动上报 (AA FA ... D0) - 优先读取主基准校准电量 b3，b9 作为基础备份
                     if (b0 === 0xAA && b1 === 0xFA && b8 === 0xD0) {
-                        const battPassive = b9;
+                        const battPassive = (b3 >= 1 && b3 <= 100) ? b3 : Math.min(100, b9 + 11);
                         const isChargingPassive = b10 === 1;
                         if (battPassive >= 1 && battPassive <= 100) {
                             return { battery: battPassive, isCharging: isChargingPassive };
                         }
                     }
-                    // 2. 主动回包 (AA 30 A5 ...)
+                    // 2. 主动回包 (AA 30 A5 ...) - b8 叠加 b3(0x0B=11) 校准偏置对齐官方驱动
                     if (b0 === 0xAA && b1 === 0x30 && b2 === 0xA5) {
-                        const battActive = b8;
+                        const offset = (b3 === 0x0B) ? 11 : 0;
+                        const battActive = Math.min(100, b8 + offset);
                         const isChargingActive = b9 === 1;
                         if (battActive >= 1 && battActive <= 100) {
                             return { battery: battActive, isCharging: isChargingActive };
@@ -2727,6 +2875,7 @@
             const bindings = {
                 keyboard: {
                     chip: els.hudKbChip,
+                    chipLiquid: els.hudKbLiquid,
                     chipVal: els.hudKbVal,
                     chipFill: els.hudKbFill,
                     chipBolt: els.hudKbBolt,
@@ -2739,6 +2888,7 @@
                 },
                 mouse: {
                     chip: els.hudMouseChip,
+                    chipLiquid: els.hudMouseLiquid,
                     chipVal: els.hudMouseVal,
                     chipFill: els.hudMouseFill,
                     chipBolt: els.hudMouseBolt,
@@ -2753,6 +2903,15 @@
 
             const devStates = new Map();
 
+            function isWiredKeyboard(d) {
+                if (!d) return false;
+                const name = (d.productName || '').toUpperCase();
+                if (d.vendorId === 0xA8A4 || d.vendorId === 0xA8A5 || d.vendorId === 0x3837 || d.vendorId === 0x4012) return false;
+                if (d.vendorId === 0x0C45) return true;
+                if (name.includes('KEYBOARD') && !name.includes('DONGLE') && !name.includes('RECEIVER')) return true;
+                return false;
+            }
+
             devList.forEach(dev => {
                 const b = bindings[dev.id];
                 if (!b) return;
@@ -2765,7 +2924,8 @@
                     isChargingLocked: false,
                     lastBattery: null,
                     pollTimer: null,
-                    onInput: null
+                    onInput: null,
+                    samples: []
                 };
 
                 // 恢复此前缓存的硬件遥测状态（防止刷新页面时丢失上次已知电量与充电锁定状态）
@@ -2776,6 +2936,7 @@
                         state.lastBattery = typeof saved.lastBattery === 'number' ? saved.lastBattery : saved.battery;
                         state.isChargingLocked = Boolean(saved.isChargingLocked);
                         state.isCharging = Boolean(saved.isCharging);
+                        state.samples = [saved.battery];
                     }
                 }
 
@@ -2805,25 +2966,51 @@
                 if (!b) return;
                 const state = devStates.get(devId);
                 if (state) {
-                    // 1. 如果硬件报文带有明确充电标志，锁定充电
-                    if (isCharging) {
-                        state.isChargingLocked = true;
-                    } else if (state.lastBattery !== null) {
-                        // 2. 针对 2.4G 无线模式（键盘或鼠标在部分接收器固件下不单独置位硬件充电 bit 的情况）：
-                        // 采用电量增长趋势锁定充电状态（例如电量爬升），数值平稳时持续锁存，直至物理电量下跌时才解除锁定
-                        if (battery > state.lastBattery) {
-                            state.isChargingLocked = true;
-                        } else if (battery < state.lastBattery) {
-                            state.isChargingLocked = false;
+                    // 滑动中位数滤波与放电单调防抖（消除传感器负载压降产生的瞬时低谷杂讯与抖动）
+                    if (typeof battery === 'number' && battery > 0 && battery <= 100) {
+                        state.samples.push(battery);
+                        if (state.samples.length > 5) state.samples.shift();
+                        const sorted = state.samples.slice().sort((x, y) => x - y);
+                        const median = sorted[Math.floor(sorted.length / 2)];
+
+                        // 放电单调平滑：非充电状态下，过滤瞬时电压回弹（<=3%回弹不闪烁），真实连续下降平滑跟随
+                        if (!isCharging && !state.isChargingLocked && state.battery !== null) {
+                            if (median > state.battery && median <= state.battery + 3) {
+                                battery = state.battery;
+                            } else {
+                                battery = median;
+                            }
+                        } else {
+                            battery = median;
                         }
                     }
 
-                    if (state.isChargingLocked) {
-                        isCharging = true;
+                    if (devId === 'mouse') {
+                        // 鼠标硬件具备精准独立的充电状态位（被动 b10，主动 b9）
+                        // 断开充电线时硬件报文立即回传 0，必须即时同步解除充电锁定，实现零延迟断开响应
+                        state.isCharging = Boolean(isCharging);
+                        state.isChargingLocked = Boolean(isCharging);
+                    } else {
+                        // 针对键盘等在 2.4G 接收器固件下不单独返回充电 bit 的设备：
+                        // 1. 若硬件报文/USB物理接入明确显示充电，锁定充电
+                        if (isCharging) {
+                            state.isChargingLocked = true;
+                        } else if (state.lastBattery !== null) {
+                            // 2. 物理电量攀升时判定进入充电并锁定；电量下跌时解除锁定
+                            if (battery > state.lastBattery) {
+                                state.isChargingLocked = true;
+                            } else if (battery < state.lastBattery) {
+                                state.isChargingLocked = false;
+                            }
+                        }
+
+                        if (state.isChargingLocked) {
+                            isCharging = true;
+                        }
+                        state.isCharging = Boolean(isCharging);
                     }
                     state.lastBattery = battery;
                     state.battery = battery;
-                    state.isCharging = Boolean(isCharging);
 
                     if (persist) {
                         LS.set('cyber-v14-periph-' + devId, {
@@ -2847,6 +3034,7 @@
 
                 if (b.chipVal) b.chipVal.textContent = (isCharging ? '⚡' : '') + pct + '%';
                 if (b.chipFill) b.chipFill.style.width = pct + '%';
+                if (b.chipLiquid) b.chipLiquid.style.width = pct + '%';
                 if (b.chipBolt) b.chipBolt.hidden = !isCharging;
                 if (b.chip) {
                     b.chip.classList.remove('level-low', 'level-mid', 'level-high', 'is-low', 'is-charging');
@@ -2932,9 +3120,16 @@
                 }
 
                 if (state.openedDevices.length > 0) {
+                    if (devConfig.id === 'keyboard' && state.openedDevices.some(isWiredKeyboard)) {
+                        state.isCharging = true;
+                        state.isChargingLocked = true;
+                        if (typeof state.battery === 'number') {
+                            updateDeviceUI('keyboard', state.battery, true);
+                        }
+                    }
                     setTimeout(() => queryDevice(state), 200);
                     if (!state.pollTimer) {
-                        state.pollTimer = setInterval(() => queryDevice(state), devConfig.queryIntervalMs || 30000);
+                        state.pollTimer = setInterval(() => queryDevice(state), devConfig.queryIntervalMs || 15000);
                     }
                 }
             }
@@ -2945,6 +3140,7 @@
 
                 // 1. 如果已有打开接口，立即执行查询刷新
                 if (state && state.openedDevices && state.openedDevices.length > 0) {
+                    state.samples = [];
                     if (b && b.chipVal && b.chipVal.textContent === '--') {
                         b.chipVal.textContent = '...';
                     }
@@ -3037,10 +3233,28 @@
                     devList.forEach(devConfig => {
                         attachDevices(devConfig, devices);
                     });
+                    if (isWiredKeyboard(e.device)) {
+                        const kbState = devStates.get('keyboard');
+                        if (kbState) {
+                            kbState.isCharging = true;
+                            kbState.isChargingLocked = true;
+                            updateDeviceUI('keyboard', typeof kbState.battery === 'number' ? kbState.battery : 100, true);
+                            queryDevice(kbState);
+                        }
+                    }
                 }).catch(() => { });
             });
 
             navigator.hid.addEventListener('disconnect', (e) => {
+                if (isWiredKeyboard(e.device)) {
+                    const kbState = devStates.get('keyboard');
+                    if (kbState) {
+                        kbState.isCharging = false;
+                        kbState.isChargingLocked = false;
+                        updateDeviceUI('keyboard', typeof kbState.battery === 'number' ? kbState.battery : 100, false);
+                    }
+                }
+
                 devList.forEach(devConfig => {
                     const state = devStates.get(devConfig.id);
                     if (state && state.openedDevices.includes(e.device)) {
@@ -3062,6 +3276,7 @@
                                 }
                                 if (b.chipVal) b.chipVal.textContent = '--';
                                 if (b.chipFill) b.chipFill.style.width = '0%';
+                                if (b.chipLiquid) b.chipLiquid.style.width = '0%';
                                 if (b.chipBolt) b.chipBolt.hidden = true;
                                 if (b.chip) b.chip.classList.remove('level-low', 'level-mid', 'level-high', 'is-low', 'is-charging');
                             }
