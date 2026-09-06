@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V3.0.11 · YAML</title>
+    <title>CYBER-DECK V3.0.12 · YAML</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -2379,8 +2379,8 @@
             bottom: calc(100% + 14px);
             left: 50%;
             transform: translateX(-50%) translateY(8px) scale(0.95);
-            width: 240px;
-            max-width: 82vw;
+            width: 275px;
+            max-width: 88vw;
             background: rgba(6, 10, 20, 0.95);
             border: 1px solid var(--drone-color);
             border-radius: 6px;
@@ -2999,9 +2999,12 @@
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 0.72rem;
-            padding: 0 3px;
+            font-size: 0.78rem;
+            padding: 2px 4px;
             line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             transition: color 0.2s, transform 0.15s;
         }
 
@@ -3440,7 +3443,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V3.0.11</span>
+            <span class="version-badge">V3.0.12</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -4131,6 +4134,9 @@
             },
             set(key, value) {
                 try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { }
+            },
+            remove(key) {
+                try { localStorage.removeItem(key); } catch (e) { }
             }
         };
 
@@ -7713,17 +7719,31 @@
             // 归位至右下角战备驻点
             function resetPosition() {
                 closeRingMenu();
+                if (isLaserGameActive) stopLaserGame();
                 LS.remove(POS_KEY);
-                widget.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s, top 0.4s';
-                widget.style.left = 'auto';
-                widget.style.top = 'auto';
-                widget.style.right = '28px';
-                widget.style.bottom = '28px';
+
+                // 计算右下角目标绝对坐标，执行平滑折跃返航飞行动画
+                const targetX = Math.max(12, window.innerWidth - (widget.offsetWidth || 86) - 28);
+                const targetY = Math.max(12, window.innerHeight - (widget.offsetHeight || 86) - 28);
+
+                widget.style.transition = 'left 0.45s cubic-bezier(0.25, 1, 0.5, 1), top 0.45s cubic-bezier(0.25, 1, 0.5, 1)';
+                widget.style.left = `${targetX}px`;
+                widget.style.top = `${targetY}px`;
+                widget.style.right = 'auto';
+                widget.style.bottom = 'auto';
+
+                triggerBarrelRoll();
                 playDroneSound('wake');
-                showBubble('[POS_RESET] 航标校准，已返回右下角战备驻点。', 3000);
+                showBubble('🚀 [POS_RESET] 收到归位指令！折跃返航右下角战备驻点完成～', 3500);
+
                 setTimeout(() => {
+                    widget.style.transition = 'none';
+                    widget.style.left = 'auto';
+                    widget.style.top = 'auto';
+                    widget.style.right = '28px';
+                    widget.style.bottom = '28px';
                     checkBubbleFlip();
-                }, 420);
+                }, 480);
             }
 
             if (els.droneResetBtn) {
