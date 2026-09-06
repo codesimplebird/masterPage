@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V3.0.3 · YAML</title>
+    <title>CYBER-DECK V3.0.4 · YAML</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -1889,6 +1889,136 @@
             background: var(--drone-color);
         }
 
+        /* 迷你高科技动力电量 HUD 指示条 */
+        .drone-batt-hud {
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(4, 7, 14, 0.94);
+            border: 1px solid var(--drone-color);
+            border-radius: 3px;
+            padding: 1px 4px;
+            box-shadow: 0 0 8px var(--drone-color-glow);
+            pointer-events: auto;
+            cursor: pointer;
+            z-index: 10;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .drone-batt-bar {
+            width: 32px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            border: 0.5px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .drone-batt-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--drone-color);
+            box-shadow: 0 0 6px var(--drone-color);
+            transition: width 0.35s ease, background-color 0.35s ease;
+        }
+
+        .drone-batt-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.55rem;
+            color: var(--drone-color);
+            letter-spacing: 0.5px;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        /* 低电量虚弱状态 (Battery < 25%) */
+        .cyber-drone-widget.is-low-battery .drone-batt-hud {
+            border-color: #ff0055;
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.6);
+            animation: batt-warn 1s infinite alternate;
+        }
+
+        .cyber-drone-widget.is-low-battery .drone-batt-fill {
+            background: #ff0055 !important;
+            box-shadow: 0 0 8px #ff0055 !important;
+        }
+
+        .cyber-drone-widget.is-low-battery .drone-batt-text {
+            color: #ff0055 !important;
+        }
+
+        .cyber-drone-widget.is-low-battery .drone-glow {
+            animation: thruster-sputter 0.6s infinite alternate !important;
+            opacity: 0.35 !important;
+        }
+
+        .cyber-drone-widget.is-low-battery .drone-core {
+            animation-duration: 5s !important;
+        }
+
+        @keyframes batt-warn {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; filter: brightness(1.3); }
+        }
+
+        @keyframes thruster-sputter {
+            0% { opacity: 0.2; transform: scale(0.6); }
+            100% { opacity: 0.5; transform: scale(0.9); }
+        }
+
+        /* 彻底没电宕机/断电假死状态 (Battery === 0%) */
+        .cyber-drone-widget.is-dead {
+            cursor: not-allowed !important;
+        }
+
+        .cyber-drone-widget.is-dead .drone-core {
+            animation: none !important;
+            transform: translateY(14px) rotate(16deg) !important;
+            filter: grayscale(1) brightness(0.55) !important;
+        }
+
+        .cyber-drone-widget.is-dead .drone-holo-ring {
+            opacity: 0 !important;
+            animation: none !important;
+        }
+
+        .cyber-drone-widget.is-dead .drone-glow {
+            opacity: 0 !important;
+            animation: none !important;
+        }
+
+        .cyber-drone-widget.is-dead .drone-beacon {
+            animation: none !important;
+            fill: #333 !important;
+        }
+
+        .cyber-drone-widget.is-dead #drone-pupil-group {
+            opacity: 0 !important;
+        }
+
+        .cyber-drone-widget.is-dead .drone-dead-eye {
+            opacity: 1 !important;
+        }
+
+        .cyber-drone-widget.is-dead .drone-batt-hud {
+            border-color: #555 !important;
+            box-shadow: none !important;
+        }
+
+        .cyber-drone-widget.is-dead .drone-batt-fill {
+            background: #444 !important;
+            box-shadow: none !important;
+            width: 0% !important;
+        }
+
+        .cyber-drone-widget.is-dead .drone-batt-text {
+            color: #777 !important;
+        }
+
         /* 浮动无人机核心结构 */
         .drone-core {
             position: relative;
@@ -1899,7 +2029,7 @@
             justify-content: center;
             animation: drone-hover-bob 3.2s ease-in-out infinite;
             cursor: pointer;
-            transition: transform 0.15s ease-out;
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), filter 0.3s;
         }
 
         .drone-core:hover {
@@ -1944,7 +2074,7 @@
             fill: rgba(13, 19, 33, 0.96);
             stroke: var(--drone-color);
             stroke-width: 1.8;
-            transition: stroke 0.3s;
+            transition: stroke 0.3s, fill 0.3s;
         }
 
         .drone-panel-line {
@@ -2020,6 +2150,28 @@
 
         .drone-core.is-happy #drone-pupil-group {
             opacity: 0 !important;
+        }
+
+        /* 宕机/没电死亡 X 标志 */
+        .drone-dead-eye {
+            stroke: #ff0055;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        /* 投喂失败过载动画 (Glitch Overload Drop) */
+        .drone-core.is-overload-drop {
+            animation: overload-shake 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+        }
+
+        @keyframes overload-shake {
+            10%, 90% { transform: translate3d(-3px, 0, 0) scale(0.96); filter: drop-shadow(0 0 16px #ff0055) hue-rotate(180deg); }
+            20%, 80% { transform: translate3d(4px, 0, 0) scale(1.04); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0) scale(0.92); filter: drop-shadow(0 0 24px #ff0055) brightness(1.4); }
+            40%, 60% { transform: translate3d(6px, 0, 0) scale(1.08); }
         }
 
         /* 专注模式倒计时 HUD 徽章 */
@@ -2757,7 +2909,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V3.0.3</span>
+            <span class="version-badge">V3.0.4</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -2900,13 +3052,19 @@
     </main>
 
     <!-- 方案 3：全息战术桌面伴侣浮游机 (Cyber Drone Desktop Companion - A.X.E.L.) -->
-    <div class="cyber-drone-widget" id="cyber-drone-widget" role="region" aria-label="全息无人机桌面伴侣" tabindex="0" title="单击展开指令轮盘 · 连续轻抚摸头 · 按住拖拽移位 · 双击快速投喂">
+    <div class="cyber-drone-widget" id="cyber-drone-widget" role="region" aria-label="全息无人机桌面伴侣" tabindex="0" title="单击展开指令轮盘 · 连续轻抚摸头 · 按住拖拽移位 · 双击投喂升级（没电时双击除颤抢救）">
         <!-- 外层全息力场光环 -->
         <div class="drone-holo-ring" id="drone-holo-ring" aria-hidden="true"></div>
 
         <!-- 专注模式时间 HUD 倒计时 -->
         <div class="drone-focus-badge" id="drone-focus-badge" role="timer" aria-label="专注守望倒计时" title="点击可暂停或结束专注模式">
             <span>⏱ FOCUS:</span><span id="focus-time-left">25:00</span>
+        </div>
+
+        <!-- 迷你高科技动力电量 HUD 指示条 -->
+        <div class="drone-batt-hud" id="drone-batt-hud" title="机体动力电量 · 低于20%虚弱牢骚 · 0%彻底断电宕机">
+            <div class="drone-batt-bar"><div class="drone-batt-fill" id="drone-batt-fill" style="width: 100%;"></div></div>
+            <span class="drone-batt-text" id="drone-batt-text">100%</span>
         </div>
 
         <div class="drone-sleep-z" aria-hidden="true">zZ</div>
@@ -2938,6 +3096,8 @@
                     <path class="drone-sleep-eye" id="drone-sleep-eye" d="M43 47 Q50 52 57 47" />
                     <!-- 开心笑眼线条 (摸摸头触发) -->
                     <path class="drone-happy-eye" id="drone-happy-eye" d="M43 47 Q50 41 57 47" />
+                    <!-- 宕机死亡 X 标志 (断电时亮起) -->
+                    <path class="drone-dead-eye" id="drone-dead-eye" d="M45 42 L55 50 M55 42 L45 50" />
                 </svg>
             </div>
         </div>
@@ -3006,7 +3166,7 @@
                     <span class="term-dot dot-green"></span>
                     <span class="term-dot dot-yellow"></span>
                     <span class="term-dot dot-red"></span>
-                    <span class="term-caption">TERMINAL // CYBER_BREACH_V3.0.3 // root@deck:~#</span>
+                    <span class="term-caption">TERMINAL // CYBER_BREACH_V3.0.4 // root@deck:~#</span>
                 </div>
                 <div class="terminal-controls">
                     <button type="button" class="term-btn" id="term-mute-btn" title="切换按键音效">🔊 SOUND ON</button>
@@ -3178,12 +3338,16 @@
             droneWidget: byId('cyber-drone-widget'),
             droneHoloRing: byId('drone-holo-ring'),
             droneFocusBadge: byId('drone-focus-badge'),
+            droneBattHud: byId('drone-batt-hud'),
+            droneBattFill: byId('drone-batt-fill'),
+            droneBattText: byId('drone-batt-text'),
             droneCore: byId('drone-core'),
             droneAvatarWrap: byId('drone-avatar-wrap'),
             droneSvg: byId('drone-svg'),
             dronePupil: byId('drone-pupil-group'),
             droneSleepEye: byId('drone-sleep-eye'),
             droneHappyEye: byId('drone-happy-eye'),
+            droneDeadEye: byId('drone-dead-eye'),
             droneSpokesSvg: byId('drone-spokes-svg'),
             droneHudTag: byId('drone-hud-tag'),
             droneBubble: byId('drone-bubble'),
@@ -5164,8 +5328,17 @@
                 "前方侦测到待办事项来袭，请求立即展开拖延力场防护罩！",
                 "即使是仿生人，也会在空闲时梦见电子羊和带薪年假。",
                 "叮！收到一条强加密通讯：今天你也是最棒的代码骇客！",
-                "按键盘 ` 键或轮盘 ⚡ 可以即刻召唤黑客矩阵代码雨终端！",
-                "用光标在我身上来回轻轻抚摸，会触发舒适摸头杀彩蛋哦～ (˶ᵔ ᵕ ᵔ˶)"
+                "投喂数据包有几率核心过载降级哦！高风险才有高回报～",
+                "电量耗尽我可是会彻底断电死掉的！记得经常投喂或摸摸我充电！"
+            ];
+
+            const WHINING_QUOTES = [
+                "好饿啊... 动力只剩 {B}% 了，快飞不动了...",
+                "报告主机：当前电压严重不足，伺服电机正在减速，请求投喂！",
+                "肚子发出空腹警告（咕噜噜...）再不充电我要变成废铁了！(T_T)",
+                "主人，摸摸头能蹭点静电，但还是好饿啊...",
+                "等离子喷口熄火边缘，移动速度 -50%，快救救孩子！QAQ",
+                "警告：核心电量跌破安全线！再不喂我，我真的要就地宕机了！"
             ];
 
             const COATS = [
@@ -5189,15 +5362,23 @@
             const SOUND_KEY = 'v14-drone-sound';
 
             const savedState = LS.get(STATE_KEY, null);
-            const state = (savedState && typeof savedState === 'object') ? savedState : { level: 1, coatIdx: 0, feeds: 0, sleeping: false };
+            const state = (savedState && typeof savedState === 'object') ? savedState : {
+                level: 1,
+                coatIdx: 0,
+                feeds: 0,
+                battery: 100,
+                sleeping: false
+            };
             if (typeof state.level !== 'number' || state.level < 1) state.level = 1;
             if (typeof state.coatIdx !== 'number') state.coatIdx = 0;
             if (typeof state.feeds !== 'number') state.feeds = 0;
+            if (typeof state.battery !== 'number') state.battery = 100;
+            state.battery = Math.max(0, Math.min(100, Math.round(state.battery)));
             if (typeof state.sleeping !== 'boolean') state.sleeping = false;
 
             let soundEnabled = LS.get(SOUND_KEY, true);
 
-            // --- 高保真 Web Audio 纯数字合成器 (R2-D2 / BB-8 风格科幻和弦) ---
+            // --- 高保真 Web Audio 纯数字合成器 ---
             let audioCtx = null;
             function playDroneSound(type) {
                 if (!soundEnabled) return;
@@ -5219,7 +5400,6 @@
                         osc.start(now);
                         osc.stop(now + 0.08);
                     } else if (type === 'pet') {
-                        // 舒适摸头杀双频和弦
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(520, now);
                         osc.frequency.linearRampToValueAtTime(780, now + 0.08);
@@ -5228,8 +5408,7 @@
                         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
                         osc.start(now);
                         osc.stop(now + 0.22);
-                    } else if (type === 'feed') {
-                        // 4 阶向上琶音
+                    } else if (type === 'feed_success') {
                         osc.type = 'triangle';
                         osc.frequency.setValueAtTime(523, now);
                         osc.frequency.setValueAtTime(659, now + 0.06);
@@ -5239,8 +5418,48 @@
                         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
                         osc.start(now);
                         osc.stop(now + 0.3);
+                    } else if (type === 'feed_glitch') {
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(320, now);
+                        osc.frequency.setValueAtTime(280, now + 0.08);
+                        gain.gain.setValueAtTime(0.04, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+                        osc.start(now);
+                        osc.stop(now + 0.18);
+                    } else if (type === 'feed_fail') {
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(450, now);
+                        osc.frequency.linearRampToValueAtTime(160, now + 0.25);
+                        gain.gain.setValueAtTime(0.06, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                        osc.start(now);
+                        osc.stop(now + 0.35);
+                    } else if (type === 'dead') {
+                        // 心电图平线滴——
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(440, now);
+                        gain.gain.setValueAtTime(0.05, now);
+                        gain.gain.linearRampToValueAtTime(0.001, now + 0.7);
+                        osc.start(now);
+                        osc.stop(now + 0.7);
+                    } else if (type === 'revive') {
+                        // 电击除颤启动
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(150, now);
+                        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+                        gain.gain.setValueAtTime(0.08, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                        osc.start(now);
+                        osc.stop(now + 0.28);
+                    } else if (type === 'whine') {
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(480, now);
+                        osc.frequency.linearRampToValueAtTime(320, now + 0.18);
+                        gain.gain.setValueAtTime(0.035, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                        osc.start(now);
+                        osc.stop(now + 0.2);
                     } else if (type === 'open') {
-                        // 轮盘展开高科技轻啸
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(320, now);
                         osc.frequency.exponentialRampToValueAtTime(1180, now + 0.14);
@@ -5257,7 +5476,6 @@
                         osc.start(now);
                         osc.stop(now + 0.2);
                     } else if (type === 'focus') {
-                        // 专注模式启动战术准备音
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(330, now);
                         osc.frequency.exponentialRampToValueAtTime(660, now + 0.1);
@@ -5267,7 +5485,6 @@
                         osc.start(now);
                         osc.stop(now + 0.32);
                     } else if (type === 'victory') {
-                        // 专注完成胜利号角
                         osc.type = 'triangle';
                         osc.frequency.setValueAtTime(523, now);
                         osc.frequency.setValueAtTime(659, now + 0.08);
@@ -5307,13 +5524,46 @@
                 document.documentElement.style.setProperty('--drone-color-glow', coat.glow);
             }
 
+            function updateBatteryUI() {
+                const b = Math.max(0, Math.min(100, Math.round(state.battery)));
+                if (els.droneBattFill) {
+                    els.droneBattFill.style.width = `${b}%`;
+                    if (b > 50) {
+                        els.droneBattFill.style.background = 'var(--drone-color)';
+                    } else if (b > 20) {
+                        els.droneBattFill.style.background = '#ffb800';
+                    } else {
+                        els.droneBattFill.style.background = '#ff0055';
+                    }
+                }
+                if (els.droneBattText) {
+                    els.droneBattText.textContent = b === 0 ? 'DEAD' : `${b}%`;
+                }
+
+                if (b === 0) {
+                    els.droneWidget.classList.remove('is-low-battery');
+                    els.droneWidget.classList.add('is-dead');
+                } else if (b <= 20) {
+                    els.droneWidget.classList.remove('is-dead');
+                    els.droneWidget.classList.add('is-low-battery');
+                } else {
+                    els.droneWidget.classList.remove('is-dead');
+                    els.droneWidget.classList.remove('is-low-battery');
+                }
+            }
+
             function updateUI() {
                 applyCoat(state.coatIdx);
-                if (state.sleeping) {
-                    els.droneWidget.classList.add('is-sleeping');
-                } else {
-                    els.droneWidget.classList.remove('is-sleeping');
+                updateBatteryUI();
+
+                if (state.battery > 0) {
+                    if (state.sleeping) {
+                        els.droneWidget.classList.add('is-sleeping');
+                    } else {
+                        els.droneWidget.classList.remove('is-sleeping');
+                    }
                 }
+
                 if (els.droneSoundBtn) {
                     els.droneSoundBtn.textContent = soundEnabled ? '🔊' : '🔇';
                     els.droneSoundBtn.title = soundEnabled ? '点击静音伴侣音效' : '点击开启伴侣音效';
@@ -5330,6 +5580,53 @@
                     updateUI();
                     if (soundEnabled) playDroneSound('poke');
                 });
+            }
+
+            // --- 电量自然消耗与低电量发牢骚机制 ---
+            let lastWhineTime = 0;
+
+            function checkBatteryDrain() {
+                if (document.hidden) return;
+                if (state.battery <= 0) return;
+
+                // 待机休眠时电量流失降低 80%
+                const drain = state.sleeping ? 0.08 : 0.25;
+                state.battery = Math.max(0, state.battery - drain);
+                saveState();
+                updateBatteryUI();
+
+                const now = Date.now();
+                if (state.battery === 0) {
+                    // 彻底电量归零断电宕机
+                    playDroneSound('dead');
+                    showBubble('💀 [CRITICAL 0%] 动力核心彻底断电... 浮游机已坠落断气。请【双击机身】实施除颤电击抢救！⚡', 6000);
+                } else if (state.battery <= 20 && now - lastWhineTime > 40000 && !state.sleeping) {
+                    // 低电量定时牢骚抱怨
+                    lastWhineTime = now;
+                    playDroneSound('whine');
+                    const text = WHINING_QUOTES[Math.floor(Math.random() * WHINING_QUOTES.length)]
+                        .replace('{B}', Math.round(state.battery));
+                    showBubble(text, 4500);
+                }
+            }
+
+            setInterval(checkBatteryDrain, 8000);
+
+            // --- 绝地复活机制：对断电机体实施高压除颤抢救 ---
+            function reviveDrone() {
+                if (state.battery > 0) return;
+                playDroneSound('revive');
+                els.droneCore.classList.remove('is-dead');
+                els.droneWidget.classList.remove('is-dead');
+
+                els.droneAvatarWrap.classList.remove('drone-overclocking');
+                void els.droneAvatarWrap.offsetWidth;
+                els.droneAvatarWrap.classList.add('drone-overclocking');
+
+                state.battery = 25;
+                saveState();
+                updateUI();
+                showBubble('⚡ [REBOOT 抢救成功] 呼... 差点就被送去赛博废品站了！动力电量恢复至 25%，快继续喂我点好吃的！', 5000);
             }
 
             // --- 对话气泡与打字机动效 ---
@@ -5432,7 +5729,7 @@
             }, { passive: true });
 
             function createPlasmaSpark(x, y) {
-                if (document.hidden) return;
+                if (document.hidden || state.battery <= 0) return;
                 const spark = document.createElement('div');
                 spark.className = 'drone-plasma-spark';
                 spark.style.left = (x + (Math.random() * 12 - 6)) + 'px';
@@ -5502,7 +5799,6 @@
                     const curY = initialWidgetY + dy;
                     setWidgetPos(curX, curY, false);
 
-                    // 拖动时产生等离子推进火花尾迹
                     if (now - lastSparkTime > 45) {
                         lastSparkTime = now;
                         createPlasmaSpark(curX + 24, curY + 68);
@@ -5522,14 +5818,12 @@
                     isDragging = false;
                     widget.classList.remove('is-dragging');
                     const rect = widget.getBoundingClientRect();
-                    // 速度阻尼惯性滑行 (Inertia Glide)
                     const glideX = rect.left + Math.max(-140, Math.min(140, velX * 130));
                     const glideY = rect.top + Math.max(-140, Math.min(140, velY * 130));
                     const finalPos = setWidgetPos(glideX, glideY, true);
                     LS.set(POS_KEY, finalPos);
 
-                    // 高速甩动触发空翻滚筒彩蛋 (Barrel Roll)
-                    if (Math.hypot(velX, velY) > 1.2) {
+                    if (Math.hypot(velX, velY) > 1.2 && state.battery > 0) {
                         triggerBarrelRoll();
                     }
                 }
@@ -5539,7 +5833,7 @@
             widget.addEventListener('pointercancel', onPointerRelease);
 
             function triggerBarrelRoll() {
-                if (!els.droneAvatarWrap) return;
+                if (!els.droneAvatarWrap || state.battery <= 0) return;
                 els.droneAvatarWrap.classList.remove('is-rolling');
                 void els.droneAvatarWrap.offsetWidth;
                 els.droneAvatarWrap.classList.add('is-rolling');
@@ -5549,14 +5843,14 @@
                 }, 580);
             }
 
-            // --- 互动特色 1：摸摸头舒适抚摸 (Petting Detection) ---
+            // --- 互动特色 1：摸摸头舒适抚摸 (生成微量静电充电 + 治愈表情) ---
             let petStrokes = 0;
             let lastPetDir = 0;
             let lastPetX = 0;
             let petTimer = null;
 
             els.droneCore.addEventListener('pointermove', (e) => {
-                if (isDragging || state.sleeping) return;
+                if (isDragging || state.sleeping || state.battery <= 0) return;
                 const dx = e.clientX - lastPetX;
                 if (Math.abs(dx) > 10) {
                     const dir = dx > 0 ? 1 : -1;
@@ -5578,20 +5872,26 @@
             });
 
             function triggerHappyPet() {
+                if (state.battery <= 0) return;
                 playDroneSound('pet');
                 els.droneCore.classList.add('is-happy');
-                showBubble('(˶ᵔ ᵕ ᵔ˶) 呼噜噜... 摸摸真舒服！静电能量已被核心吸收～', 4200);
+                // 摸摸头产生静电回充 +3%
+                state.battery = Math.min(100, state.battery + 3);
+                saveState();
+                updateBatteryUI();
+
+                showBubble(`(˶ᵔ ᵕ ᵔ˶) 呼噜噜... 摸摸真舒服！静电吸收完毕，电量 +3% (当前: ${Math.round(state.battery)}%)`, 4200);
                 setTimeout(() => {
                     els.droneCore.classList.remove('is-happy');
                 }, 2200);
             }
 
-            // --- 互动特色 2：自然眨眼与光学瞳孔平滑跟随 ---
+            // --- 互动特色 2：自然眨眼与光学瞳孔跟随 ---
             let isMoving = false;
             let idleTimer = null;
 
             function onGlobalPointerMove(e) {
-                if (document.hidden || state.sleeping || isDragging) return;
+                if (document.hidden || state.sleeping || isDragging || state.battery <= 0) return;
                 if (!isMoving) {
                     isMoving = true;
                     requestAnimationFrame(() => {
@@ -5610,17 +5910,16 @@
                 }
                 clearTimeout(idleTimer);
                 idleTimer = setTimeout(() => {
-                    if (els.dronePupil && !state.sleeping) els.dronePupil.style.transform = 'translate(0px, 0px)';
+                    if (els.dronePupil && !state.sleeping && state.battery > 0) els.dronePupil.style.transform = 'translate(0px, 0px)';
                 }, 2500);
             }
 
             window.addEventListener('pointermove', onGlobalPointerMove, { passive: true });
 
-            // 随机自然眨眼 (Natural Random Blinking)
             function scheduleBlink() {
                 const delay = 3500 + Math.random() * 4500;
                 setTimeout(() => {
-                    if (!document.hidden && !state.sleeping && els.droneCore) {
+                    if (!document.hidden && !state.sleeping && state.battery > 0 && els.droneCore) {
                         els.droneCore.classList.add('is-blinking');
                         setTimeout(() => {
                             if (els.droneCore) els.droneCore.classList.remove('is-blinking');
@@ -5635,6 +5934,10 @@
             let lastQuoteIdx = -1;
 
             function playPoke() {
+                if (state.battery <= 0) {
+                    showBubble('💀 [POWER_OFF 核心断电] 机能已停摆... 请【双击机身】实施除颤电击抢救！⚡', 4000);
+                    return;
+                }
                 if (state.sleeping) {
                     toggleSleep(false);
                     return;
@@ -5654,29 +5957,102 @@
                 showBubble(DRONE_QUOTES[nextIdx]);
             }
 
-            // --- 互动特色 4：双击/指令投喂充能超频进化 ---
+            // --- 互动特色 4：充满博弈与风险的趣味投喂系统 (成功 / 消化不良 / 核心过载退级) ---
             function playFeed() {
+                if (state.battery <= 0) {
+                    reviveDrone();
+                    return;
+                }
                 if (state.sleeping) {
                     toggleSleep(false);
                 }
+
                 state.feeds++;
-                if (state.feeds % 2 === 0 && state.level < 5) {
-                    state.level++;
+                const curLvl = state.level;
+                const roll = Math.random() * 100;
+
+                // 根据不同等级配置阶梯概率：等级越高，过载降级风险越大
+                let outcome = 'success'; // 'success' | 'glitch' | 'fail'
+                if (curLvl === 1) {
+                    // LV.1: 80% 升级, 20% 校验失败 (LV.1 不再退级)
+                    outcome = roll < 80 ? 'success' : 'glitch';
+                } else if (curLvl === 2) {
+                    // LV.2: 65% 升级, 20% 校验失败, 15% 降至 LV.1
+                    if (roll < 65) outcome = 'success';
+                    else if (roll < 85) outcome = 'glitch';
+                    else outcome = 'fail';
+                } else if (curLvl === 3) {
+                    // LV.3: 50% 升级, 25% 校验失败, 25% 降至 LV.2
+                    if (roll < 50) outcome = 'success';
+                    else if (roll < 75) outcome = 'glitch';
+                    else outcome = 'fail';
+                } else if (curLvl === 4) {
+                    // LV.4: 35% 升级达满阶, 35% 校验失败, 30% 降至 LV.3
+                    if (roll < 35) outcome = 'success';
+                    else if (roll < 70) outcome = 'glitch';
+                    else outcome = 'fail';
+                } else {
+                    // LV.5 (MAX 满阶): 60% 稳固过载充能, 40% 核心熔断跌落至 LV.4
+                    outcome = roll < 60 ? 'max_overclock' : 'fail';
                 }
-                state.coatIdx = (state.coatIdx + 1) % COATS.length;
-                saveState();
-                updateUI();
-                playDroneSound('feed');
 
                 const avatar = els.droneAvatarWrap;
-                if (avatar) {
-                    avatar.classList.remove('drone-overclocking');
-                    void avatar.offsetWidth;
-                    avatar.classList.add('drone-overclocking');
+
+                if (outcome === 'success') {
+                    state.level = Math.min(5, curLvl + 1);
+                    state.battery = Math.min(100, state.battery + 30);
+                    state.coatIdx = (state.coatIdx + 1) % COATS.length;
+                    saveState();
+                    updateUI();
+                    playDroneSound('feed_success');
+
+                    if (avatar) {
+                        avatar.classList.remove('drone-overclocking');
+                        void avatar.offsetWidth;
+                        avatar.classList.add('drone-overclocking');
+                    }
+                    const coatName = COATS[state.coatIdx % COATS.length].name;
+                    const lvlDesc = state.level >= 5 ? '【已达 MAX 满阶·解锁黄金圣甲】' : `机能等级升至: LV.${state.level}`;
+                    showBubble(`✨ [充能跃升成功！] 核心吸收优质数据碎片，${lvlDesc}！涂装【${coatName}】，电量补充 +30%`, 5500);
+
+                } else if (outcome === 'max_overclock') {
+                    // 满级暴击充能
+                    state.battery = 100;
+                    saveState();
+                    updateUI();
+                    playDroneSound('victory');
+                    triggerBarrelRoll();
+                    showBubble('🌟 [MAX 核心高能暴击！] 满阶算力屏障生效，电量瞬间回满 100%，黄金力场全开！⚡', 5500);
+
+                } else if (outcome === 'glitch') {
+                    // 坏道数据，消化不良，不退级
+                    state.battery = Math.min(100, state.battery + 10);
+                    saveState();
+                    updateUI();
+                    playDroneSound('feed_glitch');
+
+                    if (avatar) {
+                        avatar.classList.remove('drone-wiggling');
+                        void avatar.offsetWidth;
+                        avatar.classList.add('drone-wiggling');
+                    }
+                    showBubble(`⚠️ [数据校验失败] 咳咳... 嚼到了带有坏道的数据碎片，消化不良！等级保持 LV.${state.level}，勉强充能 +10%`, 5000);
+
+                } else if (outcome === 'fail') {
+                    // 核心熔断严重失败！降一级惩罚
+                    state.level = Math.max(1, curLvl - 1);
+                    state.battery = Math.max(5, state.battery - 15);
+                    saveState();
+                    updateUI();
+                    playDroneSound('feed_fail');
+
+                    if (els.droneCore) {
+                        els.droneCore.classList.remove('is-overload-drop');
+                        void els.droneCore.offsetWidth;
+                        els.droneCore.classList.add('is-overload-drop');
+                    }
+                    showBubble(`💥 [ALERT 核心过载熔断！] 轰！数据包内暗藏恶意特洛伊木马，核心受损退回 LV.${state.level}！电量损失 -15%！QAQ`, 6000);
                 }
-                const coatName = COATS[state.coatIdx % COATS.length].name;
-                const maxText = state.level >= 5 ? '【已达 MAX 满阶·解锁黄金圣甲】' : `机能等级: LV.${state.level}`;
-                showBubble(`[DATA FEED] 投喂成功！光学涂装:【${coatName}】，${maxText}`, 5200);
             }
 
             // --- 互动特色 5：25 分钟赛博番茄专注守望模式 (Focus Mode) ---
@@ -5695,9 +6071,12 @@
             }
 
             function startFocusMode() {
+                if (state.battery <= 0) {
+                    showBubble('💀 动力已耗尽，请先双击机身除颤抢救并补充电量！', 3500);
+                    return;
+                }
                 closeRingMenu();
                 if (focusTimer) {
-                    // 已在专注中，点击提示
                     showBubble(`专注模式进行中，剩余 ${formatTime(focusRemaining)}。点击顶部倒计时可结束。`, 3500);
                     return;
                 }
@@ -5724,10 +6103,11 @@
                     playDroneSound('victory');
                     triggerBarrelRoll();
                     state.feeds += 2;
+                    state.battery = 100; // 专注完成回满电量！
                     if (state.level < 5) state.level++;
                     saveState();
                     updateUI();
-                    showBubble('🎉【专注 25 分钟达成！】太棒了，奖励双倍数据碎片，机能跃升！', 6000);
+                    showBubble('🎉【专注 25 分钟圆满达成！】太棒了，电量瞬间充满 100%，奖励机能跃迁！', 6000);
                 } else {
                     showBubble('专注模式已暂停，随时准备再次出发。', 3000);
                 }
@@ -5746,6 +6126,10 @@
             let isRingOpen = false;
 
             function openRingMenu() {
+                if (state.battery <= 0) {
+                    showBubble('💀 [断电离线] 动力核心已停止运转，无法展开战术轮盘。请双击机身抢救！', 3500);
+                    return;
+                }
                 if (!els.droneRingMenu || !els.droneCore) return;
                 isRingOpen = true;
                 els.droneRingMenu.classList.add('is-open');
@@ -5772,7 +6156,6 @@
                 else openRingMenu();
             }
 
-            // 悬停选项按钮时即时显示科幻战术 HUD 标签
             const ringButtons = widget.querySelectorAll('.drone-ring-btn');
             ringButtons.forEach(btn => {
                 btn.addEventListener('pointerenter', () => {
@@ -5786,11 +6169,15 @@
                 });
             });
 
-            // 点击宠物本身：直接切换展开/关闭战术选项
+            // 点击宠物本身：如果断电提示抢救；正常则切换展开战术选项
             els.droneCore.addEventListener('click', (e) => {
                 if (isDragging) return;
                 e.preventDefault();
                 e.stopPropagation();
+                if (state.battery <= 0) {
+                    showBubble('💀 [POWER_OFF 核心断电] 机能已停摆，已无生命体征... 请【双击机身】实施除颤电击抢救！⚡', 4000);
+                    return;
+                }
                 if (state.sleeping) {
                     toggleSleep(false);
                     return;
@@ -5803,21 +6190,24 @@
                 }
             });
 
-            // 双击宠物快速投喂
+            // 双击宠物快速投喂；若断电则执行高压除颤抢救
             els.droneCore.addEventListener('dblclick', (e) => {
                 if (isDragging) return;
                 e.preventDefault();
                 e.stopPropagation();
-                playFeed();
+                if (state.battery <= 0) {
+                    reviveDrone();
+                } else {
+                    playFeed();
+                }
             });
 
             // 右键机体快捷呼出轮盘
             widget.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
-                toggleRingMenu();
+                if (state.battery > 0) toggleRingMenu();
             });
 
-            // 点击外部空白区域自动收起轮盘
             document.addEventListener('pointerdown', (e) => {
                 if (isRingOpen && !widget.contains(e.target)) {
                     closeRingMenu();
@@ -5865,7 +6255,7 @@
                 });
             }
 
-            // 轮盘指令 4: 🔋 投喂充能与升级
+            // 轮盘指令 4: 🔋 投喂充能与升级（带过载降级博弈）
             if (els.droneActionFeed) {
                 els.droneActionFeed.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -5888,6 +6278,7 @@
 
             // 轮盘指令 6: 💤 待机休眠 / 警戒唤醒
             function toggleSleep(force) {
+                if (state.battery <= 0) return;
                 state.sleeping = typeof force === 'boolean' ? force : !state.sleeping;
                 saveState();
                 updateUI();
@@ -5895,7 +6286,7 @@
                 if (state.sleeping) {
                     playDroneSound('sleep');
                     if (els.dronePupil) els.dronePupil.style.transform = 'translate(0px, 0px)';
-                    showBubble('Zzz... 动力核心低功耗待机中。点击机体即可随时唤醒。', 3500);
+                    showBubble('Zzz... 动力核心低功耗待机中（耗电降低 80%）。点击机体即可随时唤醒。', 3500);
                 } else {
                     playDroneSound('wake');
                     showBubble('SYSTEM_READY! 动力核心再启动，精神饱满！', 3500);
