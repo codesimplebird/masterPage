@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V3.0.10 · YAML</title>
+    <title>CYBER-DECK V3.0.11 · YAML</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -2588,41 +2588,127 @@
             box-shadow: 0 0 14px var(--drone-color-glow);
         }
 
-        /* --- 物理摸鱼小游戏：激光追逐与赛博木鱼 (Round 3) --- */
-        /* 战术激光光斑指示器 */
+        /* --- 物理摸鱼小游戏：战术激光逗宠与赛博木鱼 (Round 3 & V3.0.11) --- */
+        /* 战术激光光斑指示器与高敏准星 */
         .drone-laser-dot {
             position: fixed;
-            width: 18px;
-            height: 18px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            background: #ff0055;
-            box-shadow: 0 0 14px #ff0055, 0 0 28px rgba(255, 0, 85, 0.8);
+            background: radial-gradient(circle, #ff0055 35%, rgba(255, 0, 85, 0.35) 70%, transparent 100%);
+            box-shadow: 0 0 16px #ff0055, 0 0 32px rgba(255, 0, 85, 0.8);
             pointer-events: none;
             z-index: 99998;
             transform: translate(-50%, -50%);
-            animation: laser-pulse 0.6s infinite alternate;
+            transition: transform 0.05s ease-out;
+        }
+        .drone-laser-dot::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            background: #ffffff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px #ffffff;
         }
         .drone-laser-dot::after {
             content: '';
             position: absolute;
-            inset: -6px;
+            inset: -8px;
             border: 1.5px dashed #ff0055;
             border-radius: 50%;
-            animation: laser-ring 2s linear infinite;
+            animation: laser-ring 2.5s linear infinite;
         }
-        @keyframes laser-pulse {
-            0% { transform: translate(-50%, -50%) scale(0.85); opacity: 0.8; }
-            100% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+        .drone-laser-dot.is-locking::after {
+            border-color: #ffd700;
+            animation-duration: 0.8s;
         }
         @keyframes laser-ring {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
 
+        /* 激光逗宠屏幕顶部控制条 HUD */
+        .drone-laser-hud {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 7px 18px;
+            background: rgba(10, 15, 26, 0.94);
+            border: 1px solid #ff0055;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.35), inset 0 0 10px rgba(255, 0, 85, 0.2);
+            border-radius: 999px;
+            backdrop-filter: blur(10px);
+            font-family: 'Orbitron', 'PingFang SC', sans-serif;
+            color: #fff;
+            user-select: none;
+            animation: laser-hud-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            white-space: nowrap;
+        }
+        @keyframes laser-hud-in {
+            from { opacity: 0; transform: translate(-50%, -18px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        .drone-laser-hud .laser-hud-title {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #ff0055;
+            text-shadow: 0 0 8px #ff0055;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .drone-laser-hud .laser-hud-stats {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.78rem;
+            color: #a0aec0;
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0 12px;
+        }
+        .drone-laser-hud .laser-hud-stats b {
+            color: #00f0ff;
+            font-family: 'Orbitron', monospace;
+            text-shadow: 0 0 6px #00f0ff;
+        }
+        .drone-laser-hud .laser-hud-tip {
+            font-size: 0.72rem;
+            color: #718096;
+        }
+        .drone-laser-hud .laser-hud-exit-btn {
+            background: rgba(255, 0, 85, 0.15);
+            border: 1px solid #ff0055;
+            color: #ff0055;
+            border-radius: 999px;
+            padding: 3px 12px;
+            font-size: 0.72rem;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .drone-laser-hud .laser-hud-exit-btn:hover {
+            background: #ff0055;
+            color: #fff;
+            box-shadow: 0 0 10px #ff0055;
+        }
+
         /* 捕获激光高速俯冲追逐态 */
         .cyber-drone-widget.is-hunting {
             transition: none !important;
-            filter: drop-shadow(0 0 16px var(--drone-color)) !important;
+            filter: drop-shadow(0 0 18px #ff0055) !important;
+            cursor: crosshair !important;
         }
 
         /* 赛博功德木鱼敲击浮动文字 */
@@ -3354,7 +3440,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V3.0.10</span>
+            <span class="version-badge">V3.0.11</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -3619,7 +3705,7 @@
                 </div>
                 <div class="drone-header-tools">
                     <button type="button" class="drone-tool-btn" id="drone-health-btn" title="开启 30 秒护眼与深呼吸放松引导" aria-label="开启呼吸引导">🌿</button>
-                    <button type="button" class="drone-tool-btn" id="drone-game-btn" title="开启战术激光逗引小游戏 (光标追捕)" aria-label="开启激光小游戏">🎮</button>
+                    <button type="button" class="drone-tool-btn" id="drone-game-btn" title="开启战术激光逗宠模式 (移动光标逗引/戏耍扑咬)" aria-label="开启激光逗宠模式">🎮</button>
                     <button type="button" class="drone-tool-btn" id="drone-zen-btn" title="切换赛博功德木鱼模式 (敲击功德+1/Bug-1)" aria-label="切换赛博木鱼模式">📿</button>
                     <button type="button" class="drone-tool-btn" id="drone-reset-btn" title="归位至屏幕右下角" aria-label="归位至右下角">⌖</button>
                     <button type="button" class="drone-tool-btn" id="drone-sound-btn" title="切换伴侣音效" aria-label="切换伴侣音效">🔊</button>
@@ -6329,13 +6415,26 @@
                 }
             }
 
-            // --- 小游戏 1：战术红外激光逗引追逐 (Laser Pointer Chase) ---
+            // --- 小游戏 1：战术红外激光逗引与逗宠互动 (Laser Pointer Chase & Tease) ---
             let isLaserGameActive = false;
             let laserTargetX = window.innerWidth / 2;
             let laserTargetY = window.innerHeight / 2;
             let laserDotEl = null;
+            let laserHudEl = null;
             let laserAnimFrame = null;
             let laserCatches = 0;
+            let laserCombo = 0;
+            let maxCombo = 0;
+            let totalAffinityEarned = 0;
+            let catchCooldownUntil = 0;
+            let lastLaserPointerX = laserTargetX;
+            let lastLaserPointerY = laserTargetY;
+            let lastPointerTime = Date.now();
+            let pointerSpeed = 0;
+            let laserStartPointerX = 0;
+            let laserStartPointerY = 0;
+            let isArmed = false; // 需移开至少 60px 或经过安全期才激活扑咬判定，杜绝秒触发
+            let lastMissSpeechTime = 0;
 
             function startLaserGame() {
                 if (state.battery <= 0) {
@@ -6351,16 +6450,60 @@
 
                 isLaserGameActive = true;
                 laserCatches = 0;
+                laserCombo = 0;
+                maxCombo = 0;
+                totalAffinityEarned = 0;
+                isArmed = false;
+                catchCooldownUntil = Date.now() + 1000; // 前 1.0 秒免触发
+
+                const rect = widget.getBoundingClientRect();
+                const curCenterX = rect.left + rect.width / 2;
+                const curCenterY = rect.top + rect.height / 2;
+
+                // 初始红点放置在机甲对侧，避免重叠
+                laserTargetX = (curCenterX > window.innerWidth / 2) ? curCenterX - 240 : curCenterX + 240;
+                laserTargetY = Math.max(80, Math.min(window.innerHeight - 80, curCenterY - 100));
+                lastLaserPointerX = laserTargetX;
+                lastLaserPointerY = laserTargetY;
+                laserStartPointerX = laserTargetX;
+                laserStartPointerY = laserTargetY;
+                lastPointerTime = Date.now();
+                pointerSpeed = 0;
+
                 widget.classList.add('is-hunting');
                 playDroneSound('radar');
 
+                // 1. 创建红外激光点
                 laserDotEl = document.createElement('div');
                 laserDotEl.className = 'drone-laser-dot';
                 laserDotEl.style.left = `${laserTargetX}px`;
                 laserDotEl.style.top = `${laserTargetY}px`;
                 document.body.appendChild(laserDotEl);
 
-                showBubble('🎯【红外激光逗引模式已启动】移动鼠标引诱机甲！抓获 3 次即可通关！(按 Esc 随时退出)', 5000);
+                // 2. 创建屏幕顶部游戏控制 HUD
+                laserHudEl = document.createElement('div');
+                laserHudEl.className = 'drone-laser-hud';
+                laserHudEl.innerHTML = `
+                    <div class="laser-hud-title">🎯 战术激光逗宠</div>
+                    <div class="laser-hud-stats">
+                        <span>捕获: <b id="laser-hud-catches">0</b></span>
+                        <span>连击: <b id="laser-hud-combo">0</b></span>
+                        <span>好感: <b id="laser-hud-affinity">+0</b></span>
+                    </div>
+                    <div class="laser-hud-tip">移动红光引诱 · 停下让其扑击 · 甩开可戏耍</div>
+                    <button type="button" class="laser-hud-exit-btn" id="laser-hud-exit-btn">退出 (ESC)</button>
+                `;
+                document.body.appendChild(laserHudEl);
+
+                const exitBtn = byId('laser-hud-exit-btn');
+                if (exitBtn) {
+                    exitBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        stopLaserGame();
+                    });
+                }
+
+                showBubble('🎯【激光逗引已就绪】快移动鼠标把红光甩开！看本座能否扑住它～(按 ESC 随时退出)', 4500);
 
                 window.addEventListener('pointermove', onLaserPointerMove, { passive: true });
                 window.addEventListener('keydown', onLaserKeydown);
@@ -6368,11 +6511,25 @@
             }
 
             function onLaserPointerMove(e) {
+                const now = Date.now();
+                const dt = Math.max(1, now - lastPointerTime);
+                const moveDist = Math.hypot(e.clientX - lastLaserPointerX, e.clientY - lastLaserPointerY);
+                pointerSpeed = (moveDist / dt) * 1000; // px/s
+
+                lastLaserPointerX = e.clientX;
+                lastLaserPointerY = e.clientY;
+                lastPointerTime = now;
+
                 laserTargetX = e.clientX;
                 laserTargetY = e.clientY;
                 if (laserDotEl) {
                     laserDotEl.style.left = `${laserTargetX}px`;
                     laserDotEl.style.top = `${laserTargetY}px`;
+                }
+
+                // 一旦光标距离起点超过 60px，激活扑咬捕获判定
+                if (!isArmed && Math.hypot(e.clientX - laserStartPointerX, e.clientY - laserStartPointerY) > 60) {
+                    isArmed = true;
                 }
             }
 
@@ -6392,45 +6549,100 @@
                 const dy = laserTargetY - curY;
                 const dist = Math.hypot(dx, dy);
 
-                // 物理追逐逼近算法（限制最大追逐速度 8px/帧）
-                if (dist > 28) {
-                    const speed = Math.min(8.5, dist * 0.08);
+                // 激光点锁定动效
+                if (laserDotEl) {
+                    if (dist < 80) {
+                        laserDotEl.classList.add('is-locking');
+                    } else {
+                        laserDotEl.classList.remove('is-locking');
+                    }
+                }
+
+                const now = Date.now();
+
+                // 追逐物理逼近逻辑
+                if (dist > 32) {
+                    // 距离较远时平滑高速追猎，限速 10.5px/帧
+                    const speed = Math.min(10.5, Math.max(3.2, dist * 0.085));
                     const nx = rect.left + (dx / dist) * speed;
                     const ny = rect.top + (dy / dist) * speed;
                     setWidgetPos(nx, ny, false);
 
-                    // 疾速追逐等离子火花
-                    if (Math.random() > 0.6) {
+                    // 尾部疾速等离子火花
+                    if (Math.random() > 0.55) {
                         createPlasmaSpark(nx + 43, ny + 70);
                     }
-                } else {
-                    // 成功扑咬捕获激光点！
-                    laserCatches++;
-                    playDroneSound('catch');
-                    triggerBarrelRoll();
-                    addAffinity(3, true);
-                    state.battery = Math.min(100, state.battery + 5);
-                    saveState();
-                    updateBatteryUI();
+                } else if (isArmed && now > catchCooldownUntil) {
+                    // 机甲逼近扑击距离 (dist <= 32px)
+                    // 判断：玩家是否在最后一瞬快速甩开光标进行“戏耍”
+                    if (pointerSpeed > 320 && (now - lastMissSpeechTime > 1500)) {
+                        // 戏耍成功！机甲扑空！
+                        lastMissSpeechTime = now;
+                        catchCooldownUntil = now + 900; // 扑空硬直 0.9s
+                        laserCombo = 0; // 连击重置
+                        playDroneSound('poke');
 
-                    // 产生暴击粒子
-                    createPlasmaSpark(curX, curY);
+                        const avatar = els.droneAvatarWrap;
+                        if (avatar) {
+                            avatar.classList.remove('drone-wiggling');
+                            void avatar.offsetWidth;
+                            avatar.classList.add('drone-wiggling');
+                        }
 
-                    // 激光点瞬移到随机新位置
-                    laserTargetX = 60 + Math.random() * (window.innerWidth - 120);
-                    laserTargetY = 60 + Math.random() * (window.innerHeight - 120);
-                    if (laserDotEl) {
-                        laserDotEl.style.left = `${laserTargetX}px`;
-                        laserDotEl.style.top = `${laserTargetY}px`;
-                    }
+                        const missQuotes = [
+                            '嗷呜！扑空了！主人手速好快！',
+                            '可恶，等离子爪抓了个寂寞！别跑！',
+                            '好险！就差 0.01 秒就能按住啦！',
+                            '主人太坏了居然戏耍我，这次本座认真了！'
+                        ];
+                        showBubble(missQuotes[Math.floor(Math.random() * missQuotes.length)], 2200);
 
-                    if (laserCatches >= 3) {
-                        stopLaserGame();
-                        playDroneSound('victory');
-                        showBubble(`🏆【战术捕获大获全胜！】成功拦截 3 次激光信标！好感度 +9，电量补充 +15%！机甲机动工况 100%！`, 6000);
-                        return;
+                        const comboEl = byId('laser-hud-combo');
+                        if (comboEl) comboEl.textContent = '0';
                     } else {
-                        showBubble(`嗷呜！捕获第 ${laserCatches} 次！好感度 +3，电量 +5%！继续追捕下一个！⚡`, 2500);
+                        // 扑咬成功！捕获激光光斑！
+                        laserCatches++;
+                        laserCombo++;
+                        if (laserCombo > maxCombo) maxCombo = laserCombo;
+                        catchCooldownUntil = now + 1100; // 捕获庆祝硬直 1.1s
+
+                        playDroneSound('catch');
+                        triggerBarrelRoll();
+                        createPlasmaSpark(curX, curY);
+                        createPlasmaSpark(laserTargetX, laserTargetY);
+
+                        // 收益累加：好感度 +3，电量 +4%
+                        addAffinity(3, true);
+                        totalAffinityEarned += 3;
+                        state.battery = Math.min(100, state.battery + 4);
+                        saveState();
+                        updateBatteryUI();
+
+                        // 弹出浮动奖励
+                        spawnKarmaParticle(curX, curY - 25, `🎯 扑获+1 ⚡ COMBO x${laserCombo}`);
+
+                        // 更新 HUD 统计
+                        const catchesEl = byId('laser-hud-catches');
+                        const comboEl = byId('laser-hud-combo');
+                        const affEl = byId('laser-hud-affinity');
+                        if (catchesEl) catchesEl.textContent = laserCatches;
+                        if (comboEl) comboEl.textContent = laserCombo;
+                        if (affEl) affEl.textContent = `+${totalAffinityEarned}`;
+
+                        // 连击提示与里程碑奖励
+                        if (laserCombo >= 3) {
+                            showBubble(`🔥【${laserCombo} 连击超神！】机甲身法如电！亲密度 +3，动力充能完毕！`, 2600);
+                        } else {
+                            showBubble(`嗷呜！成功扑中第 ${laserCatches} 次！亲密度 +3！继续甩动引诱我～`, 2200);
+                        }
+
+                        if (laserCatches === 5 || laserCatches === 10) {
+                            playDroneSound('victory');
+                            addAffinity(5, true);
+                            totalAffinityEarned += 5;
+                            if (affEl) affEl.textContent = `+${totalAffinityEarned}`;
+                            showBubble(`🏆【战术突击突破 ${laserCatches} 次！】敏捷勋章已解锁！额外好感 +5！`, 3500);
+                        }
                     }
                 }
 
@@ -6444,12 +6656,25 @@
                 window.removeEventListener('pointermove', onLaserPointerMove);
                 window.removeEventListener('keydown', onLaserKeydown);
                 widget.classList.remove('is-hunting');
+
                 if (laserDotEl && laserDotEl.parentNode) {
                     laserDotEl.parentNode.removeChild(laserDotEl);
                     laserDotEl = null;
                 }
+                if (laserHudEl && laserHudEl.parentNode) {
+                    laserHudEl.parentNode.removeChild(laserHudEl);
+                    laserHudEl = null;
+                }
+
                 const rect = widget.getBoundingClientRect();
                 LS.set(POS_KEY, { x: rect.left, y: rect.top });
+
+                if (laserCatches > 0) {
+                    playDroneSound('victory');
+                    showBubble(`🏁【逗宠训练结束】共扑获 ${laserCatches} 次，最高连击 x${maxCombo}！累计获得好感度 +${totalAffinityEarned}！伴侣身心舒畅！`, 5500);
+                } else {
+                    showBubble('激光逗宠模式已退出，伴侣恢复待命巡逻。', 3000);
+                }
             }
 
             // --- 小游戏 2：赛博解压电子木鱼 (Cyber Wooden Fish / Karma Tapper) ---
@@ -6527,6 +6752,7 @@
 
             function openHealthSentry() {
                 if (!els.droneHealthOverlay) return;
+                if (isLaserGameActive) stopLaserGame();
                 closeRingMenu();
                 els.droneHealthOverlay.hidden = false;
                 els.droneHealthOverlay.setAttribute('aria-hidden', 'false');
@@ -6877,8 +7103,8 @@
                 }, 450);
             }
 
-            let startPointerX = 0;
-            let startPointerY = 0;
+            let dragStartX = 0;
+            let dragStartY = 0;
             let initialWidgetX = 0;
             let initialWidgetY = 0;
             let lastMoveX = 0;
@@ -6894,8 +7120,8 @@
                 }
                 isPointerDown = true;
                 isDragging = false;
-                startPointerX = e.clientX;
-                startPointerY = e.clientY;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
                 const rect = widget.getBoundingClientRect();
                 initialWidgetX = rect.left;
                 initialWidgetY = rect.top;
@@ -6910,8 +7136,8 @@
 
             widget.addEventListener('pointermove', (e) => {
                 if (!isPointerDown) return;
-                const dx = e.clientX - startPointerX;
-                const dy = e.clientY - startPointerY;
+                const dx = e.clientX - dragStartX;
+                const dy = e.clientY - dragStartY;
                 const dist = Math.hypot(dx, dy);
 
                 if (!isDragging && dist >= 6) {
