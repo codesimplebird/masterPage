@@ -24,7 +24,13 @@
 - 分类数据更多可视化（分类图标 hover 动效微调）
 - 链接数量更多时考虑分页或折叠分类
 
-## 最新一次优化要点（V3.0.9 - Round 4 进化）
+## 最新一次优化要点（V3.0.10）
+
+- 修复伴侣初始化 TDZ 暂时性死区异常（Fix ReferenceError: Cannot access 'widget' before initialization）：
+  - 根因定位：在 `setupDroneCompanion` 函数内部，`const widget = els.droneWidget;` 原先声明在靠后的拖拽模块中，而前置的 `updateUI` -> `applyChassis` 在执行时试图读取 `widget`，触发了 JavaScript ES6 块级作用域的暂时性死区（TDZ），导致后续页面链接看板的 `render()` 及组件初始化被中断白屏；
+  - 修复方案：将 `const widget = els.droneWidget;` 及相关全局标志位（`isRingOpen`, `isPointerDown`, `isDragging`）移至 `setupDroneCompanion` 函数最顶端前置初始化，彻底根除变量访问死区，页面初始化与看板渲染 100% 顺畅执行！
+
+## 历史优化要点（V3.0.9 - Round 4 进化）
 
 - 赛博桌面伴侣生产力与健康守护哨兵矩阵（Health Sentry, Memo Sync & Audio Suite）：
   - 久坐远眺与 30 秒赛博深呼吸引导 (Health & Eye Care Sentry)：
