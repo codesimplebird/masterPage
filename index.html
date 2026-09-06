@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V3.0.5</title>
+    <title>CYBER-DECK V3.0.6</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -2441,6 +2441,143 @@
             border-bottom: 6px solid var(--drone-color);
         }
 
+        /* --- 三大机体形态与模块化装甲 (Round 1) --- */
+        .drone-chassis {
+            display: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .cyber-drone-widget[data-chassis="falcon"] #chassis-falcon,
+        .cyber-drone-widget[data-chassis="titan"] #chassis-titan,
+        .cyber-drone-widget[data-chassis="neko"] #chassis-neko {
+            display: inline;
+        }
+
+        /* 泰坦形态专属微动效 */
+        .titan-ear-l {
+            animation: titan-ear-l-wag 2.8s ease-in-out infinite alternate;
+            transform-origin: 26px 45px;
+        }
+        .titan-ear-r {
+            animation: titan-ear-r-wag 2.8s ease-in-out infinite alternate;
+            transform-origin: 74px 45px;
+        }
+        @keyframes titan-ear-l-wag {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-10deg); }
+        }
+        @keyframes titan-ear-r-wag {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(10deg); }
+        }
+
+        /* 赛博猫咪形态专属微动效 */
+        .neko-tail {
+            animation: neko-tail-sway 2.4s ease-in-out infinite alternate;
+            transform-origin: 28px 60px;
+        }
+        .neko-ear-l {
+            animation: neko-ear-twitch 3.8s ease-in-out infinite;
+            transform-origin: 38px 24px;
+        }
+        .neko-ear-r {
+            animation: neko-ear-twitch 4.2s ease-in-out 0.6s infinite;
+            transform-origin: 60px 24px;
+        }
+        @keyframes neko-tail-sway {
+            0% { transform: rotate(-8deg); }
+            100% { transform: rotate(12deg); }
+        }
+        @keyframes neko-ear-twitch {
+            0%, 90%, 100% { transform: rotate(0deg); }
+            93% { transform: rotate(-8deg); }
+            96% { transform: rotate(4deg); }
+        }
+
+        /* 模块化等级装甲动态挂载 */
+        .drone-modular-armor path,
+        .drone-modular-armor polygon,
+        .drone-modular-armor line,
+        .drone-modular-armor circle {
+            display: none;
+            transition: opacity 0.4s ease;
+        }
+        .cyber-drone-widget.lvl-2 .armor-lv2,
+        .cyber-drone-widget.lvl-3 .armor-lv2,
+        .cyber-drone-widget.lvl-4 .armor-lv2,
+        .cyber-drone-widget.lvl-5 .armor-lv2 {
+            display: inline;
+        }
+        .cyber-drone-widget.lvl-3 .armor-lv3,
+        .cyber-drone-widget.lvl-4 .armor-lv3,
+        .cyber-drone-widget.lvl-5 .armor-lv3 {
+            display: inline;
+        }
+        .cyber-drone-widget.lvl-4 .armor-lv4,
+        .cyber-drone-widget.lvl-5 .armor-lv4 {
+            display: inline;
+        }
+        .cyber-drone-widget.lvl-5 .armor-lv5 {
+            display: inline;
+            animation: armor-halo-pulse 2.2s ease-in-out infinite alternate;
+        }
+        @keyframes armor-halo-pulse {
+            0% { opacity: 0.4; filter: drop-shadow(0 0 2px var(--drone-color)); }
+            100% { opacity: 0.95; filter: drop-shadow(0 0 8px var(--drone-color)); }
+        }
+
+        /* 气泡标题栏形态与重命名按钮 */
+        .drone-bubble-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .drone-rename-btn {
+            background: none;
+            border: none;
+            color: rgba(0, 243, 255, 0.65);
+            font-size: 0.72rem;
+            cursor: pointer;
+            padding: 1px 3px;
+            border-radius: 3px;
+            line-height: 1;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .drone-rename-btn:hover {
+            color: #fff;
+            background: rgba(0, 243, 255, 0.2);
+        }
+
+        .drone-chassis-btn {
+            background: rgba(0, 243, 255, 0.12);
+            border: 1px solid rgba(0, 243, 255, 0.4);
+            color: var(--drone-color);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.62rem;
+            padding: 1px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .drone-chassis-btn:hover {
+            background: var(--drone-color);
+            color: #05070d;
+            box-shadow: 0 0 8px var(--drone-color-glow);
+        }
+
+        /* 变形瞬态量子光芒 */
+        .drone-transforming {
+            animation: drone-transform-flash 0.45s ease-out;
+        }
+        @keyframes drone-transform-flash {
+            0% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 0px var(--drone-color)); }
+            50% { transform: scale(1.25) rotate(15deg); filter: brightness(2.2) drop-shadow(0 0 22px var(--drone-color)); }
+            100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 4px var(--drone-color)); }
+        }
+
         /* 视窗右侧自适应防裁切：靠右时气泡自动右对齐 */
         .cyber-drone-widget.bubble-align-right .drone-bubble {
             left: auto;
@@ -2933,7 +3070,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V3.0.5</span>
+            <span class="version-badge">V3.0.6</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -3097,21 +3234,69 @@
         <div class="drone-core" id="drone-core" role="button" aria-haspopup="true" aria-expanded="false" aria-label="全息机甲伴侣核心">
             <div class="drone-avatar-wrap" id="drone-avatar-wrap">
                 <svg class="drone-svg" id="drone-svg" viewBox="0 0 100 80" width="80" height="60" aria-hidden="true">
-                    <!-- 推进器等离子尾焰 -->
-                    <ellipse class="drone-glow thruster-l" cx="24" cy="58" rx="7" ry="2.5" />
-                    <ellipse class="drone-glow thruster-r" cx="76" cy="58" rx="7" ry="2.5" />
-                    <!-- 双翼悬浮护翼 -->
-                    <path class="drone-wing" d="M12 42 Q24 28 34 38 L30 48 Q20 48 12 42 Z" />
-                    <path class="drone-wing" d="M88 42 Q76 28 66 38 L70 48 Q80 48 88 42 Z" />
-                    <!-- 机身核心战术装甲 -->
-                    <polygon class="drone-hull" points="30,32 70,32 78,48 68,60 32,60 22,48" />
-                    <line class="drone-panel-line" x1="36" y1="36" x2="64" y2="36" />
-                    <!-- 天线雷达与微光信标 -->
-                    <line class="drone-antenna" x1="50" y1="32" x2="50" y2="18" />
-                    <circle class="drone-beacon" cx="50" cy="16" r="2.5" />
-                    <!-- 核心光学眼环 -->
+                    <!-- 形态 1: 游隼侦察机 (Falcon Scout) -->
+                    <g id="chassis-falcon" class="drone-chassis">
+                        <ellipse class="drone-glow thruster-l" cx="24" cy="58" rx="7" ry="2.5" />
+                        <ellipse class="drone-glow thruster-r" cx="76" cy="58" rx="7" ry="2.5" />
+                        <path class="drone-wing" d="M12 42 Q24 28 34 38 L30 48 Q20 48 12 42 Z" />
+                        <path class="drone-wing" d="M88 42 Q76 28 66 38 L70 48 Q80 48 88 42 Z" />
+                        <polygon class="drone-hull" points="30,32 70,32 78,48 68,60 32,60 22,48" />
+                        <line class="drone-panel-line" x1="36" y1="36" x2="64" y2="36" />
+                        <line class="drone-antenna" x1="50" y1="32" x2="50" y2="18" />
+                        <circle class="drone-beacon" cx="50" cy="16" r="2.5" />
+                    </g>
+
+                    <!-- 形态 2: 泰坦重装球 (Titan Orb) -->
+                    <g id="chassis-titan" class="drone-chassis">
+                        <ellipse class="drone-glow" cx="36" cy="68" rx="5" ry="2" />
+                        <ellipse class="drone-glow" cx="64" cy="68" rx="5" ry="2" />
+                        <!-- 泰坦左右开合动力耳鳍 -->
+                        <path class="drone-wing titan-ear-l" d="M26 34 C14 30 14 52 26 58 Z" />
+                        <path class="drone-wing titan-ear-r" d="M74 34 C86 30 86 52 74 58 Z" />
+                        <!-- 球形重装装甲外壳 -->
+                        <circle class="drone-hull" cx="50" cy="46" r="23" />
+                        <circle class="drone-panel-line" cx="50" cy="46" r="17" stroke-dasharray="3 3" />
+                        <!-- 顶部重装甲 crest -->
+                        <path class="drone-wing" d="M38 25 Q50 20 62 25 L58 30 Q50 26 42 30 Z" />
+                        <line class="drone-antenna" x1="50" y1="20" x2="50" y2="12" />
+                        <circle class="drone-beacon" cx="50" cy="11" r="2.5" />
+                    </g>
+
+                    <!-- 形态 3: 灵动机械猫 (Cyber Neko Pod) -->
+                    <g id="chassis-neko" class="drone-chassis">
+                        <ellipse class="drone-glow" cx="50" cy="66" rx="8" ry="2.5" />
+                        <!-- 机械猫耳天线 -->
+                        <polygon class="drone-wing neko-ear-l" points="30,34 37,17 46,31" />
+                        <polygon class="drone-wing neko-ear-r" points="54,31 63,17 70,34" />
+                        <line class="drone-panel-line" x1="37" y1="22" x2="41" y2="30" />
+                        <line class="drone-panel-line" x1="63" y1="22" x2="59" y2="30" />
+                        <!-- 猫耳头部圆弧舱体 -->
+                        <path class="drone-hull" d="M28 36 Q50 28 72 36 Q80 48 74 60 Q50 67 26 60 Q20 48 28 36 Z" />
+                        <!-- 灵动微型脉冲胡须 -->
+                        <line class="drone-panel-line" x1="20" y1="46" x2="31" y2="47" />
+                        <line class="drone-panel-line" x1="18" y1="52" x2="30" y2="51" />
+                        <line class="drone-panel-line" x1="69" y1="47" x2="80" y2="46" />
+                        <line class="drone-panel-line" x1="70" y1="51" x2="82" y2="52" />
+                        <!-- 柔性摇摆数据尾巴 -->
+                        <path class="drone-panel-line neko-tail" d="M26 58 Q14 62 13 52 Q12 44 18 42" />
+                    </g>
+
+                    <!-- 动态模块化装甲外挂组件 (随投喂等级点亮) -->
+                    <g id="drone-modular-armor" class="drone-modular-armor">
+                        <!-- LV.2 肩部导流副翼 -->
+                        <polygon class="armor-lv2 drone-panel-line" points="26,38 32,32 34,40" />
+                        <polygon class="armor-lv2 drone-panel-line" points="74,38 68,32 66,40" />
+                        <!-- LV.3 胸部高能防护板 -->
+                        <polygon class="armor-lv3 drone-hull" points="40,56 60,56 56,62 44,62" />
+                        <!-- LV.4 侧舷等离子充能导轨 -->
+                        <line class="armor-lv4" x1="28" y1="48" x2="34" y2="56" stroke="var(--drone-color)" stroke-width="1.5" />
+                        <line class="armor-lv4" x1="72" y1="48" x2="66" y2="56" stroke="var(--drone-color)" stroke-width="1.5" />
+                        <!-- LV.5 满阶黄金力场微型悬浮星环 -->
+                        <circle class="armor-lv5" cx="50" cy="46" r="28" fill="none" stroke="var(--drone-color)" stroke-width="1" stroke-dasharray="4 3" />
+                    </g>
+
+                    <!-- 共享光学眼核心 (全机型自适应匹配) -->
                     <circle class="drone-eye-outer" cx="50" cy="46" r="10" />
-                    <!-- 光学瞳孔 (跟随鼠标平滑注视) -->
                     <g id="drone-pupil-group">
                         <circle class="drone-eye-iris" cx="50" cy="46" r="5" />
                         <circle class="drone-eye-glint" cx="48" cy="44" r="1.5" />
@@ -3142,7 +3327,11 @@
         <!-- 全息对话气泡 -->
         <div class="drone-bubble" id="drone-bubble" aria-live="polite">
             <div class="drone-bubble-header">
-                <span>// A.X.E.L. COMPANION</span>
+                <div class="drone-bubble-title-wrap">
+                    <span id="drone-name-display">// A.X.E.L.</span>
+                    <button type="button" class="drone-rename-btn" id="drone-rename-btn" title="自定义伴侣命名" aria-label="修改伴侣名称">✎</button>
+                    <button type="button" class="drone-chassis-btn" id="drone-chassis-btn" title="点击切换机体形态 (游隼/泰坦/机械猫)">FALCON ⇄</button>
+                </div>
                 <div class="drone-header-tools">
                     <button type="button" class="drone-tool-btn" id="drone-reset-btn" title="归位至屏幕右下角" aria-label="归位至右下角">⌖</button>
                     <button type="button" class="drone-tool-btn" id="drone-sound-btn" title="切换伴侣音效" aria-label="切换伴侣音效">🔊</button>
@@ -3364,6 +3553,9 @@
             droneSpokesSvg: byId('drone-spokes-svg'),
             droneHudTag: byId('drone-hud-tag'),
             droneBubble: byId('drone-bubble'),
+            droneNameDisplay: byId('drone-name-display'),
+            droneRenameBtn: byId('drone-rename-btn'),
+            droneChassisBtn: byId('drone-chassis-btn'),
             droneResetBtn: byId('drone-reset-btn'),
             droneSoundBtn: byId('drone-sound-btn'),
             droneBubbleClose: byId('drone-bubble-close'),
@@ -5350,12 +5542,16 @@
 
             const savedState = LS.get(STATE_KEY, null);
             const state = (savedState && typeof savedState === 'object') ? savedState : {
+                name: 'A.X.E.L.',
+                chassis: 'falcon', // 'falcon' | 'titan' | 'neko'
                 level: 1,
                 coatIdx: 0,
                 feeds: 0,
                 battery: 100,
                 sleeping: false
             };
+            if (!state.name) state.name = 'A.X.E.L.';
+            if (!state.chassis) state.chassis = 'falcon';
             if (typeof state.level !== 'number' || state.level < 1) state.level = 1;
             if (typeof state.coatIdx !== 'number') state.coatIdx = 0;
             if (typeof state.feeds !== 'number') state.feeds = 0;
@@ -5446,6 +5642,15 @@
                         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
                         osc.start(now);
                         osc.stop(now + 0.2);
+                    } else if (type === 'transform') {
+                        // 赛博机甲变形量子流光音
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(220, now);
+                        osc.frequency.exponentialRampToValueAtTime(880, now + 0.24);
+                        gain.gain.setValueAtTime(0.05, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+                        osc.start(now);
+                        osc.stop(now + 0.26);
                     } else if (type === 'open') {
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(320, now);
@@ -5505,6 +5710,73 @@
                 LS.set(STATE_KEY, state);
             }
 
+            const CHASSIS_TYPES = [
+                { id: 'falcon', label: 'FALCON ⇄', name: '游隼侦察型', intro: '【游隼型·侦察机】空气动力矢量翼展开！雷达已就绪，准备巡航！' },
+                { id: 'titan', label: 'TITAN ⇄', name: '泰坦重装球', intro: '【泰坦型·重装机甲球】球形重甲闭合！全向同心护盾充能，防御力大幅提升！' },
+                { id: 'neko', label: 'NEKO ⇄', name: '赛博机械猫', intro: '【赛博猫咪型·柔性伴侣】脉冲猫耳与机尾展开！喵呜~ 软萌伴侣上线，摸头更舒服啦！' }
+            ];
+
+            function applyChassis(chassisId, announce = false) {
+                const found = CHASSIS_TYPES.find(c => c.id === chassisId) || CHASSIS_TYPES[0];
+                state.chassis = found.id;
+                saveState();
+
+                if (widget) {
+                    widget.setAttribute('data-chassis', found.id);
+                }
+                if (els.droneChassisBtn) {
+                    els.droneChassisBtn.textContent = found.label;
+                    els.droneChassisBtn.setAttribute('title', `当前机型：${found.name}（点击切换）`);
+                }
+
+                if (announce) {
+                    playDroneSound('transform');
+                    const wrap = els.droneAvatarWrap;
+                    if (wrap) {
+                        wrap.classList.remove('drone-transforming');
+                        void wrap.offsetWidth;
+                        wrap.classList.add('drone-transforming');
+                    }
+                    showBubble(found.intro, 4500);
+                }
+            }
+
+            function cycleChassis() {
+                const curIdx = CHASSIS_TYPES.findIndex(c => c.id === state.chassis);
+                const nextIdx = (curIdx + 1) % CHASSIS_TYPES.length;
+                applyChassis(CHASSIS_TYPES[nextIdx].id, true);
+            }
+
+            function updateNameDisplay() {
+                const name = state.name || 'A.X.E.L.';
+                if (els.droneNameDisplay) {
+                    els.droneNameDisplay.textContent = `// ${name}`;
+                }
+            }
+
+            function promptRename() {
+                const curName = state.name || 'A.X.E.L.';
+                const input = window.prompt('请输入机甲伴侣的新名称/代号（1~10个字符）：', curName);
+                if (input !== null) {
+                    const trimmed = input.trim();
+                    if (trimmed.length > 0 && trimmed.length <= 10) {
+                        state.name = trimmed;
+                        saveState();
+                        updateNameDisplay();
+                        playDroneSound('victory');
+                        showBubble(`[ID_REGISTERED] 核心代号更新成功！以后我就是您的专属伴侣【${trimmed}】啦！`, 4500);
+                    } else if (trimmed.length > 10) {
+                        alert('名称长度需在 10 个字符以内哦！');
+                    }
+                }
+            }
+
+            function updateArmorLevelUI() {
+                if (!widget) return;
+                widget.classList.remove('lvl-1', 'lvl-2', 'lvl-3', 'lvl-4', 'lvl-5');
+                widget.classList.add(`lvl-${state.level || 1}`);
+            }
+
             function applyCoat(idx) {
                 const coat = COATS[idx % COATS.length];
                 document.documentElement.style.setProperty('--drone-color', coat.color);
@@ -5541,6 +5813,9 @@
 
             function updateUI() {
                 applyCoat(state.coatIdx);
+                applyChassis(state.chassis, false);
+                updateArmorLevelUI();
+                updateNameDisplay();
                 updateBatteryUI();
 
                 if (state.battery > 0) {
@@ -5566,6 +5841,20 @@
                     LS.set(SOUND_KEY, soundEnabled);
                     updateUI();
                     if (soundEnabled) playDroneSound('poke');
+                });
+            }
+
+            if (els.droneChassisBtn) {
+                els.droneChassisBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    cycleChassis();
+                });
+            }
+
+            if (els.droneRenameBtn) {
+                els.droneRenameBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    promptRename();
                 });
             }
 
