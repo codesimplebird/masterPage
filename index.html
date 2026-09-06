@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V3.0.8</title>
+    <title>CYBER-DECK V3.0.9</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -2441,6 +2441,150 @@
             border-bottom: 6px solid var(--drone-color);
         }
 
+        /* --- 生产力与健康守护哨兵 (Round 4) --- */
+        /* 便签未完待办信标脉冲 */
+        .drone-beacon.has-memos {
+            fill: #ffb800 !important;
+            filter: drop-shadow(0 0 10px #ffb800) !important;
+            animation: beacon-alert 1.6s ease-in-out infinite alternate !important;
+        }
+        @keyframes beacon-alert {
+            0% { opacity: 0.5; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1.4); }
+        }
+
+        /* 赛博呼吸引导健康浮层 */
+        .drone-health-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(3, 6, 12, 0.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: overlay-fade-in 0.3s ease-out;
+        }
+        .drone-health-overlay[hidden] {
+            display: none !important;
+        }
+
+        .health-card {
+            position: relative;
+            width: min(440px, 92vw);
+            background: rgba(8, 12, 22, 0.96);
+            border: 1px solid var(--neon);
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(0, 243, 255, 0.25), inset 0 0 20px rgba(0, 243, 255, 0.05);
+            padding: 24px;
+            text-align: center;
+            font-family: 'Orbitron', 'PingFang SC', sans-serif;
+            color: #d1e8ff;
+        }
+
+        .health-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: var(--neon);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .health-subtitle {
+            font-size: 0.76rem;
+            color: #8da4be;
+            margin-bottom: 22px;
+        }
+
+        /* 呼吸引导核心光环 */
+        .breathe-circle-wrap {
+            position: relative;
+            width: 170px;
+            height: 170px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .breathe-outer-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px dashed rgba(0, 243, 255, 0.3);
+            animation: breathe-ring-spin 18s linear infinite;
+        }
+        @keyframes breathe-ring-spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .breathe-bubble {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 243, 255, 0.5) 0%, rgba(0, 255, 157, 0.2) 70%, transparent 100%);
+            box-shadow: 0 0 24px rgba(0, 243, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 4s ease-in-out, box-shadow 4s ease-in-out;
+        }
+
+        .breathe-bubble.inhale {
+            transform: scale(1.48);
+            box-shadow: 0 0 45px rgba(0, 255, 157, 0.7);
+        }
+        .breathe-bubble.hold {
+            transform: scale(1.48);
+            box-shadow: 0 0 45px rgba(255, 215, 0, 0.7);
+        }
+        .breathe-bubble.exhale {
+            transform: scale(0.85);
+            box-shadow: 0 0 16px rgba(0, 243, 255, 0.3);
+        }
+
+        .breathe-phase-text {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.8);
+            letter-spacing: 2px;
+        }
+
+        .health-tips {
+            font-size: 0.78rem;
+            line-height: 1.5;
+            color: #9eb8d6;
+            margin-bottom: 20px;
+            background: rgba(0, 243, 255, 0.04);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 243, 255, 0.15);
+        }
+
+        .health-close-btn {
+            background: rgba(0, 243, 255, 0.12);
+            border: 1px solid var(--neon);
+            color: var(--neon);
+            padding: 6px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .health-close-btn:hover {
+            background: var(--neon);
+            color: #05070d;
+            box-shadow: 0 0 14px var(--drone-color-glow);
+        }
+
         /* --- 物理摸鱼小游戏：激光追逐与赛博木鱼 (Round 3) --- */
         /* 战术激光光斑指示器 */
         .drone-laser-dot {
@@ -3207,7 +3351,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V3.0.8</span>
+            <span class="version-badge">V3.0.9</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -3471,6 +3615,7 @@
                     <span class="drone-affinity-badge" id="drone-affinity-badge" title="伴侣好感度与羁绊称号">♥ 50 PARTNER</span>
                 </div>
                 <div class="drone-header-tools">
+                    <button type="button" class="drone-tool-btn" id="drone-health-btn" title="开启 30 秒护眼与深呼吸放松引导" aria-label="开启呼吸引导">🌿</button>
                     <button type="button" class="drone-tool-btn" id="drone-game-btn" title="开启战术激光逗引小游戏 (光标追捕)" aria-label="开启激光小游戏">🎮</button>
                     <button type="button" class="drone-tool-btn" id="drone-zen-btn" title="切换赛博功德木鱼模式 (敲击功德+1/Bug-1)" aria-label="切换赛博木鱼模式">📿</button>
                     <button type="button" class="drone-tool-btn" id="drone-reset-btn" title="归位至屏幕右下角" aria-label="归位至右下角">⌖</button>
@@ -3507,6 +3652,24 @@
             <button type="button" class="drone-ring-btn" id="drone-action-sleep" data-tag="💤 LOW_POWER" title="待机休眠/警戒唤醒" aria-label="待机休眠/警戒唤醒">
                 <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             </button>
+        </div>
+    </div>
+
+    <!-- 赛博护眼与深呼吸引导全息浮层 (Round 4) -->
+    <div class="drone-health-overlay" id="drone-health-overlay" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="深呼吸引导与健康防护">
+        <div class="health-card">
+            <div class="health-title">🌿 SENTRY_RELAX · 赛博健康守护</div>
+            <div class="health-subtitle">极目远眺 20 秒 · 舒展腰背颈椎 · 随光环深呼吸</div>
+            <div class="breathe-circle-wrap">
+                <div class="breathe-outer-ring"></div>
+                <div class="breathe-bubble" id="breathe-bubble">
+                    <span class="breathe-phase-text" id="breathe-phase">吸气</span>
+                </div>
+            </div>
+            <div class="health-tips" id="health-tips">
+                提示：请跟随光环收放节奏调节呼吸，端正坐姿，多补充温水，放松紧绷的眼球。
+            </div>
+            <button type="button" class="health-close-btn" id="health-close-btn">完成放松 (ESC)</button>
         </div>
     </div>
 
@@ -3697,7 +3860,12 @@
             droneRenameBtn: byId('drone-rename-btn'),
             droneChassisBtn: byId('drone-chassis-btn'),
             droneAffinityBadge: byId('drone-affinity-badge'),
+            droneHealthBtn: byId('drone-health-btn'),
             droneGameBtn: byId('drone-game-btn'),
+            droneHealthOverlay: byId('drone-health-overlay'),
+            breatheBubble: byId('breathe-bubble'),
+            breathePhase: byId('breathe-phase'),
+            healthCloseBtn: byId('health-close-btn'),
             droneZenBtn: byId('drone-zen-btn'),
             droneResetBtn: byId('drone-reset-btn'),
             droneSoundBtn: byId('drone-sound-btn'),
@@ -5816,6 +5984,24 @@
                         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
                         osc.start(now);
                         osc.stop(now + 0.22);
+                    } else if (type === 'inhale') {
+                        // 舒缓渐升呼吸引导音
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(260, now);
+                        osc.frequency.exponentialRampToValueAtTime(440, now + 3.8);
+                        gain.gain.setValueAtTime(0.03, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 3.9);
+                        osc.start(now);
+                        osc.stop(now + 3.9);
+                    } else if (type === 'exhale') {
+                        // 舒缓渐降呼吸引导音
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(440, now);
+                        osc.frequency.exponentialRampToValueAtTime(220, now + 3.8);
+                        gain.gain.setValueAtTime(0.03, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 3.9);
+                        osc.start(now);
+                        osc.stop(now + 3.9);
                     } else if (type === 'open') {
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(320, now);
@@ -6251,6 +6437,78 @@
                 }, 1100);
             }
 
+            // --- 生产力与健康守护哨兵 (Round 4) ---
+            let breatheTimer = null;
+            let breathePhaseIdx = 0;
+            let breatheCycleCount = 0;
+
+            function openHealthSentry() {
+                if (!els.droneHealthOverlay) return;
+                closeRingMenu();
+                els.droneHealthOverlay.hidden = false;
+                els.droneHealthOverlay.setAttribute('aria-hidden', 'false');
+                breatheCycleCount = 0;
+                runBreatheStep();
+                window.addEventListener('keydown', onHealthKeydown);
+            }
+
+            function closeHealthSentry() {
+                if (!els.droneHealthOverlay) return;
+                clearTimeout(breatheTimer);
+                els.droneHealthOverlay.hidden = true;
+                els.droneHealthOverlay.setAttribute('aria-hidden', 'true');
+                window.removeEventListener('keydown', onHealthKeydown);
+
+                if (breatheCycleCount >= 2) {
+                    addAffinity(6, true);
+                    state.battery = Math.min(100, state.battery + 10);
+                    saveState();
+                    updateBatteryUI();
+                    showBubble('🌿【深呼吸与远眺放松完成！】精神饱满，好感度 +6，动力恢复 +10%！继续从容前行！', 5000);
+                    playDroneSound('victory');
+                }
+            }
+
+            function onHealthKeydown(e) {
+                if (e.key === 'Escape') closeHealthSentry();
+            }
+
+            function runBreatheStep() {
+                if (!els.breatheBubble || !els.breathePhase || els.droneHealthOverlay.hidden) return;
+                // 3 阶段：吸气 (4s) -> 屏息 (3s) -> 呼气 (4s)
+                const phases = [
+                    { name: '吸气', cls: 'inhale', dur: 4000, sound: 'inhale' },
+                    { name: '屏息', cls: 'hold', dur: 3000, sound: null },
+                    { name: '呼气', cls: 'exhale', dur: 4000, sound: 'exhale' }
+                ];
+
+                const cur = phases[breathePhaseIdx];
+                els.breatheBubble.className = `breathe-bubble ${cur.cls}`;
+                els.breathePhase.textContent = cur.name;
+                if (cur.sound) playDroneSound(cur.sound);
+
+                breathePhaseIdx = (breathePhaseIdx + 1) % phases.length;
+                if (breathePhaseIdx === 0) breatheCycleCount++;
+
+                breatheTimer = setTimeout(runBreatheStep, cur.dur);
+            }
+
+            // 便签未办联动检测 (Memo Sync Sentry)
+            function checkMemoSync() {
+                const beacon = widget ? widget.querySelector('.drone-beacon') : null;
+                if (!beacon) return;
+                const memos = LS.get('v14-memos', []);
+                const pendingCount = memos.filter(m => !m.done).length;
+
+                if (pendingCount > 0) {
+                    beacon.classList.add('has-memos');
+                    beacon.setAttribute('title', `待办哨兵：尚有 ${pendingCount} 项未完成便签！`);
+                } else {
+                    beacon.classList.remove('has-memos');
+                    beacon.removeAttribute('title');
+                }
+            }
+
             function applyCoat(idx) {
                 const coat = COATS[idx % COATS.length];
                 document.documentElement.style.setProperty('--drone-color', coat.color);
@@ -6357,6 +6615,19 @@
                 });
             }
 
+            if (els.droneHealthBtn) {
+                els.droneHealthBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openHealthSentry();
+                });
+            }
+
+            if (els.healthCloseBtn) {
+                els.healthCloseBtn.addEventListener('click', () => {
+                    closeHealthSentry();
+                });
+            }
+
             // --- 电量自然消耗与低电量发牢骚机制 ---
             let lastWhineTime = 0;
 
@@ -6388,6 +6659,8 @@
             setInterval(checkBatteryDrain, 8000);
             setInterval(checkBoredom, 10000);
             setInterval(checkCircadian, 60000);
+            setInterval(checkMemoSync, 12000);
+            checkMemoSync();
 
             // --- 绝地复活机制：对断电机体实施高压除颤抢救 ---
             function reviveDrone() {
