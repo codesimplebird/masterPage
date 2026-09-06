@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER-DECK V3.0.2 · YAML</title>
+    <title>CYBER-DECK V3.0.3 · YAML</title>
     <meta name="description"
           content="A cyberpunk-style HTML navigation page - your personal cyber deck for quick access to favorite websites.">
     <meta name="theme-color" content="#050508" media="(prefers-color-scheme: dark)">
@@ -1796,6 +1796,921 @@
             }
         }
 
+        .sidebar-hack-btn {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--neon);
+            color: var(--neon);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.68rem;
+            padding: 2px 7px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-hack-btn:hover {
+            background: var(--neon);
+            color: #000;
+            box-shadow: 0 0 10px var(--neon);
+            transform: translateY(-1px);
+        }
+
+        /* ========================================================
+           方案 3：全息战术桌面伴侣浮游机 (Cyber Drone Desktop Companion - A.X.E.L.)
+           ======================================================== */
+        :root {
+            --drone-color: #00f3ff;
+            --drone-color-glow: rgba(0, 243, 255, 0.45);
+        }
+
+        .cyber-drone-widget {
+            position: fixed;
+            right: 28px;
+            bottom: 28px;
+            width: 86px;
+            height: 86px;
+            z-index: 9000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            cursor: grab;
+            filter: drop-shadow(0 6px 22px rgba(0, 0, 0, 0.7));
+            transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .cyber-drone-widget:active,
+        .cyber-drone-widget.is-dragging {
+            cursor: grabbing;
+            transition: none !important;
+        }
+
+        /* 菜单展开或专注态时机身悬停动画暂停，保证操作绝对稳定 */
+        .cyber-drone-widget.is-menu-open .drone-core,
+        .cyber-drone-widget.is-focusing .drone-core {
+            animation-play-state: paused !important;
+        }
+
+        /* 外层全息战术力场轮盘 */
+        .drone-holo-ring {
+            position: absolute;
+            inset: -12px;
+            border-radius: 50%;
+            border: 1px dashed var(--drone-color);
+            opacity: 0.45;
+            pointer-events: none;
+            animation: drone-ring-rotate 22s linear infinite;
+            transition: opacity 0.3s ease, border-color 0.3s ease;
+        }
+
+        .drone-holo-ring::before,
+        .drone-holo-ring::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border: 1px solid var(--drone-color);
+        }
+
+        .drone-holo-ring::before {
+            top: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--drone-color);
+            box-shadow: 0 0 6px var(--drone-color);
+        }
+
+        .drone-holo-ring::after {
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--drone-color);
+        }
+
+        /* 浮动无人机核心结构 */
+        .drone-core {
+            position: relative;
+            width: 82px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: drone-hover-bob 3.2s ease-in-out infinite;
+            cursor: pointer;
+            transition: transform 0.15s ease-out;
+        }
+
+        .drone-core:hover {
+            transform: scale(1.05);
+        }
+
+        .cyber-drone-widget.is-dragging .drone-core {
+            animation: none;
+            transform: scale(1.08);
+        }
+
+        .drone-avatar-wrap {
+            flex-shrink: 0;
+            width: 80px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .drone-svg {
+            overflow: visible;
+            filter: drop-shadow(0 0 8px var(--drone-color-glow));
+            transition: filter 0.3s ease;
+        }
+
+        .drone-glow {
+            fill: var(--drone-color);
+            opacity: 0.8;
+            animation: thruster-pulse 1.2s ease-in-out infinite alternate;
+        }
+
+        .drone-wing {
+            fill: rgba(8, 14, 24, 0.92);
+            stroke: var(--drone-color);
+            stroke-width: 1.6;
+            transition: stroke 0.3s;
+        }
+
+        .drone-hull {
+            fill: rgba(13, 19, 33, 0.96);
+            stroke: var(--drone-color);
+            stroke-width: 1.8;
+            transition: stroke 0.3s;
+        }
+
+        .drone-panel-line {
+            stroke: var(--drone-color);
+            stroke-width: 1;
+            opacity: 0.7;
+        }
+
+        .drone-antenna {
+            stroke: var(--drone-color);
+            stroke-width: 1.5;
+        }
+
+        .drone-beacon {
+            fill: #ff0055;
+            animation: beacon-blink 1.4s infinite;
+        }
+
+        .drone-eye-outer {
+            fill: rgba(2, 4, 8, 0.95);
+            stroke: var(--drone-color);
+            stroke-width: 1.8;
+        }
+
+        .drone-eye-iris {
+            fill: var(--drone-color);
+            filter: drop-shadow(0 0 6px var(--drone-color));
+            transition: fill 0.3s;
+        }
+
+        .drone-eye-glint {
+            fill: #ffffff;
+        }
+
+        #drone-pupil-group {
+            transition: transform 0.08s ease-out;
+            transform-origin: 50px 46px;
+        }
+
+        /* 眨眼自然微动作 */
+        .drone-core.is-blinking #drone-pupil-group {
+            animation: eye-blink 0.16s ease-in-out;
+        }
+
+        @keyframes eye-blink {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.08); }
+        }
+
+        /* 闭眼休眠态 path */
+        .drone-sleep-eye {
+            stroke: var(--drone-color);
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        /* 开心/抚摸微表情 (Joyful Smile Eye) */
+        .drone-happy-eye {
+            stroke: var(--drone-color);
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .drone-core.is-happy .drone-happy-eye {
+            opacity: 1 !important;
+        }
+
+        .drone-core.is-happy #drone-pupil-group {
+            opacity: 0 !important;
+        }
+
+        /* 专注模式倒计时 HUD 徽章 */
+        .drone-focus-badge {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(4, 7, 14, 0.95);
+            border: 1px solid var(--neon-alt);
+            color: var(--neon-alt);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            box-shadow: 0 0 12px rgba(188, 19, 254, 0.5);
+            pointer-events: auto;
+            cursor: pointer;
+            display: none;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .cyber-drone-widget.is-focusing .drone-focus-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            animation: badge-pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(188, 19, 254, 0.4); }
+            50% { box-shadow: 0 0 16px rgba(188, 19, 254, 0.8); }
+        }
+
+        /* 激光连接辐射线 SVG */
+        .drone-spokes-svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180px;
+            height: 180px;
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .drone-ring-menu.is-open ~ .drone-spokes-svg,
+        .cyber-drone-widget.is-menu-open .drone-spokes-svg {
+            opacity: 0.65;
+        }
+
+        .drone-spoke-line {
+            stroke: var(--drone-color);
+            stroke-width: 1.2;
+            stroke-dasharray: 4 3;
+            animation: spoke-dash 1.5s linear infinite;
+        }
+
+        @keyframes spoke-dash {
+            to { stroke-dashoffset: -14; }
+        }
+
+        /* 环形战术轮盘菜单 (六边形正交展开，零抖动高科技节点) */
+        .drone-ring-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            z-index: 25;
+        }
+
+        .drone-ring-btn {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(6, 10, 20, 0.96);
+            border: 1.5px solid var(--drone-color);
+            color: var(--drone-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            pointer-events: none;
+            opacity: 0;
+            box-shadow: 0 0 12px var(--drone-color-glow);
+            --btn-x: 0px;
+            --btn-y: 0px;
+            transform: translate(calc(-50% + var(--btn-x)), calc(-50% + var(--btn-y))) scale(0.2);
+            transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        opacity 0.2s ease,
+                        background 0.2s,
+                        color 0.2s,
+                        box-shadow 0.2s;
+        }
+
+        .drone-ring-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            pointer-events: none;
+            transition: transform 0.2s;
+        }
+
+        .drone-ring-menu.is-open .drone-ring-btn {
+            pointer-events: auto;
+            opacity: 1;
+            transform: translate(calc(-50% + var(--btn-x)), calc(-50% + var(--btn-y))) scale(1);
+        }
+
+        /* 悬停放大：严格保持原生极坐标平移，彻底避免坐标震荡 */
+        .drone-ring-menu.is-open .drone-ring-btn:hover {
+            transform: translate(calc(-50% + var(--btn-x)), calc(-50% + var(--btn-y))) scale(1.22);
+            background: var(--drone-color);
+            color: #000;
+            box-shadow: 0 0 20px var(--drone-color);
+            z-index: 10;
+        }
+
+        .drone-ring-menu.is-open .drone-ring-btn:hover svg {
+            stroke: #000;
+            transform: scale(1.1);
+        }
+
+        /* 6 个方向的六边形正交展开 (半径 R = 66px) */
+        .drone-ring-btn:nth-child(1) {
+            /* 1. 正上方 (0, -66px) - ⚡ HACK */
+            --btn-x: 0px;
+            --btn-y: -66px;
+            transition-delay: 0.02s;
+        }
+        .drone-ring-btn:nth-child(2) {
+            /* 2. 右上方 (57px, -33px) - ⏱ FOCUS */
+            --btn-x: 57px;
+            --btn-y: -33px;
+            transition-delay: 0.04s;
+        }
+        .drone-ring-btn:nth-child(3) {
+            /* 3. 右下方 (57px, 33px) - 🎲 RADAR */
+            --btn-x: 57px;
+            --btn-y: 33px;
+            transition-delay: 0.06s;
+        }
+        .drone-ring-btn:nth-child(4) {
+            /* 4. 正下方 (0, 66px) - 🔋 FEED */
+            --btn-x: 0px;
+            --btn-y: 66px;
+            transition-delay: 0.08s;
+        }
+        .drone-ring-btn:nth-child(5) {
+            /* 5. 左下方 (-57px, 33px) - 🎨 COAT */
+            --btn-x: -57px;
+            --btn-y: 33px;
+            transition-delay: 0.10s;
+        }
+        .drone-ring-btn:nth-child(6) {
+            /* 6. 左上方 (-57px, -33px) - 💤 SLEEP */
+            --btn-x: -57px;
+            --btn-y: -33px;
+            transition-delay: 0.12s;
+        }
+
+        /* 战术指令悬浮即时 HUD 标签 */
+        .drone-hud-tag {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(3, 6, 12, 0.95);
+            border: 1px solid var(--drone-color);
+            color: var(--drone-color);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.8px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+            box-shadow: 0 0 10px var(--drone-color-glow);
+            z-index: 35;
+        }
+
+        .drone-hud-tag.is-active {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* 悬浮全息对话气泡 */
+        .drone-bubble {
+            position: absolute;
+            bottom: calc(100% + 14px);
+            left: 50%;
+            transform: translateX(-50%) translateY(8px) scale(0.95);
+            width: 240px;
+            max-width: 82vw;
+            background: rgba(6, 10, 20, 0.95);
+            border: 1px solid var(--drone-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 0.74rem;
+            line-height: 1.45;
+            color: #d6e8ff;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.75), inset 0 0 12px var(--drone-color-glow);
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.25s, bottom 0.25s, top 0.25s;
+            z-index: 30;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .drone-bubble.is-visible {
+            pointer-events: auto;
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        .cyber-drone-widget.is-menu-open .drone-bubble {
+            bottom: calc(100% + 46px);
+        }
+
+        .drone-bubble::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid var(--drone-color);
+        }
+
+        .cyber-drone-widget.flip-down .drone-bubble {
+            bottom: auto;
+            top: calc(100% + 14px);
+            transform: translateX(-50%) translateY(-8px) scale(0.95);
+        }
+
+        .cyber-drone-widget.flip-down.is-menu-open .drone-bubble {
+            top: calc(100% + 46px);
+            bottom: auto;
+        }
+
+        .cyber-drone-widget.flip-down .drone-bubble.is-visible {
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        .cyber-drone-widget.flip-down .drone-bubble::after {
+            top: auto;
+            bottom: 100%;
+            border-top: none;
+            border-bottom: 6px solid var(--drone-color);
+        }
+
+        .drone-bubble-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.62rem;
+            color: var(--drone-color);
+            letter-spacing: 0.5px;
+            border-bottom: 1px dashed rgba(0, 243, 255, 0.2);
+            padding-bottom: 3px;
+        }
+
+        .drone-header-tools {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .drone-tool-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.72rem;
+            padding: 0 3px;
+            line-height: 1;
+            transition: color 0.2s, transform 0.15s;
+        }
+
+        .drone-tool-btn:hover {
+            color: var(--drone-color);
+            transform: scale(1.15);
+        }
+
+        .drone-tool-btn.danger:hover {
+            color: #ff0055;
+        }
+
+        .drone-msg-text {
+            word-break: break-word;
+            font-family: 'Share Tech Mono', 'PingFang SC', sans-serif;
+        }
+
+        /* 拖拽尾迹等离子光斑 (Plasma Exhaust Spark) */
+        .drone-plasma-spark {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--drone-color);
+            box-shadow: 0 0 10px var(--drone-color);
+            pointer-events: none;
+            z-index: 8990;
+            animation: spark-fade 0.45s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes spark-fade {
+            0% { opacity: 0.9; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.2) translateY(12px); }
+        }
+
+        /* 360 度战术滚筒翻滚 (Barrel Roll) */
+        .drone-avatar-wrap.is-rolling {
+            animation: barrel-roll 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        }
+
+        @keyframes barrel-roll {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* 互动抖动与升级特效 */
+        .drone-wiggling {
+            animation: drone-wiggle 0.45s ease-in-out !important;
+        }
+
+        .drone-overclocking {
+            animation: drone-overclock 0.65s ease-in-out !important;
+        }
+
+        /* 休眠模式样式 */
+        .cyber-drone-widget.is-sleeping .drone-holo-ring {
+            opacity: 0.15;
+            animation-play-state: paused;
+        }
+
+        .cyber-drone-widget.is-sleeping #drone-pupil-group {
+            opacity: 0;
+        }
+
+        .cyber-drone-widget.is-sleeping .drone-sleep-eye {
+            opacity: 1;
+        }
+
+        .cyber-drone-widget.is-sleeping .drone-core {
+            animation-duration: 6s;
+        }
+
+        .drone-sleep-z {
+            position: absolute;
+            top: 4px;
+            right: 12px;
+            color: var(--drone-color);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.7rem;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cyber-drone-widget.is-sleeping .drone-sleep-z {
+            animation: sleep-z-drift 2.8s infinite;
+        }
+
+        @keyframes sleep-z-drift {
+            0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+            30% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { opacity: 0; transform: translate(12px, -18px) scale(1.2); }
+        }
+
+        @keyframes drone-hover-bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes drone-ring-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes thruster-pulse {
+            0% { transform: scale(0.85); opacity: 0.45; }
+            100% { transform: scale(1.18); opacity: 0.95; }
+        }
+
+        @keyframes beacon-blink {
+            0%, 100% { opacity: 0.25; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes drone-wiggle {
+            0% { transform: rotate(0deg) scale(1); }
+            20% { transform: rotate(-9deg) scale(1.1); }
+            45% { transform: rotate(7deg) scale(1.08); }
+            70% { transform: rotate(-4deg) scale(1.03); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
+        @keyframes drone-overclock {
+            0% { filter: drop-shadow(0 0 4px var(--drone-color)); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 28px var(--drone-color)) brightness(1.7); transform: scale(1.22); }
+            100% { filter: drop-shadow(0 0 4px var(--drone-color)); transform: scale(1); }
+        }
+
+        /* ========================================================
+           方案 4：黑客帝国代码雨与狂暴打字终端 (Matrix Rain & Hacker Typer)
+           ======================================================== */
+        .matrix-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(3, 4, 8, 0.88);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            padding: 16px;
+            animation: overlay-fade-in 0.25s ease-out;
+        }
+
+        .matrix-overlay[hidden] {
+            display: none !important;
+        }
+
+        .matrix-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+            opacity: 0.82;
+            cursor: crosshair;
+        }
+
+        .hacker-terminal {
+            position: relative;
+            z-index: 2;
+            width: min(860px, 94vw);
+            height: min(560px, 82vh);
+            background: rgba(5, 7, 13, 0.95);
+            border: 1px solid var(--neon);
+            border-radius: 6px;
+            box-shadow: 0 0 35px rgba(0, 243, 255, 0.3), inset 0 0 20px rgba(0, 243, 255, 0.06);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            pointer-events: auto;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            background: rgba(0, 243, 255, 0.08);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            user-select: none;
+        }
+
+        .terminal-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .term-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-green { background: #00ff9d; box-shadow: 0 0 6px #00ff9d; }
+        .dot-yellow { background: #ffb800; box-shadow: 0 0 6px #ffb800; }
+        .dot-red { background: #ff0055; box-shadow: 0 0 6px #ff0055; }
+
+        .term-caption {
+            color: #d1e8ff;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .terminal-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .term-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: var(--neon);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.68rem;
+            padding: 3px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .term-btn:hover {
+            border-color: var(--neon);
+            background: var(--neon);
+            color: #000;
+        }
+
+        .term-close {
+            border-color: rgba(255, 0, 85, 0.5);
+            color: #ff3377;
+        }
+
+        .term-close:hover {
+            background: #ff0055;
+            color: #fff;
+            border-color: #ff0055;
+            box-shadow: 0 0 10px #ff0055;
+        }
+
+        .terminal-status-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 6px 14px;
+            background: rgba(0, 0, 0, 0.55);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+            font-size: 0.72rem;
+            font-family: 'Share Tech Mono', monospace;
+            user-select: none;
+        }
+
+        .status-col {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-label {
+            color: #7b889b;
+        }
+
+        .progress-col {
+            flex: 1;
+        }
+
+        .breach-bar-outer {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .breach-bar-inner {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon), #00ff9d);
+            box-shadow: 0 0 8px var(--neon);
+            transition: width 0.12s ease-out;
+        }
+
+        .terminal-body {
+            flex: 1;
+            padding: 14px;
+            overflow-y: auto;
+            font-family: 'Share Tech Mono', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: #a6e3a1;
+            background: radial-gradient(circle at center, rgba(10, 20, 30, 0.3) 0%, rgba(3, 5, 8, 0.95) 100%);
+            scrollbar-width: thin;
+        }
+
+        .terminal-code {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .code-comment { color: #6c7086; }
+        .code-keyword { color: #f38ba8; font-weight: bold; }
+        .code-fn { color: #89b4fa; }
+        .code-num { color: #fab387; }
+        .code-str { color: #a6e3a1; }
+        .code-prompt { color: var(--neon); font-weight: bold; }
+        .term-cursor { color: var(--neon); animation: term-blink 1s step-end infinite; }
+
+        .terminal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 14px;
+            background: rgba(0, 0, 0, 0.6);
+            border-top: 1px solid rgba(0, 243, 255, 0.15);
+            font-size: 0.7rem;
+            font-family: 'Share Tech Mono', monospace;
+            color: #6c7086;
+            user-select: none;
+        }
+
+        .breach-stamp {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(3px);
+            animation: stamp-fade-in 0.2s ease-out;
+        }
+
+        .breach-stamp[hidden] {
+            display: none !important;
+        }
+
+        .stamp-box {
+            border: 3px solid #00ff9d;
+            color: #00ff9d;
+            padding: 24px 38px;
+            text-align: center;
+            font-family: 'Orbitron', monospace;
+            transform: rotate(-3deg);
+            box-shadow: 0 0 40px rgba(0, 255, 157, 0.45), inset 0 0 20px rgba(0, 255, 157, 0.2);
+            background: rgba(3, 15, 8, 0.94);
+            border-radius: 4px;
+            animation: stamp-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .stamp-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px #00ff9d;
+            margin-bottom: 8px;
+        }
+
+        .stamp-sub {
+            font-size: 0.85rem;
+            color: #d1e8ff;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .stamp-tip {
+            font-size: 0.72rem;
+            color: #7b889b;
+        }
+
+        @keyframes overlay-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes stamp-pop {
+            0% { transform: rotate(-10deg) scale(0.6); opacity: 0; }
+            100% { transform: rotate(-3deg) scale(1); opacity: 1; }
+        }
+
+        @keyframes term-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
         /* 尊重「减少动态效果」系统设置 */
         @media (prefers-reduced-motion: reduce) {
 
@@ -1842,7 +2757,7 @@
     <aside class="sidebar" id="sidebar" aria-label="系统状态面板">
         <!-- 版本号定在这里：SECURE_TIME 之上，小改动时只递增最后一位 -->
         <div class="side-panel version-strip">
-            <span class="version-badge">V3.0.2</span>
+            <span class="version-badge">V3.0.3</span>
         </div>
         <div class="side-panel clock-wrap">
             <div class="clock-label"><span class="status-beacon" aria-hidden="true"></span><span>SECURE_TIME</span></div>
@@ -1890,7 +2805,10 @@
         <div class="side-panel fx-panel" id="fx-panel">
             <div class="stat-label">
                 <span>MOUSE_FX</span>
-                <button type="button" class="fx-master-badge" id="fx-master-btn" aria-label="鼠标动效总开关" title="切换鼠标动效总开关">ON</button>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <button type="button" class="sidebar-hack-btn" id="sidebar-hack-btn" aria-label="启动黑客矩阵终端" title="启动代码雨与黑客终端 (快捷键 ~ 或 `)">⚡ HACK</button>
+                    <button type="button" class="fx-master-badge" id="fx-master-btn" aria-label="鼠标动效总开关" title="切换鼠标动效总开关">ON</button>
+                </div>
             </div>
             <div class="fx-grid">
                 <button type="button" class="fx-chip is-active" id="fx-glow-chip" data-fx="glow" aria-pressed="true" title="随动环境漫反射柔光">
@@ -1980,6 +2898,162 @@
 
         <div id="render-area"></div>
     </main>
+
+    <!-- 方案 3：全息战术桌面伴侣浮游机 (Cyber Drone Desktop Companion - A.X.E.L.) -->
+    <div class="cyber-drone-widget" id="cyber-drone-widget" role="region" aria-label="全息无人机桌面伴侣" tabindex="0" title="单击展开指令轮盘 · 连续轻抚摸头 · 按住拖拽移位 · 双击快速投喂">
+        <!-- 外层全息力场光环 -->
+        <div class="drone-holo-ring" id="drone-holo-ring" aria-hidden="true"></div>
+
+        <!-- 专注模式时间 HUD 倒计时 -->
+        <div class="drone-focus-badge" id="drone-focus-badge" role="timer" aria-label="专注守望倒计时" title="点击可暂停或结束专注模式">
+            <span>⏱ FOCUS:</span><span id="focus-time-left">25:00</span>
+        </div>
+
+        <div class="drone-sleep-z" aria-hidden="true">zZ</div>
+
+        <!-- 核心无人机机体 (直接点击机体即可呼出战术选项) -->
+        <div class="drone-core" id="drone-core" role="button" aria-haspopup="true" aria-expanded="false" aria-label="全息机甲伴侣核心">
+            <div class="drone-avatar-wrap" id="drone-avatar-wrap">
+                <svg class="drone-svg" id="drone-svg" viewBox="0 0 100 80" width="80" height="60" aria-hidden="true">
+                    <!-- 推进器等离子尾焰 -->
+                    <ellipse class="drone-glow thruster-l" cx="24" cy="58" rx="7" ry="2.5" />
+                    <ellipse class="drone-glow thruster-r" cx="76" cy="58" rx="7" ry="2.5" />
+                    <!-- 双翼悬浮护翼 -->
+                    <path class="drone-wing" d="M12 42 Q24 28 34 38 L30 48 Q20 48 12 42 Z" />
+                    <path class="drone-wing" d="M88 42 Q76 28 66 38 L70 48 Q80 48 88 42 Z" />
+                    <!-- 机身核心战术装甲 -->
+                    <polygon class="drone-hull" points="30,32 70,32 78,48 68,60 32,60 22,48" />
+                    <line class="drone-panel-line" x1="36" y1="36" x2="64" y2="36" />
+                    <!-- 天线雷达与微光信标 -->
+                    <line class="drone-antenna" x1="50" y1="32" x2="50" y2="18" />
+                    <circle class="drone-beacon" cx="50" cy="16" r="2.5" />
+                    <!-- 核心光学眼环 -->
+                    <circle class="drone-eye-outer" cx="50" cy="46" r="10" />
+                    <!-- 光学瞳孔 (跟随鼠标平滑注视) -->
+                    <g id="drone-pupil-group">
+                        <circle class="drone-eye-iris" cx="50" cy="46" r="5" />
+                        <circle class="drone-eye-glint" cx="48" cy="44" r="1.5" />
+                    </g>
+                    <!-- 休眠闭眼线条 -->
+                    <path class="drone-sleep-eye" id="drone-sleep-eye" d="M43 47 Q50 52 57 47" />
+                    <!-- 开心笑眼线条 (摸摸头触发) -->
+                    <path class="drone-happy-eye" id="drone-happy-eye" d="M43 47 Q50 41 57 47" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- 激光连接辐射线 SVG -->
+        <svg class="drone-spokes-svg" id="drone-spokes-svg" viewBox="0 0 180 180" aria-hidden="true">
+            <line class="drone-spoke-line" x1="90" y1="90" x2="90" y2="24" />
+            <line class="drone-spoke-line" x1="90" y1="90" x2="147" y2="57" />
+            <line class="drone-spoke-line" x1="90" y1="90" x2="147" y2="123" />
+            <line class="drone-spoke-line" x1="90" y1="90" x2="90" y2="156" />
+            <line class="drone-spoke-line" x1="90" y1="90" x2="33" y2="123" />
+            <line class="drone-spoke-line" x1="90" y1="90" x2="33" y2="57" />
+        </svg>
+
+        <!-- 即时战术 HUD 悬浮指示标签 -->
+        <div class="drone-hud-tag" id="drone-hud-tag" aria-hidden="true">[ TACTICAL_COMMAND ]</div>
+
+        <!-- 全息对话气泡 -->
+        <div class="drone-bubble" id="drone-bubble" aria-live="polite">
+            <div class="drone-bubble-header">
+                <span>// A.X.E.L. COMPANION</span>
+                <div class="drone-header-tools">
+                    <button type="button" class="drone-tool-btn" id="drone-reset-btn" title="归位至屏幕右下角" aria-label="归位至右下角">⌖</button>
+                    <button type="button" class="drone-tool-btn" id="drone-sound-btn" title="切换伴侣音效" aria-label="切换伴侣音效">🔊</button>
+                    <button type="button" class="drone-tool-btn danger" id="drone-bubble-close" title="关闭对话" aria-label="关闭对话气泡">✕</button>
+                </div>
+            </div>
+            <div class="drone-msg-text" id="drone-msg">NEURAL_LINK: 稳定。摸鱼雷达警戒中...</div>
+        </div>
+
+        <!-- 战术环形轮盘菜单 (6 个正交战术矢量节点) -->
+        <div class="drone-ring-menu" id="drone-ring-menu" aria-hidden="true">
+            <!-- 1. 终端黑客代码雨 -->
+            <button type="button" class="drone-ring-btn" id="drone-action-hack" data-tag="⚡ HACK_TERMINAL" title="启动矩阵黑客终端与代码雨" aria-label="启动矩阵黑客终端">
+                <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+            </button>
+            <!-- 2. 25分钟专注守望伴侣 -->
+            <button type="button" class="drone-ring-btn" id="drone-action-focus" data-tag="⏱ FOCUS_SENTRY" title="开启 25 分钟番茄专注守望模式" aria-label="开启专注守望模式">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"></circle><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="13" x2="15" y2="15"></line><line x1="10" y1="3" x2="14" y2="3"></line></svg>
+            </button>
+            <!-- 3. 摸鱼雷达与今日运势 -->
+            <button type="button" class="drone-ring-btn" id="drone-action-radar" data-tag="🎲 RADAR_SCAN" title="全域摸鱼雷达扫描与今日赛博运势" aria-label="摸鱼雷达与今日运势测算">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 12 L18 8"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+            <!-- 4. 充能投喂与超频升级 -->
+            <button type="button" class="drone-ring-btn" id="drone-action-feed" data-tag="🔋 DATA_FEED" title="投喂数据碎片充能升级" aria-label="投喂数据碎片充能升级">
+                <svg viewBox="0 0 24 24"><rect x="3" y="6" width="16" height="12" rx="2"></rect><line x1="21" y1="10" x2="21" y2="14"></line><line x1="7" y1="12" x2="13" y2="12"></line><line x1="10" y1="9" x2="10" y2="15"></line></svg>
+            </button>
+            <!-- 5. 光学纳米涂装切换 -->
+            <button type="button" class="drone-ring-btn" id="drone-action-coat" data-tag="🎨 NANO_COAT" title="切换光学纳米涂装" aria-label="切换光学纳米涂装">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 3 A9 9 0 0 1 21 12 L12 12 Z" fill="currentColor"></path></svg>
+            </button>
+            <!-- 6. 低功耗休眠与唤醒 -->
+            <button type="button" class="drone-ring-btn" id="drone-action-sleep" data-tag="💤 LOW_POWER" title="待机休眠/警戒唤醒" aria-label="待机休眠/警戒唤醒">
+                <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 方案 4：黑客帝国代码雨与狂暴打字终端彩蛋 (Matrix Rain & Hacker Typer) -->
+    <div class="matrix-overlay" id="matrix-overlay" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="赛博黑客终端与代码雨">
+        <canvas class="matrix-canvas" id="matrix-canvas"></canvas>
+        <div class="hacker-terminal" id="hacker-terminal">
+            <div class="terminal-header">
+                <div class="terminal-title">
+                    <span class="term-dot dot-green"></span>
+                    <span class="term-dot dot-yellow"></span>
+                    <span class="term-dot dot-red"></span>
+                    <span class="term-caption">TERMINAL // CYBER_BREACH_V3.0.3 // root@deck:~#</span>
+                </div>
+                <div class="terminal-controls">
+                    <button type="button" class="term-btn" id="term-mute-btn" title="切换按键音效">🔊 SOUND ON</button>
+                    <button type="button" class="term-btn term-close" id="term-close-btn" title="退出终端 (Esc)">✕ EXIT [ESC]</button>
+                </div>
+            </div>
+            <div class="terminal-status-bar">
+                <div class="status-col">
+                    <span class="status-label">TARGET:</span>
+                    <span class="status-val text-neon">NEURAL_NET_GATEWAY.0x80</span>
+                </div>
+                <div class="status-col">
+                    <span class="status-label">BREACH:</span>
+                    <span class="status-val" id="breach-pct" style="color: #00ff9d; font-weight: bold;">0%</span>
+                </div>
+                <div class="status-col progress-col">
+                    <div class="breach-bar-outer">
+                        <div class="breach-bar-inner" id="breach-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="terminal-body" id="term-body">
+                <pre class="terminal-code" id="term-code"><span class="code-comment">/*
+ * ========================================================
+ * CYBER-DECK HACKER TERMINAL (狂暴黑客打字模式)
+ * 随意敲击键盘任意键，体验好莱坞级黑客破壁代码极速喷涌！
+ * 移动鼠标可划开背景代码雨波纹；按 Esc 随时退出。
+ * ========================================================
+ */</span>
+
+<span class="code-prompt">root@cyberdeck:~#</span> <span class="code-active-line" id="term-active-line"></span><span class="term-cursor" aria-hidden="true">█</span></pre>
+            </div>
+            <div class="terminal-footer">
+                <span class="tip-text">⌨ 敲击任意键喷涌代码 | 晃动鼠标扰动雨幕 | Esc 退出</span>
+                <button type="button" class="term-btn" id="term-reset-btn" title="清空终端重置进度">RESET</button>
+            </div>
+        </div>
+
+        <!-- 破壁成功巨幅印章 -->
+        <div class="breach-stamp" id="breach-stamp" hidden>
+            <div class="stamp-box">
+                <div class="stamp-title">ACCESS GRANTED</div>
+                <div class="stamp-sub">SYSTEM BREACH SUCCESSFUL // 核心协议已攻破</div>
+                <div class="stamp-tip">[ 敲击任意键继续渗透 / 按 ESC 退出 ]</div>
+            </div>
+        </div>
+    </div>
 
     <noscript>
         <div
@@ -2100,7 +3174,43 @@
             hudMouseBolt: byId('hud-mouse-bolt'),
             hudMouseVal: byId('hud-mouse-val'),
             memoIn: byId('memo-in'),
-            memoList: byId('memo-list')
+            memoList: byId('memo-list'),
+            droneWidget: byId('cyber-drone-widget'),
+            droneHoloRing: byId('drone-holo-ring'),
+            droneFocusBadge: byId('drone-focus-badge'),
+            droneCore: byId('drone-core'),
+            droneAvatarWrap: byId('drone-avatar-wrap'),
+            droneSvg: byId('drone-svg'),
+            dronePupil: byId('drone-pupil-group'),
+            droneSleepEye: byId('drone-sleep-eye'),
+            droneHappyEye: byId('drone-happy-eye'),
+            droneSpokesSvg: byId('drone-spokes-svg'),
+            droneHudTag: byId('drone-hud-tag'),
+            droneBubble: byId('drone-bubble'),
+            droneResetBtn: byId('drone-reset-btn'),
+            droneSoundBtn: byId('drone-sound-btn'),
+            droneBubbleClose: byId('drone-bubble-close'),
+            droneMsg: byId('drone-msg'),
+            droneRingMenu: byId('drone-ring-menu'),
+            droneActionHack: byId('drone-action-hack'),
+            droneActionFocus: byId('drone-action-focus'),
+            droneActionRadar: byId('drone-action-radar'),
+            droneActionFeed: byId('drone-action-feed'),
+            droneActionCoat: byId('drone-action-coat'),
+            droneActionSleep: byId('drone-action-sleep'),
+            sidebarHackBtn: byId('sidebar-hack-btn'),
+            matrixOverlay: byId('matrix-overlay'),
+            matrixCanvas: byId('matrix-canvas'),
+            hackerTerminal: byId('hacker-terminal'),
+            termMuteBtn: byId('term-mute-btn'),
+            termCloseBtn: byId('term-close-btn'),
+            termResetBtn: byId('term-reset-btn'),
+            breachPct: byId('breach-pct'),
+            breachBar: byId('breach-bar'),
+            termBody: byId('term-body'),
+            termCode: byId('term-code'),
+            termActiveLine: byId('term-active-line'),
+            breachStamp: byId('breach-stamp')
         };
 
         // --- 工具函数 ---
@@ -3588,6 +4698,15 @@
             function submitSearch() {
                 const q = input.value.trim();
                 if (!q) { input.focus(); return; }
+                const lower = q.toLowerCase();
+                if (lower === 'hack' || lower === 'matrix') {
+                    input.value = '';
+                    closeHistory();
+                    if (typeof window.__openHackerMatrix === 'function') {
+                        window.__openHackerMatrix();
+                        return;
+                    }
+                }
                 closeHistory();
                 recordSearch(q);
                 doEngineSearch(q);
@@ -4019,6 +5138,1099 @@
             }, { passive: true });
         }
 
+        // ========================================================
+        // 方案 3：全息战术桌面伴侣浮游机 (Cyber Drone Desktop Companion - A.X.E.L.)
+        // ========================================================
+        function setupDroneCompanion() {
+            if (!els.droneWidget || !els.droneCore || !els.dronePupil || !els.droneMsg) return;
+
+            const DRONE_QUOTES = [
+                "NEURAL_LINK: 稳定。摸鱼雷达全域警戒中...",
+                "检测到当前摸鱼指数：94.2%，建议假装敲两下键盘！",
+                "别戳啦，义体外壳超载发热中！⚡",
+                "已为您拦截来自赛博空间的 404 条虚假催办通知。",
+                "警告：检测到碳基生物长时间凝视屏幕，记得眨眼与喝水！",
+                "正在尝试渗透荒坂内网... 权限不足，已为您回滚掩护连接。",
+                "点击机身展开战术轮盘，可随时开启 25 分钟专注、测算运势或切换涂装！",
+                "嘀嘀！机体动力核心正常，等离子喷口工况稳定。",
+                "今天也是赛博空间里努力冲浪、永不宕机的一天！",
+                "扫描中... 发现目标：一位思路清晰的数字漫游者。",
+                "夜之城没有活着的传奇，但这里有活着的摸鱼专家。",
+                "量子纠缠信标校准完毕，正在向您投射今日幸运电磁波。",
+                "CPU 负载平稳，主机精神带宽尚有 80% 空余，摸鱼正当时。",
+                "光学传感器已锁定您的光标～ 走到哪我都在看着你呢！",
+                "不要温和地走进那个良夜，除非那里有暖气和千兆光纤。",
+                "正在将主人本周的开心片段加密备份至本地闪存...",
+                "前方侦测到待办事项来袭，请求立即展开拖延力场防护罩！",
+                "即使是仿生人，也会在空闲时梦见电子羊和带薪年假。",
+                "叮！收到一条强加密通讯：今天你也是最棒的代码骇客！",
+                "按键盘 ` 键或轮盘 ⚡ 可以即刻召唤黑客矩阵代码雨终端！",
+                "用光标在我身上来回轻轻抚摸，会触发舒适摸头杀彩蛋哦～ (˶ᵔ ᵕ ᵔ˶)"
+            ];
+
+            const COATS = [
+                { color: '#00f3ff', glow: 'rgba(0, 243, 255, 0.45)', name: '霓虹青' },
+                { color: '#00ff9d', glow: 'rgba(0, 255, 157, 0.45)', name: '矩阵绿' },
+                { color: '#ffb800', glow: 'rgba(255, 184, 0, 0.45)', name: '熔岩橙' },
+                { color: '#bc13fe', glow: 'rgba(188, 19, 254, 0.45)', name: '洋紫晶' },
+                { color: '#ffd700', glow: 'rgba(255, 215, 0, 0.55)', name: '黄金圣甲' }
+            ];
+
+            const RADAR_FORTUNES = [
+                { y: '提交免测代码, 喝冰美式, 准点打卡下班', n: '周五线上热更新, 帮同事排查祖传Bug', fish: '98.5%' },
+                { y: '开启战术专注模式, 整理整洁收藏夹', n: '手抖执行 rm -rf, 在大群发错表情包', fish: '94.2%' },
+                { y: '投喂机甲伴侣, 切换高阶黄金涂装', n: '长时间低头颈椎僵硬, 忘喝温水', fish: '91.8%' },
+                { y: '键盘狂暴输入打字雨, 触发黑客彩蛋', n: '盲目相信单测通过, 临时修改配置', fish: '96.0%' },
+                { y: '深呼吸伸展筋骨, 保持机能高能状态', n: '被产品临时拉会, 参与虚无争论', fish: '99.1%' }
+            ];
+
+            const STATE_KEY = 'v14-drone-state';
+            const POS_KEY = 'v14-drone-pos';
+            const SOUND_KEY = 'v14-drone-sound';
+
+            const savedState = LS.get(STATE_KEY, null);
+            const state = (savedState && typeof savedState === 'object') ? savedState : { level: 1, coatIdx: 0, feeds: 0, sleeping: false };
+            if (typeof state.level !== 'number' || state.level < 1) state.level = 1;
+            if (typeof state.coatIdx !== 'number') state.coatIdx = 0;
+            if (typeof state.feeds !== 'number') state.feeds = 0;
+            if (typeof state.sleeping !== 'boolean') state.sleeping = false;
+
+            let soundEnabled = LS.get(SOUND_KEY, true);
+
+            // --- 高保真 Web Audio 纯数字合成器 (R2-D2 / BB-8 风格科幻和弦) ---
+            let audioCtx = null;
+            function playDroneSound(type) {
+                if (!soundEnabled) return;
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    if (type === 'poke') {
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(880, now);
+                        osc.frequency.exponentialRampToValueAtTime(1320, now + 0.08);
+                        gain.gain.setValueAtTime(0.045, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                        osc.start(now);
+                        osc.stop(now + 0.08);
+                    } else if (type === 'pet') {
+                        // 舒适摸头杀双频和弦
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(520, now);
+                        osc.frequency.linearRampToValueAtTime(780, now + 0.08);
+                        osc.frequency.linearRampToValueAtTime(650, now + 0.16);
+                        gain.gain.setValueAtTime(0.04, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                        osc.start(now);
+                        osc.stop(now + 0.22);
+                    } else if (type === 'feed') {
+                        // 4 阶向上琶音
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(523, now);
+                        osc.frequency.setValueAtTime(659, now + 0.06);
+                        osc.frequency.setValueAtTime(784, now + 0.12);
+                        osc.frequency.setValueAtTime(1046, now + 0.18);
+                        gain.gain.setValueAtTime(0.05, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                        osc.start(now);
+                        osc.stop(now + 0.3);
+                    } else if (type === 'open') {
+                        // 轮盘展开高科技轻啸
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(320, now);
+                        osc.frequency.exponentialRampToValueAtTime(1180, now + 0.14);
+                        gain.gain.setValueAtTime(0.035, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                        osc.start(now);
+                        osc.stop(now + 0.15);
+                    } else if (type === 'radar') {
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(440, now);
+                        osc.frequency.exponentialRampToValueAtTime(1760, now + 0.18);
+                        gain.gain.setValueAtTime(0.035, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                        osc.start(now);
+                        osc.stop(now + 0.2);
+                    } else if (type === 'focus') {
+                        // 专注模式启动战术准备音
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(330, now);
+                        osc.frequency.exponentialRampToValueAtTime(660, now + 0.1);
+                        osc.frequency.exponentialRampToValueAtTime(880, now + 0.25);
+                        gain.gain.setValueAtTime(0.05, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+                        osc.start(now);
+                        osc.stop(now + 0.32);
+                    } else if (type === 'victory') {
+                        // 专注完成胜利号角
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(523, now);
+                        osc.frequency.setValueAtTime(659, now + 0.08);
+                        osc.frequency.setValueAtTime(784, now + 0.16);
+                        osc.frequency.setValueAtTime(1046, now + 0.24);
+                        gain.gain.setValueAtTime(0.06, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                        osc.start(now);
+                        osc.stop(now + 0.45);
+                    } else if (type === 'sleep') {
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(620, now);
+                        osc.frequency.exponentialRampToValueAtTime(220, now + 0.22);
+                        gain.gain.setValueAtTime(0.04, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+                        osc.start(now);
+                        osc.stop(now + 0.24);
+                    } else if (type === 'wake') {
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(260, now);
+                        osc.frequency.exponentialRampToValueAtTime(1040, now + 0.18);
+                        gain.gain.setValueAtTime(0.045, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                        osc.start(now);
+                        osc.stop(now + 0.22);
+                    }
+                } catch (err) {}
+            }
+
+            function saveState() {
+                LS.set(STATE_KEY, state);
+            }
+
+            function applyCoat(idx) {
+                const coat = COATS[idx % COATS.length];
+                document.documentElement.style.setProperty('--drone-color', coat.color);
+                document.documentElement.style.setProperty('--drone-color-glow', coat.glow);
+            }
+
+            function updateUI() {
+                applyCoat(state.coatIdx);
+                if (state.sleeping) {
+                    els.droneWidget.classList.add('is-sleeping');
+                } else {
+                    els.droneWidget.classList.remove('is-sleeping');
+                }
+                if (els.droneSoundBtn) {
+                    els.droneSoundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+                    els.droneSoundBtn.title = soundEnabled ? '点击静音伴侣音效' : '点击开启伴侣音效';
+                }
+            }
+
+            updateUI();
+
+            if (els.droneSoundBtn) {
+                els.droneSoundBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    soundEnabled = !soundEnabled;
+                    LS.set(SOUND_KEY, soundEnabled);
+                    updateUI();
+                    if (soundEnabled) playDroneSound('poke');
+                });
+            }
+
+            // --- 对话气泡与打字机动效 ---
+            let bubbleHideTimer = null;
+            let typeTimer = null;
+
+            function checkBubbleFlip() {
+                if (!els.droneWidget || !els.droneBubble) return;
+                const rect = els.droneWidget.getBoundingClientRect();
+                if (rect.top < 170) {
+                    els.droneWidget.classList.add('flip-down');
+                } else {
+                    els.droneWidget.classList.remove('flip-down');
+                }
+            }
+
+            function showBubble(text, autoHideMs = 4500) {
+                if (!els.droneBubble || !els.droneMsg) return;
+                checkBubbleFlip();
+                clearTimeout(bubbleHideTimer);
+                clearInterval(typeTimer);
+
+                els.droneMsg.textContent = '';
+                els.droneBubble.classList.add('is-visible');
+
+                let i = 0;
+                typeTimer = setInterval(() => {
+                    if (i < text.length) {
+                        els.droneMsg.textContent += text.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(typeTimer);
+                    }
+                }, 20);
+
+                if (autoHideMs > 0) {
+                    bubbleHideTimer = setTimeout(() => {
+                        hideBubble();
+                    }, autoHideMs);
+                }
+            }
+
+            function hideBubble() {
+                if (els.droneBubble) {
+                    els.droneBubble.classList.remove('is-visible');
+                }
+                clearInterval(typeTimer);
+            }
+
+            if (els.droneBubbleClose) {
+                els.droneBubbleClose.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    hideBubble();
+                });
+            }
+
+            // --- 拖拽物理系统 + 等离子尾迹粒子 ---
+            const widget = els.droneWidget;
+            const savedPos = LS.get(POS_KEY, null);
+
+            function clampPosition(x, y) {
+                const pad = 12;
+                const maxW = Math.max(200, window.innerWidth);
+                const maxH = Math.max(200, window.innerHeight);
+                const w = widget.offsetWidth || 86;
+                const h = widget.offsetHeight || 86;
+                const minX = pad;
+                const maxX = maxW - w - pad;
+                const minY = pad;
+                const maxY = maxH - h - pad;
+                return {
+                    x: Math.max(minX, Math.min(maxX, x)),
+                    y: Math.max(minY, Math.min(maxY, y))
+                };
+            }
+
+            function setWidgetPos(x, y, animate = false) {
+                const clamped = clampPosition(x, y);
+                if (animate) {
+                    widget.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+                } else {
+                    widget.style.transition = 'none';
+                }
+                widget.style.left = `${clamped.x}px`;
+                widget.style.top = `${clamped.y}px`;
+                widget.style.right = 'auto';
+                widget.style.bottom = 'auto';
+                checkBubbleFlip();
+                return clamped;
+            }
+
+            if (savedPos && typeof savedPos.x === 'number' && typeof savedPos.y === 'number') {
+                setWidgetPos(savedPos.x, savedPos.y, false);
+            }
+
+            window.addEventListener('resize', () => {
+                const rect = widget.getBoundingClientRect();
+                const clamped = setWidgetPos(rect.left, rect.top, true);
+                LS.set(POS_KEY, clamped);
+            }, { passive: true });
+
+            function createPlasmaSpark(x, y) {
+                if (document.hidden) return;
+                const spark = document.createElement('div');
+                spark.className = 'drone-plasma-spark';
+                spark.style.left = (x + (Math.random() * 12 - 6)) + 'px';
+                spark.style.top = (y + (Math.random() * 6 - 3)) + 'px';
+                document.body.appendChild(spark);
+                setTimeout(() => {
+                    spark.remove();
+                }, 450);
+            }
+
+            let isPointerDown = false;
+            let isDragging = false;
+            let startPointerX = 0;
+            let startPointerY = 0;
+            let initialWidgetX = 0;
+            let initialWidgetY = 0;
+            let lastMoveX = 0;
+            let lastMoveY = 0;
+            let lastTime = 0;
+            let velX = 0;
+            let velY = 0;
+            let lastSparkTime = 0;
+
+            widget.addEventListener('pointerdown', (e) => {
+                if (e.target.closest('#drone-bubble') || e.target.closest('.drone-ring-btn') || e.target.closest('#drone-focus-badge')) {
+                    return;
+                }
+                isPointerDown = true;
+                isDragging = false;
+                startPointerX = e.clientX;
+                startPointerY = e.clientY;
+                const rect = widget.getBoundingClientRect();
+                initialWidgetX = rect.left;
+                initialWidgetY = rect.top;
+                lastMoveX = e.clientX;
+                lastMoveY = e.clientY;
+                lastTime = performance.now();
+                velX = 0;
+                velY = 0;
+                try {
+                    widget.setPointerCapture(e.pointerId);
+                } catch (err) {}
+            });
+
+            widget.addEventListener('pointermove', (e) => {
+                if (!isPointerDown) return;
+                const dx = e.clientX - startPointerX;
+                const dy = e.clientY - startPointerY;
+                const dist = Math.hypot(dx, dy);
+
+                if (!isDragging && dist >= 6) {
+                    isDragging = true;
+                    widget.classList.add('is-dragging');
+                    closeRingMenu();
+                }
+
+                if (isDragging) {
+                    const now = performance.now();
+                    const dt = Math.max(1, now - lastTime);
+                    velX = (e.clientX - lastMoveX) / dt;
+                    velY = (e.clientY - lastMoveY) / dt;
+                    lastMoveX = e.clientX;
+                    lastMoveY = e.clientY;
+                    lastTime = now;
+
+                    const curX = initialWidgetX + dx;
+                    const curY = initialWidgetY + dy;
+                    setWidgetPos(curX, curY, false);
+
+                    // 拖动时产生等离子推进火花尾迹
+                    if (now - lastSparkTime > 45) {
+                        lastSparkTime = now;
+                        createPlasmaSpark(curX + 24, curY + 68);
+                        createPlasmaSpark(curX + 62, curY + 68);
+                    }
+                }
+            });
+
+            function onPointerRelease(e) {
+                if (!isPointerDown) return;
+                isPointerDown = false;
+                try {
+                    widget.releasePointerCapture(e.pointerId);
+                } catch (err) {}
+
+                if (isDragging) {
+                    isDragging = false;
+                    widget.classList.remove('is-dragging');
+                    const rect = widget.getBoundingClientRect();
+                    // 速度阻尼惯性滑行 (Inertia Glide)
+                    const glideX = rect.left + Math.max(-140, Math.min(140, velX * 130));
+                    const glideY = rect.top + Math.max(-140, Math.min(140, velY * 130));
+                    const finalPos = setWidgetPos(glideX, glideY, true);
+                    LS.set(POS_KEY, finalPos);
+
+                    // 高速甩动触发空翻滚筒彩蛋 (Barrel Roll)
+                    if (Math.hypot(velX, velY) > 1.2) {
+                        triggerBarrelRoll();
+                    }
+                }
+            }
+
+            widget.addEventListener('pointerup', onPointerRelease);
+            widget.addEventListener('pointercancel', onPointerRelease);
+
+            function triggerBarrelRoll() {
+                if (!els.droneAvatarWrap) return;
+                els.droneAvatarWrap.classList.remove('is-rolling');
+                void els.droneAvatarWrap.offsetWidth;
+                els.droneAvatarWrap.classList.add('is-rolling');
+                playDroneSound('open');
+                setTimeout(() => {
+                    if (els.droneAvatarWrap) els.droneAvatarWrap.classList.remove('is-rolling');
+                }, 580);
+            }
+
+            // --- 互动特色 1：摸摸头舒适抚摸 (Petting Detection) ---
+            let petStrokes = 0;
+            let lastPetDir = 0;
+            let lastPetX = 0;
+            let petTimer = null;
+
+            els.droneCore.addEventListener('pointermove', (e) => {
+                if (isDragging || state.sleeping) return;
+                const dx = e.clientX - lastPetX;
+                if (Math.abs(dx) > 10) {
+                    const dir = dx > 0 ? 1 : -1;
+                    if (lastPetDir !== 0 && dir !== lastPetDir) {
+                        petStrokes++;
+                        if (petStrokes >= 3) {
+                            petStrokes = 0;
+                            triggerHappyPet();
+                        }
+                    }
+                    lastPetDir = dir;
+                    lastPetX = e.clientX;
+                    clearTimeout(petTimer);
+                    petTimer = setTimeout(() => {
+                        petStrokes = 0;
+                        lastPetDir = 0;
+                    }, 800);
+                }
+            });
+
+            function triggerHappyPet() {
+                playDroneSound('pet');
+                els.droneCore.classList.add('is-happy');
+                showBubble('(˶ᵔ ᵕ ᵔ˶) 呼噜噜... 摸摸真舒服！静电能量已被核心吸收～', 4200);
+                setTimeout(() => {
+                    els.droneCore.classList.remove('is-happy');
+                }, 2200);
+            }
+
+            // --- 互动特色 2：自然眨眼与光学瞳孔平滑跟随 ---
+            let isMoving = false;
+            let idleTimer = null;
+
+            function onGlobalPointerMove(e) {
+                if (document.hidden || state.sleeping || isDragging) return;
+                if (!isMoving) {
+                    isMoving = true;
+                    requestAnimationFrame(() => {
+                        isMoving = false;
+                        if (!els.dronePupil || state.sleeping || els.droneCore.classList.contains('is-happy')) return;
+                        const rect = els.dronePupil.getBoundingClientRect();
+                        if (rect.width === 0 || rect.height === 0) return;
+                        const cx = rect.left + rect.width / 2;
+                        const cy = rect.top + rect.height / 2;
+                        const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
+                        const dist = Math.min(3.6, Math.hypot(e.clientX - cx, e.clientY - cy) / 45);
+                        const dx = Math.cos(angle) * dist;
+                        const dy = Math.sin(angle) * dist;
+                        els.dronePupil.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`;
+                    });
+                }
+                clearTimeout(idleTimer);
+                idleTimer = setTimeout(() => {
+                    if (els.dronePupil && !state.sleeping) els.dronePupil.style.transform = 'translate(0px, 0px)';
+                }, 2500);
+            }
+
+            window.addEventListener('pointermove', onGlobalPointerMove, { passive: true });
+
+            // 随机自然眨眼 (Natural Random Blinking)
+            function scheduleBlink() {
+                const delay = 3500 + Math.random() * 4500;
+                setTimeout(() => {
+                    if (!document.hidden && !state.sleeping && els.droneCore) {
+                        els.droneCore.classList.add('is-blinking');
+                        setTimeout(() => {
+                            if (els.droneCore) els.droneCore.classList.remove('is-blinking');
+                        }, 180);
+                    }
+                    scheduleBlink();
+                }, delay);
+            }
+            scheduleBlink();
+
+            // --- 互动特色 3：戳一戳吐槽播报 ---
+            let lastQuoteIdx = -1;
+
+            function playPoke() {
+                if (state.sleeping) {
+                    toggleSleep(false);
+                    return;
+                }
+                playDroneSound('poke');
+                const avatar = els.droneAvatarWrap;
+                if (avatar) {
+                    avatar.classList.remove('drone-wiggling');
+                    void avatar.offsetWidth;
+                    avatar.classList.add('drone-wiggling');
+                }
+                let nextIdx;
+                do {
+                    nextIdx = Math.floor(Math.random() * DRONE_QUOTES.length);
+                } while (nextIdx === lastQuoteIdx && DRONE_QUOTES.length > 1);
+                lastQuoteIdx = nextIdx;
+                showBubble(DRONE_QUOTES[nextIdx]);
+            }
+
+            // --- 互动特色 4：双击/指令投喂充能超频进化 ---
+            function playFeed() {
+                if (state.sleeping) {
+                    toggleSleep(false);
+                }
+                state.feeds++;
+                if (state.feeds % 2 === 0 && state.level < 5) {
+                    state.level++;
+                }
+                state.coatIdx = (state.coatIdx + 1) % COATS.length;
+                saveState();
+                updateUI();
+                playDroneSound('feed');
+
+                const avatar = els.droneAvatarWrap;
+                if (avatar) {
+                    avatar.classList.remove('drone-overclocking');
+                    void avatar.offsetWidth;
+                    avatar.classList.add('drone-overclocking');
+                }
+                const coatName = COATS[state.coatIdx % COATS.length].name;
+                const maxText = state.level >= 5 ? '【已达 MAX 满阶·解锁黄金圣甲】' : `机能等级: LV.${state.level}`;
+                showBubble(`[DATA FEED] 投喂成功！光学涂装:【${coatName}】，${maxText}`, 5200);
+            }
+
+            // --- 互动特色 5：25 分钟赛博番茄专注守望模式 (Focus Mode) ---
+            let focusTimer = null;
+            let focusRemaining = 25 * 60;
+
+            function formatTime(sec) {
+                const m = Math.floor(sec / 60).toString().padStart(2, '0');
+                const s = (sec % 60).toString().padStart(2, '0');
+                return `${m}:${s}`;
+            }
+
+            function updateFocusDisplay() {
+                const el = byId('focus-time-left');
+                if (el) el.textContent = formatTime(focusRemaining);
+            }
+
+            function startFocusMode() {
+                closeRingMenu();
+                if (focusTimer) {
+                    // 已在专注中，点击提示
+                    showBubble(`专注模式进行中，剩余 ${formatTime(focusRemaining)}。点击顶部倒计时可结束。`, 3500);
+                    return;
+                }
+                focusRemaining = 25 * 60;
+                updateFocusDisplay();
+                widget.classList.add('is-focusing');
+                playDroneSound('focus');
+                showBubble('⏱【25分钟专注模式已启动】我将为您警戒干扰，全力冲锋！', 4500);
+
+                focusTimer = setInterval(() => {
+                    focusRemaining--;
+                    updateFocusDisplay();
+                    if (focusRemaining <= 0) {
+                        endFocusMode(true);
+                    }
+                }, 1000);
+            }
+
+            function endFocusMode(completed = false) {
+                clearInterval(focusTimer);
+                focusTimer = null;
+                widget.classList.remove('is-focusing');
+                if (completed) {
+                    playDroneSound('victory');
+                    triggerBarrelRoll();
+                    state.feeds += 2;
+                    if (state.level < 5) state.level++;
+                    saveState();
+                    updateUI();
+                    showBubble('🎉【专注 25 分钟达成！】太棒了，奖励双倍数据碎片，机能跃升！', 6000);
+                } else {
+                    showBubble('专注模式已暂停，随时准备再次出发。', 3000);
+                }
+            }
+
+            if (els.droneFocusBadge) {
+                els.droneFocusBadge.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm('是否提前结束本次 25 分钟专注模式？')) {
+                        endFocusMode(false);
+                    }
+                });
+            }
+
+            // --- 战术轮盘菜单与 HUD 悬浮指示 ---
+            let isRingOpen = false;
+
+            function openRingMenu() {
+                if (!els.droneRingMenu || !els.droneCore) return;
+                isRingOpen = true;
+                els.droneRingMenu.classList.add('is-open');
+                els.droneRingMenu.setAttribute('aria-hidden', 'false');
+                els.droneCore.setAttribute('aria-expanded', 'true');
+                widget.classList.add('is-menu-open');
+                playDroneSound('open');
+                checkBubbleFlip();
+            }
+
+            function closeRingMenu() {
+                if (!els.droneRingMenu || !els.droneCore) return;
+                isRingOpen = false;
+                els.droneRingMenu.classList.remove('is-open');
+                els.droneRingMenu.setAttribute('aria-hidden', 'true');
+                els.droneCore.setAttribute('aria-expanded', 'false');
+                widget.classList.remove('is-menu-open');
+                if (els.droneHudTag) els.droneHudTag.classList.remove('is-active');
+                checkBubbleFlip();
+            }
+
+            function toggleRingMenu() {
+                if (isRingOpen) closeRingMenu();
+                else openRingMenu();
+            }
+
+            // 悬停选项按钮时即时显示科幻战术 HUD 标签
+            const ringButtons = widget.querySelectorAll('.drone-ring-btn');
+            ringButtons.forEach(btn => {
+                btn.addEventListener('pointerenter', () => {
+                    if (!isRingOpen || !els.droneHudTag) return;
+                    const tag = btn.getAttribute('data-tag') || btn.getAttribute('title') || '';
+                    els.droneHudTag.textContent = tag;
+                    els.droneHudTag.classList.add('is-active');
+                });
+                btn.addEventListener('pointerleave', () => {
+                    if (els.droneHudTag) els.droneHudTag.classList.remove('is-active');
+                });
+            });
+
+            // 点击宠物本身：直接切换展开/关闭战术选项
+            els.droneCore.addEventListener('click', (e) => {
+                if (isDragging) return;
+                e.preventDefault();
+                e.stopPropagation();
+                if (state.sleeping) {
+                    toggleSleep(false);
+                    return;
+                }
+                if (isRingOpen) {
+                    closeRingMenu();
+                } else {
+                    openRingMenu();
+                    playPoke();
+                }
+            });
+
+            // 双击宠物快速投喂
+            els.droneCore.addEventListener('dblclick', (e) => {
+                if (isDragging) return;
+                e.preventDefault();
+                e.stopPropagation();
+                playFeed();
+            });
+
+            // 右键机体快捷呼出轮盘
+            widget.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                toggleRingMenu();
+            });
+
+            // 点击外部空白区域自动收起轮盘
+            document.addEventListener('pointerdown', (e) => {
+                if (isRingOpen && !widget.contains(e.target)) {
+                    closeRingMenu();
+                }
+            }, { passive: true });
+
+            // 轮盘指令 1: ⚡ 矩阵黑客终端
+            function launchMatrixTerminal() {
+                closeRingMenu();
+                if (typeof window.__openHackerMatrix === 'function') {
+                    window.__openHackerMatrix();
+                }
+            }
+
+            if (els.droneActionHack) {
+                els.droneActionHack.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    launchMatrixTerminal();
+                });
+            }
+
+            if (els.sidebarHackBtn) {
+                els.sidebarHackBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    launchMatrixTerminal();
+                });
+            }
+
+            // 轮盘指令 2: ⏱ 25分钟番茄专注守望模式
+            if (els.droneActionFocus) {
+                els.droneActionFocus.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    startFocusMode();
+                });
+            }
+
+            // 轮盘指令 3: 🎲 摸鱼雷达与今日运势测算
+            if (els.droneActionRadar) {
+                els.droneActionRadar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeRingMenu();
+                    playDroneSound('radar');
+                    const rand = RADAR_FORTUNES[Math.floor(Math.random() * RADAR_FORTUNES.length)];
+                    showBubble(`[摸鱼雷达扫描] 指数: ${rand.fish}\n宜: ${rand.y}\n忌: ${rand.n}`, 6000);
+                });
+            }
+
+            // 轮盘指令 4: 🔋 投喂充能与升级
+            if (els.droneActionFeed) {
+                els.droneActionFeed.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    playFeed();
+                });
+            }
+
+            // 轮盘指令 5: 🎨 切换光学涂装
+            if (els.droneActionCoat) {
+                els.droneActionCoat.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    state.coatIdx = (state.coatIdx + 1) % COATS.length;
+                    saveState();
+                    updateUI();
+                    playDroneSound('poke');
+                    const coat = COATS[state.coatIdx];
+                    showBubble(`[COAT] 已应用纳米涂装【${coat.name}】`, 3000);
+                });
+            }
+
+            // 轮盘指令 6: 💤 待机休眠 / 警戒唤醒
+            function toggleSleep(force) {
+                state.sleeping = typeof force === 'boolean' ? force : !state.sleeping;
+                saveState();
+                updateUI();
+                closeRingMenu();
+                if (state.sleeping) {
+                    playDroneSound('sleep');
+                    if (els.dronePupil) els.dronePupil.style.transform = 'translate(0px, 0px)';
+                    showBubble('Zzz... 动力核心低功耗待机中。点击机体即可随时唤醒。', 3500);
+                } else {
+                    playDroneSound('wake');
+                    showBubble('SYSTEM_READY! 动力核心再启动，精神饱满！', 3500);
+                }
+            }
+
+            if (els.droneActionSleep) {
+                els.droneActionSleep.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleSleep();
+                });
+            }
+
+            // 归位至右下角战备驻点
+            function resetPosition() {
+                closeRingMenu();
+                LS.remove(POS_KEY);
+                widget.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), left 0.4s, top 0.4s';
+                widget.style.left = 'auto';
+                widget.style.top = 'auto';
+                widget.style.right = '28px';
+                widget.style.bottom = '28px';
+                playDroneSound('wake');
+                showBubble('[POS_RESET] 航标校准，已返回右下角战备驻点。', 3000);
+                setTimeout(() => {
+                    checkBubbleFlip();
+                }, 420);
+            }
+
+            if (els.droneResetBtn) {
+                els.droneResetBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    resetPosition();
+                });
+            }
+        }
+
+        // ========================================================
+        // 方案 4：黑客帝国代码雨与狂暴打字终端彩蛋 (Matrix Rain & Hacker Typer)
+        // ========================================================
+        function setupHackerMatrix() {
+            const overlay = els.matrixOverlay;
+            const canvas = els.matrixCanvas;
+            if (!overlay || !canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const termCode = els.termCode;
+            const breachPct = els.breachPct;
+            const breachBar = els.breachBar;
+            const termBody = els.termBody;
+            const termMuteBtn = els.termMuteBtn;
+            const termCloseBtn = els.termCloseBtn;
+            const termResetBtn = els.termResetBtn;
+            const breachStamp = els.breachStamp;
+
+            let isSoundMuted = false;
+            let audioCtx = null;
+
+            function initAudio() {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) audioCtx = new AudioContextClass();
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume().catch(() => {});
+                }
+            }
+
+            function playChirp(freq = 880, dur = 0.035) {
+                if (isSoundMuted) return;
+                try {
+                    initAudio();
+                    if (!audioCtx) return;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + dur);
+                } catch (err) {}
+            }
+
+            function playFanfare() {
+                if (isSoundMuted) return;
+                try {
+                    initAudio();
+                    if (!audioCtx) return;
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        setTimeout(() => playChirp(freq, 0.15), idx * 80);
+                    });
+                } catch (err) {}
+            }
+
+            if (termMuteBtn) {
+                termMuteBtn.addEventListener('click', () => {
+                    isSoundMuted = !isSoundMuted;
+                    termMuteBtn.textContent = isSoundMuted ? '🔇 MUTED' : '🔊 SOUND ON';
+                    termMuteBtn.style.color = isSoundMuted ? '#ff0055' : 'var(--neon)';
+                });
+            }
+
+            // --- 代码雨 Canvas 系统 ---
+            let animId = null;
+            let width = 0;
+            let height = 0;
+            let columns = 0;
+            let drops = [];
+            const fontSize = 16;
+            const CHARS = '0123456789ABCDEFﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ<>/{}=+*#~';
+
+            const mouse = { x: -999, y: -999, active: false };
+
+            function resizeCanvas() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                columns = Math.max(10, Math.floor(width / fontSize));
+                drops = new Array(columns).fill(0).map(() => Math.floor(Math.random() * -50));
+            }
+
+            window.addEventListener('resize', () => {
+                if (!overlay.hidden) resizeCanvas();
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+                mouse.active = true;
+            });
+            canvas.addEventListener('mouseleave', () => {
+                mouse.active = false;
+            });
+
+            function drawMatrix() {
+                ctx.fillStyle = 'rgba(3, 5, 10, 0.14)';
+                ctx.fillRect(0, 0, width, height);
+
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const char = CHARS[Math.floor(Math.random() * CHARS.length)];
+                    const x = i * fontSize;
+                    const y = drops[i] * fontSize;
+
+                    // 鼠标交互激光波纹：如果光标在附近，改变颜色并激荡排斥
+                    let dist = 999;
+                    if (mouse.active) {
+                        dist = Math.hypot(x - mouse.x, y - mouse.y);
+                    }
+
+                    if (dist < 90) {
+                        ctx.fillStyle = '#00f3ff';
+                        ctx.shadowColor = '#00f3ff';
+                        ctx.shadowBlur = 10;
+                    } else if (Math.random() > 0.96) {
+                        ctx.fillStyle = '#ffffff';
+                        ctx.shadowColor = '#ffffff';
+                        ctx.shadowBlur = 8;
+                    } else {
+                        ctx.fillStyle = '#00ff9d';
+                        ctx.shadowColor = 'transparent';
+                        ctx.shadowBlur = 0;
+                    }
+
+                    ctx.fillText(char, x, y);
+
+                    if (y > height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+
+                animId = requestAnimationFrame(drawMatrix);
+            }
+
+            function startMatrix() {
+                if (animId) return;
+                resizeCanvas();
+                animId = requestAnimationFrame(drawMatrix);
+            }
+
+            function stopMatrix() {
+                if (animId) {
+                    cancelAnimationFrame(animId);
+                    animId = null;
+                }
+                if (ctx) ctx.clearRect(0, 0, width, height);
+            }
+
+            // --- 狂暴黑客打字机系统 ---
+            const HACKER_CHUNKS = [
+                '#include <cyber/netlink.h>\n#include <crypto/quantum_aes.h>\n\n',
+                'static int __init breach_core_init(void) {\n    struct neural_socket *sock = allocate_socket(AF_CYBER, SOCK_RAW, IPPROTO_RAW);\n',
+                '    if (!sock) return -ENOMEM;\n    sock->target_addr = 0x7FFF0000;\n    sock->flags |= (CYBER_FLAG_STEALTH | CYBER_FLAG_FORCE);\n',
+                '    return bypass_firewall_matrix(sock, 0x55AA);\n}\n\n',
+                'void inject_payload(uint8_t *buffer, size_t len) {\n    asm volatile(\n        "xor %%rax, %%rax\\n\\t"\n        "mov $0x20, %%al\\n\\t"\n',
+                '        "syscall\\n\\t"\n        : : "r"(buffer) : "rax", "memory"\n    );\n',
+                '    decrypt_memory_pages(0x00400000, 0x0040FFFF);\n}\n\n',
+                '/* BYPASS LEVEL 2: INITIATING QUANTUM PROTOCOL */\nint status = neural_link_sync(&ctx, SYNC_HIGH_FREQ);\nwhile (status != BREACH_OK) {\n',
+                '    quantum_entropy_cycle(&ctx);\n    status = verify_checksum(0xFF60, 0xFFA1);\n}\n\n',
+                '// EXPLOIT PAYLOAD LOADED: ACCESSING ROOT DAEMON\nsystem_override_privilege(ROOT_UID, DAEMON_OVERCLOCK);\nsend_packet(PORT_SECURE_GATE, PAYLOAD_DECRYPTED);\n\n',
+                'if (firewall_ack == 0x00) {\n    log_telemetry("[SUCCESS] FIREWALL_COLLAPSED // KEY_GRANTED");\n    trigger_access_granted();\n}\n\n'
+            ];
+
+            let chunkIdx = 0;
+            let charIdx = 0;
+            let breachProgress = 0;
+            let isAccessGranted = false;
+
+            function appendHackerCode() {
+                const chunk = HACKER_CHUNKS[chunkIdx % HACKER_CHUNKS.length];
+                const sliceLen = Math.floor(Math.random() * 4) + 4; // 每次输出 4~7 个字符
+                const slice = chunk.substring(charIdx, charIdx + sliceLen);
+                charIdx += sliceLen;
+
+                if (charIdx >= chunk.length) {
+                    charIdx = 0;
+                    chunkIdx++;
+                }
+
+                if (termCode) {
+                    termCode.appendChild(document.createTextNode(slice));
+                    if (termBody) termBody.scrollTop = termBody.scrollHeight;
+                }
+
+                playChirp(800 + Math.random() * 600, 0.03);
+
+                if (!isAccessGranted) {
+                    breachProgress = Math.min(100, breachProgress + 2);
+                    if (breachPct) breachPct.textContent = breachProgress + '%';
+                    if (breachBar) breachBar.style.width = breachProgress + '%';
+
+                    if (breachProgress >= 100) {
+                        isAccessGranted = true;
+                        if (breachStamp) breachStamp.hidden = false;
+                        playFanfare();
+                    }
+                }
+            }
+
+            function resetTerminal() {
+                if (termCode) {
+                    termCode.innerHTML = `<span class="code-comment">/* \n * ========================================================\n * CYBER-DECK HACKER TERMINAL (狂暴黑客打字模式)\n * 随意敲击键盘任意键，体验好莱坞级黑客破壁代码极速喷涌！\n * 移动鼠标可划开背景代码雨波纹；按 Esc 随时退出。\n * ========================================================\n */</span>\n\n<span class="code-prompt">root@cyberdeck:~#</span> <span class="code-active-line" id="term-active-line"></span><span class="term-cursor" aria-hidden="true">█</span>`;
+                }
+                breachProgress = 0;
+                chunkIdx = 0;
+                charIdx = 0;
+                isAccessGranted = false;
+                if (breachPct) breachPct.textContent = '0%';
+                if (breachBar) breachBar.style.width = '0%';
+                if (breachStamp) breachStamp.hidden = true;
+            }
+
+            if (termResetBtn) {
+                termResetBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    resetTerminal();
+                });
+            }
+
+            // 浮层打开与关闭生命周期
+            function openOverlay() {
+                overlay.hidden = false;
+                overlay.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+                startMatrix();
+                initAudio();
+                playChirp(1200, 0.08);
+            }
+
+            function closeOverlay() {
+                overlay.hidden = true;
+                overlay.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                stopMatrix();
+            }
+
+            window.__openHackerMatrix = openOverlay;
+            window.__closeHackerMatrix = closeOverlay;
+
+            if (termCloseBtn) {
+                termCloseBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeOverlay();
+                });
+            }
+
+            // 键盘全局打字监听与唤醒
+            window.addEventListener('keydown', (e) => {
+                // 1. 如果浮层处于展开状态：
+                if (!overlay.hidden) {
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        closeOverlay();
+                        return;
+                    }
+                    if (e.key === '`' || e.key === '~') {
+                        e.preventDefault();
+                        closeOverlay();
+                        return;
+                    }
+                    // 忽略功能键，其它任意键均作为打字输入
+                    if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
+                    e.preventDefault();
+                    appendHackerCode();
+                    return;
+                }
+
+                // 2. 如果浮层未展开：检查反引号快捷键唤醒
+                if (e.key === '`' || e.key === '~') {
+                    const active = document.activeElement;
+                    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+                        return;
+                    }
+                    e.preventDefault();
+                    openOverlay();
+                }
+            });
+
+            // 页面可见性管理：后台时完全冻结 Matrix Canvas 渲染循环
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopMatrix();
+                } else if (!overlay.hidden) {
+                    startMatrix();
+                }
+            });
+        }
+
         // --- 初始化 ---
         function init() {
             migrateLegacyStorage();
@@ -4030,6 +6242,8 @@
             setupWeatherInteractive();
             setupCardScale();
             setupMouseEffects();
+            setupDroneCompanion();
+            setupHackerMatrix();
             setupMemo();
             setupSearch();
             setupSidebar();
